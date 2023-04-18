@@ -1,0 +1,91 @@
+{% extends 'base.html' %}
+{% load static%}
+
+
+
+{%  block header %}
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link type="text/css" href="{% static 'css/run/styles.css' %}" rel="stylesheet" />
+{% endblock %}
+
+{% block content %}
+    <form class="container" action="{% url 'add_well' %}" method="post">
+        {% for f in context.form %}
+        <div class="container__item">
+            <label class="container__label" for="{{f.id_for_label}}">
+                {{f.label}}:
+            </label>
+            {{f}}
+        </div>
+        {% endfor %}
+
+<!--      {{context.form.as_p}}-->
+      <button type="submit">Добавить</button>
+    </form>
+    <script src="{% static 'js/run/script.js' %}"></script>
+{% endblock %}
+
+
+
+<!-- <div class="container__item">-->
+<!--        <label class="container__label" for="field">Месторождение</label>-->
+<!--        <select class="container__selector selector" name="field" id="field">-->
+<!--          <option value="">Выберите месторождение</option>-->
+<!--          <option value="Самотлорское">Самотлорское</option>-->
+<!--          <option value="Гун-Еганское">Гун-Еганское</option>-->
+<!--        </select>-->
+<!--      </div>-->
+<!--      <div class="container__item">-->
+<!--        <label class="container__label" for="rig">Куст</label>-->
+<!--        <select-->
+<!--          class="container__selector selector"-->
+<!--          name="rig"-->
+<!--          id="rig"-->
+<!--          disabled-->
+<!--        >-->
+<!--          <option value="">Выберите Куст</option>-->
+<!--          <option value="1">1</option>-->
+<!--          <option value="2">2</option>-->
+<!--        </select>-->
+<!--      </div>-->
+<!--      <div class="container__item">-->
+<!--        <label class="container__label" for="well">Скважина</label>-->
+<!--        <select-->
+<!--          class="container__selector selector"-->
+<!--          name="well"-->
+<!--          id="well"-->
+<!--          disabled-->
+<!--        >-->
+<!--          <option value="">Выберите скважину</option>-->
+<!--          <option value="11111">11111</option>-->
+<!--          <option value="22222">22222</option>-->
+<!--        </select>-->
+<!--      </div>-->
+<!--      <div class="container__item">-->
+<!--        <label class="container__label" for="bore">Ствол</label>-->
+<!--        <select-->
+<!--          class="container__selector selector"-->
+<!--          name="bore"-->
+<!--          id="bore"-->
+<!--          disabled-->
+<!--        >-->
+<!--          <option value="">Выберите ствол</option>-->
+<!--          <option value="1 ствол">1 ствол</option>-->
+<!--          <option value="2 ствол">2 ствол</option>-->
+<!--        </select>-->
+<!--      </div>-->
+<!--      <div class="container__item">-->
+<!--        <label class="container__label" for="section">Рейс</label>-->
+<!--        <select-->
+<!--          class="container__selector selector"-->
+<!--          name="section"-->
+<!--          id="section"-->
+<!--          disabled-->
+<!--        >-->
+<!--          <option value="">Выберите рейс</option>-->
+<!--          <option value="1 рейс">1 рейс</option>-->
+<!--          <option value="2 рейс">2 рейс</option>-->
+<!--        </select>-->
+<!--      </div>-->
+<!--      <button type="submit" class="container__button">Готово</button>-->

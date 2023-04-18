@@ -1,0 +1,78 @@
+{% extends 'base.html' %}
+
+
+
+{% block content %}
+<center>
+<div style="max-width:5000px">
+
+        <form action="" method="post" enctype="multipart/form-data" style="margin-top:1%" name="axe_form" onsubmit="return validForm()">
+            {% csrf_token %}
+
+            <div style="max-width:500px; margin-top:1%">
+                <div style="max-width:500px">
+                        <a>Выберите рейс</a>
+                    <p></p>
+                    <div class="input-group mb-3">
+                        <select type="text" name="run" class="form-select" id="run">
+                            <option value="Выберите рейс">Выберите рейс</option>
+                             {% for r in context.run %}
+                            <option value="{{r.id}}">{{r}}</option>
+                             {% endfor %}
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <picture>
+                <img src="" class="img-fluid img-thumbnail" alt="Выберите рейс" id="axes_graph" hidden>
+            </picture>
+        </form>
+</center>
+
+<script>
+    document.getElementsByName("run")[0].addEventListener("change",function(e){
+        console.log("Selected" + e.target.value);
+        var params = new FormData();
+        params.set('run_title', e.target.value);
+        img_graph = document.getElementById('axes_graph');
+        if (e.target.value=='Выберите рейс'){
+            img_graph.setAttribute("src", "");
+            img_graph.hidden = true;
+            } else {
+            img_graph.setAttribute("src", "http://10.23.125.230:9613/axes/api/graph/"+e.target.value);
+            img_graph.hidden = false;
+            }
+
+<!--        fetch('http://10.23.125.230:9613/axes/run_index', {-->
+<!--        method: 'POST',-->
+<!--        body: params }).then(response=>response.json())-->
+<!--        .then(data=>{console.log(data);-->
+<!--                    document.getElementById("inputGroupSelect01").value=data.device;-->
+<!--                    document.getElementById("inp_depth").value = data.depth;-->
+<!--                    document.getElementById("inp_gx").value = data.GX;-->
+<!--                    document.getElementById("inp_gy").value = data.GY;-->
+<!--                    document.getElementById("inp_gz").value = data.GZ;-->
+<!--                    document.getElementById("inp_bx").value = data.BX;-->
+<!--                    document.getElementById("inp_by").value = data.BY;-->
+<!--                    document.getElementById("inp_bz").value = data.BZ;-->
+<!--                    document.getElementById("inp_unit").value = data.unit;-->
+<!--                    document.getElementById("inp_string").value = data.string;-->
+<!--                    })-->
+    });
+
+    $('#sortTable3').DataTable();
+
+
+
+    <!-- Отслеживаем чтобы пользователь ввел данные -->
+    function validForm(){
+    var f = document.forms['axe_form']['run'].value;
+
+    if (f=='Выберите рейс'){
+        alert("Необходимо выбрать рейс");
+        return false;
+        }
+    }
+</script>
+
+{% endblock %}

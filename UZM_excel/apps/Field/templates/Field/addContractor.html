@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+{% load static%}
+
+
+{%  block header %}
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link type="text/css" href="{% static 'css/run/styles.css' %}" rel="stylesheet" />
+{% endblock %}
+
+{% block content %}
+
+<!--      {{context.form.as_p}}-->
+
+
+<form class="container" action="{% url 'add_well' %}" method="post">
+    {% for f in context.form %}
+        <div class="container__item">
+            <label class="container__label" for="{{f.id_for_label}}">
+                {{f.label}}:
+            </label>
+            {{f}}
+        </div>
+    {% endfor %}
+    <button type="submit">Добавить</button>
+</form>
+
+{% endblock %}

@@ -1,0 +1,57 @@
+{% extends 'base.html' %}
+{% load static%}
+
+
+
+{%  block header %}
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link type="text/css" href="{% static 'css/run/styles.css' %}" rel="stylesheet" />
+{% endblock %}
+
+{% block content %}
+    <form class="container" action="{% url context.method %}" method="post">
+        {% for f in context.form %}
+        <div class="container__item">
+            <label class="container__label" for="{{f.id_for_label}}">
+                {{f.label}}:
+            </label>
+            {{f}}
+        </div>
+        {% endfor %}
+
+<!--      {{context.form.as_p}}-->
+      <button type="submit">Добавить</button>
+    </form>
+
+    <script src="{% static 'js/run/script.js' %}"></script>
+    {% if context.data is not None %}
+    <hr style="color:#FFC501;margin-top:1%;border-width: 3px">
+    <div class="container__item">
+        <div class="mx-auto">
+            <table  class="table table-light  table-bordered table-hover" name="table_calculation" style="margin-top:2%">
+                <thead class="thead-dark">
+
+                <tr clas="table-warning">
+                    {% for key in context.data.0.keys %}
+                    <th scope="col">{{key}}</th>
+                    {% endfor %}
+                </tr>
+
+                </thead>
+
+                <tbody>
+                    {% for dict in context.data %}
+                    <tr>
+                        {% for value in dict.values %}
+                            <td scope="col"> {{value}} </td>
+                        {% endfor %}
+                    </tr>
+                    {% endfor %}
+                 </tbody>
+            </table>
+        </div>
+    </div>
+    {% endif %}
+<br>
+{% endblock %}

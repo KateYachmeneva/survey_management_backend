@@ -1,0 +1,206 @@
+{% extends 'base.html' %}
+
+
+
+{% block content %}
+<center>
+<div style="max-width:5000px">
+
+        <form action="" method="post" enctype="multipart/form-data" style="margin-top:1%" name="axe_form" onsubmit="return validForm()">
+            {% csrf_token %}
+
+            <div style="max-width:500px; margin-top:1%">
+                <div style="max-width:500px">
+                        <a>Выберите рейс</a>
+                    <p></p>
+                    <div class="input-group mb-3">
+                        <select type="text" name="run" class="form-select" id="run">
+                            <option value="Выберите рейс">Выберите рейс</option>
+                             {% for r in context.run %}
+                            <option value="{{r.id}}">{{r}}</option>
+                             {% endfor %}
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div style="max-width:500px">
+                <a>Выберите телесистему</a>
+                <p></p>
+                <div class="input-group mb-3">
+                  <select type="text" name="device" class="form-select" id="inputGroupSelect01">
+                    {% for element in context.telesystem %}
+                    <option>{{element}}</option>
+                      {% endfor %}
+                  </select>
+                </div>
+            </div>
+
+
+            <hr style="color:#FFC501;margin-top:1%;border-width: 3px">
+
+            <div class="container">
+                  <div class="row">
+                    <div class="col-sm">
+                      <h4 style="margin-top:3%">Загрузите файл с осями</h4>
+                            {% csrf_token %}
+                        <input  type="file" name="file" style="margin-top:1%">
+                    </div>
+                    <div class="col-sm">
+                        <h5 style="margin-top:2%">Имя(буква) столбца</h5>
+                        <div class="input-group mb-3">
+                              <span class="input-group-text">Глубина</span>
+                          <input type="text" class="form-control" name="manually_depth" id="inp_depth"  >
+                          <span class="input-group-text">Gx</span>
+                          <input type="text" class="form-control" name="manually_gx" id="inp_gx">
+                                      <span class="input-group-text">Gy</span>
+                          <input type="text" class="form-control" name="manually_gy" id="inp_gy">
+                                      <span class="input-group-text">Gz</span>
+                          <input type="text" class="form-control" name="manually_gz" id="inp_gz">
+                                      <span class="input-group-text">Bx</span>
+                          <input type="text" class="form-control" name="manually_bx" id="inp_bx">
+                                      <span class="input-group-text">By</span>
+                          <input type="text" class="form-control" name="manually_by" id="inp_by">
+                                      <span class="input-group-text">Bz</span>
+                          <input type="text" class="form-control" name="manually_bz" id="inp_bz">
+                        </div>
+                        <div class="input-group mb-3">
+                          <span class="input-group-text">Строка единиц измерений</span>
+                            <input type="text" class="form-control"  name="manually_measurement" id="inp_unit">
+                          <span class="input-group-text" >Импорт со строки</span>
+                            <input type="text" class="form-control" name="manually_import" id="inp_string">
+                        </div>
+                    </div>
+                  </div>
+            </div>
+
+            <hr style="color:#FFC501;margin-top:1%;border-width: 3px">
+
+            <button type="submit" style="border:1">Загрузить данные</button>
+        </form>
+    <hr style="color:#FFC501;margin-top:1%;border-width: 3px">
+    <div class="container" style="max-width:5000px">
+          <div class="row">
+            <div class="col-sm">
+              <h3 style="margin-top:1%">Распаршенные данные</h3>
+                <table  class="table table-light  table-bordered ">
+                    <thead class="thead-dark">
+                        <tr clas="table-warning">
+                            <th scope="col">Глубина</th>
+                            <th scope="col">GX</th>
+                            <th scope="col">GY</th>
+                            <th scope="col">GZ</th>
+                            <th scope="col">BX</th>
+                            <th scope="col">BY</th>
+                            <th scope="col">BZ</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+
+                    {% for row in context.result %}
+                        <tr>
+                        {% for element in row  %}
+                            {% if element1  == "None" %}
+                            <td style="background-color:red">{{element}}</td>
+                            {% elif element1 == "Коротий замер" %}
+                            <td style="background-color:red">{{element}}</td>
+                            {% elif element1 == "Влияние ОК." %}
+                            <td style="background-color:red">{{element}}</td>
+                            {% else%}
+                            <td>{{ element }}</td>
+                            {% endif%}
+                        {% endfor %}
+                        </tr>
+                 {% endfor %}
+                    </tbody>
+                </table>
+
+            </div>
+              <div class="col-sm">
+                <h3 style="margin-top:1%">Приведенные данные</h3>
+                <table  class="table table-light  table-bordered ">
+                    <thead class="thead-dark">
+                        <tr clas="table-warning">
+                            <th scope="col">Глубина</th>
+                            <th scope="col">GX</th>
+                            <th scope="col">GY</th>
+                            <th scope="col">GZ</th>
+                            <th scope="col">BX</th>
+                            <th scope="col">BY</th>
+                            <th scope="col">BZ</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for row in context.result2 %}
+                        <tr>
+                            {% for element in row  %}
+                            {% if element  == "None" %}
+                            <td style="background-color:red">{{element}}</td>
+                            {% elif element == "Коротий замер" %}
+                            <td style="background-color:red">{{element}}</td>
+                            {% elif element == "Влияние ОК." %}
+                            <td style="background-color:red">{{element}}</td>
+                            {% else %}
+                            <td>{{ element }}</td>
+                            {% endif %}
+                            {% endfor %}
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+              </div>
+          </div>
+
+    </div>
+</div>
+</center>
+
+<script>
+    document.getElementsByName("run")[0].addEventListener("change",function(e){
+        console.log("Selected" + e.target.value);
+         document.getElementById("inp_depth").value = "";
+         document.getElementById("inp_gx").value = "";
+         document.getElementById("inp_gy").value = "";
+         document.getElementById("inp_gz").value = "";
+         document.getElementById("inp_bx").value = "";
+         document.getElementById("inp_by").value = "";
+         document.getElementById("inp_bz").value = "";
+         document.getElementById("inp_unit").value = "";
+         document.getElementById("inp_string").value = "";
+        var params = new FormData();
+        params.set('run_title', e.target.value);
+
+        fetch('http://10.23.125.230:9613/axes/run_index', {
+        method: 'POST',
+        body: params }).then(response=>response.json())
+        .then(data=>{console.log(data);
+                    document.getElementById("inputGroupSelect01").value=data.device;
+                    document.getElementById("inp_depth").value = data.depth;
+                    document.getElementById("inp_gx").value = data.GX;
+                    document.getElementById("inp_gy").value = data.GY;
+                    document.getElementById("inp_gz").value = data.GZ;
+                    document.getElementById("inp_bx").value = data.BX;
+                    document.getElementById("inp_by").value = data.BY;
+                    document.getElementById("inp_bz").value = data.BZ;
+                    document.getElementById("inp_unit").value = data.unit;
+                    document.getElementById("inp_string").value = data.string;
+                    })
+    });
+
+    $('#sortTable3').DataTable();
+
+
+
+    <!-- Отслеживаем чтобы пользователь ввел данные -->
+    function validForm(){
+    var f = document.forms['axe_form']['run'].value;
+
+    if (f=='Выберите рейс'){
+        alert("Необходимо выбрать рейс");
+        return false;
+        }
+    }
+</script>
+
+{% endblock %}
