@@ -2,6 +2,7 @@ from openpyxl import Workbook
 
 
 def excel_with_axes():
+    """Не используем (можно удалить)"""
     wb = Workbook()
     sheet2 = wb.create_sheet("Данные", 0)
     sheet2.cell(row=1, column=1).value = "Глубина";

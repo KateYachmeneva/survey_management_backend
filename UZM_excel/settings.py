@@ -1,10 +1,9 @@
+import os
+import sys
 from pathlib import Path
-import sys, os
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
-import django
 # import structlog
-from corsheaders.defaults import default_headers
-from django.utils import timezone
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent

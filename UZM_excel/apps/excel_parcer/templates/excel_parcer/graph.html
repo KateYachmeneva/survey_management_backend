@@ -1,6 +1,9 @@
 {% extends 'base.html' %}
+{% load static %}
 
-
+{% block head %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@latest/dist/Chart.min.js"></script>
+{% endblock %}
 
 {% block content %}
 <center>
@@ -23,56 +26,167 @@
                     </div>
                 </div>
             </div>
-            <picture>
-                <img src="" class="img-fluid img-thumbnail" alt="Выберите рейс" id="axes_graph" hidden>
-            </picture>
+
+<!--            <picture>-->
+<!--                <img src="" class="img-fluid img-thumbnail" alt="Выберите рейс" id="axes_graph" hidden>-->
+<!--            </picture>-->
         </form>
+    <div class="container" style="height: 20px;">
+        <canvas id="grafica1" width="10" height="1"></canvas>
+
+        <canvas id="grafica2" width="10" height="1"></canvas>
+
+        <canvas id="grafica3" width="10" height="1"></canvas>
+
+        <canvas id="grafica4" width="10" height="1"></canvas>
+
+        <canvas id="grafica5" width="10" height="1"></canvas>
+
+        <canvas id="grafica6" width="10" height="1"></canvas>
+    </div>
 </center>
 
-<script>
-    document.getElementsByName("run")[0].addEventListener("change",function(e){
-        console.log("Selected" + e.target.value);
-        var params = new FormData();
-        params.set('run_title', e.target.value);
-        img_graph = document.getElementById('axes_graph');
-        if (e.target.value=='Выберите рейс'){
-            img_graph.setAttribute("src", "");
-            img_graph.hidden = true;
-            } else {
-            img_graph.setAttribute("src", "http://10.23.125.230:9613/axes/api/graph/"+e.target.value);
-            img_graph.hidden = false;
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.bundle.min.js"></script>
+    <script>
+        // Получение ссылки на элемент canvas в DOM
+        const grafica1 = document.querySelector("#grafica1");
+        const grafica2 = document.querySelector("#grafica2");
+        const grafica3 = document.querySelector("#grafica3");
+        const grafica4 = document.querySelector("#grafica4");
+        const grafica5 = document.querySelector("#grafica5");
+        const grafica6 = document.querySelector("#grafica6");
+
+        // Tags - это метки, которые идут по оси X.
+        const tags = ["Январь", "Февраль", "Март", "Апрель"]
+        // У нас может быть несколько наборов данных. Давайте начнем с одного
+        const dataSales2020 = {
+            label: "Продажи за месяц",
+            data: [5000, 1500, 8000, 5102], // Данные представляют собой массив, который должен иметь такое же количество значений, как и количество тегов.
+            backgroundColor: 'rgba(54, 162, 235, 0.2)', // Цвет фона
+            borderColor: 'rgba(54, 162, 235, 1)', // Цвет границ
+            borderWidth: 1,// Толщина границ
+        };
+        new Chart(grafica1, {
+            type: 'line',// Тип графики
+            data: {
+                labels: tags,
+                datasets: [
+                    dataSales2020,
+                    // Больше данных здесь....
+                ]
+            },
+            options: {
+                scales:{
+                  yAxes: [{
+                    scaleLabel: {
+                      display: true,
+                      labelString: 'Goxy, G'
+                    }
+                  }],
+                  xAxes: [{
+                    scaleLabel: {
+                      display: true,
+                      labelString: 'Измеренная глубина, м'
+                    }
+                  }],
+                },
             }
-
-<!--        fetch('http://10.23.125.230:9613/axes/run_index', {-->
-<!--        method: 'POST',-->
-<!--        body: params }).then(response=>response.json())-->
-<!--        .then(data=>{console.log(data);-->
-<!--                    document.getElementById("inputGroupSelect01").value=data.device;-->
-<!--                    document.getElementById("inp_depth").value = data.depth;-->
-<!--                    document.getElementById("inp_gx").value = data.GX;-->
-<!--                    document.getElementById("inp_gy").value = data.GY;-->
-<!--                    document.getElementById("inp_gz").value = data.GZ;-->
-<!--                    document.getElementById("inp_bx").value = data.BX;-->
-<!--                    document.getElementById("inp_by").value = data.BY;-->
-<!--                    document.getElementById("inp_bz").value = data.BZ;-->
-<!--                    document.getElementById("inp_unit").value = data.unit;-->
-<!--                    document.getElementById("inp_string").value = data.string;-->
-<!--                    })-->
-    });
-
-    $('#sortTable3').DataTable();
-
-
-
-    <!-- Отслеживаем чтобы пользователь ввел данные -->
-    function validForm(){
-    var f = document.forms['axe_form']['run'].value;
-
-    if (f=='Выберите рейс'){
-        alert("Необходимо выбрать рейс");
-        return false;
-        }
-    }
-</script>
-
+        });
+        new Chart(grafica2, {
+            type: 'line',// Тип графики
+            data: {
+                labels: tags,
+                datasets: [
+                    dataSales2020,
+                    // Больше данных здесь....
+                ]
+            },
+            options: {
+                scales: {
+                    yAxes: [{
+                        ticks: {
+                            beginAtZero: true
+                        }
+                    }],
+                },
+            }
+        });
+        new Chart(grafica3, {
+            type: 'line',// Тип графики
+            data: {
+                labels: tags,
+                datasets: [
+                    dataSales2020,
+                    // Больше данных здесь....
+                ]
+            },
+            options: {
+                scales: {
+                    yAxes: [{
+                        ticks: {
+                            beginAtZero: true
+                        }
+                    }],
+                },
+            }
+        });
+        new Chart(grafica4, {
+            type: 'line',// Тип графики
+            data: {
+                labels: tags,
+                datasets: [
+                    dataSales2020,
+                    // Больше данных здесь....
+                ]
+            },
+            options: {
+                scales: {
+                    yAxes: [{
+                        ticks: {
+                            beginAtZero: true
+                        }
+                    }],
+                },
+            }
+        });
+        new Chart(grafica5, {
+            type: 'line',// Тип графики
+            data: {
+                labels: tags,
+                datasets: [
+                    dataSales2020,
+                    // Больше данных здесь....
+                ]
+            },
+            options: {
+                scales: {
+                    yAxes: [{
+                        ticks: {
+                            beginAtZero: true
+                        }
+                    }],
+                },
+            }
+        });
+        new Chart(grafica6, {
+            type: 'line',// Тип графики
+            data: {
+                labels: tags,
+                datasets: [
+                    dataSales2020,
+                    // Больше данных здесь....
+                ]
+            },
+            options: {
+                scales: {
+                    yAxes: [{
+                        ticks: {
+                            beginAtZero: true
+                        }
+                    }],
+                },
+            }
+        });
+    </script>
 {% endblock %}

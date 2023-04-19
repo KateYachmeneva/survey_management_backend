@@ -10,7 +10,7 @@ from django.http import FileResponse, HttpResponse, JsonResponse
 
 from .work_with_Excel import excel_open, write_data_in_Excel
 from ..models import ReportIndex, DynamicNNBData, Raw, IgirgiStatic, StaticNNBData, Plan, get_run_by_id, IgirgiDynamic
-
+from .data_bd import get_data
 from Field.models import Run
 import lasio
 
@@ -162,7 +162,6 @@ def processing_data(start_data: dict, run_id: int, index_id: int) -> FileRespons
         all_data['Статические замеры ИГИРГИ']['Азимут'] = [0, *all_data['Статические замеры ИГИРГИ']['Азимут']]
 
     if all_data['Статические замеры ННБ']['Глубина'][-1] not in all_data['Статические замеры ИГИРГИ']['Глубина']:
-        # print("удалили последний замер")
         all_data['Статические замеры ННБ']['Глубина'].pop(-1)
         all_data['Статические замеры ННБ']['Угол'].pop(-1)
         all_data['Статические замеры ННБ']['Азимут'].pop(-1)
@@ -172,13 +171,15 @@ def processing_data(start_data: dict, run_id: int, index_id: int) -> FileRespons
 
     Run = get_run_by_id(run_id)
 
+    # перезапись данных (расширение подаваемых значений, данными БД)
+    # FIXME - протестировать
+    # all_data = get_data(Run)
     # выдача файлов на скачивание
     file_type = 0 if start_data["response_type"] == "cut_version" else 1
     file_name = write_data_in_Excel(all_data, f'Единая_форма_отчета{file_type}.xlsx', file_type, Run)
     return FileResponse(open(file_dir + "\\Report_out\\" + file_name, 'rb'))
 
 
-# @new_thread
 def reader(key: str, value: str, run_index_id: int) -> dict:
     """Общая цель: подбор параметров под чтение файлов из ReportIndex,
        чтение и возврат словаря.

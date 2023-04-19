@@ -368,7 +368,7 @@
          params.set('run_id', e.target.value);
 
 
-         fetch('http://10.23.125.230:9613/report/api/run_index',
+         fetch('http://{{ context.server_ip }}/report/api/run_index',
          { method: 'POST', body: params })
          .then(response=>response.json()).
          then(data=>{
@@ -387,11 +387,6 @@
           var file = document.getElementById("igirgi_file");
           file.disabled = false;
           document.getElementById("modal_data").value="";
-
-<!--         fetch('http://10.23.125.230:9613/report/api/delete_igirgi_data')-->
-<!--         .then(response=>response.json())-->
-<!--         .then(data=>{-->
-<!--         console.log(data);});-->
           });
 
     <!-- Отслеживаем чтобы пользователь ввел данные -->

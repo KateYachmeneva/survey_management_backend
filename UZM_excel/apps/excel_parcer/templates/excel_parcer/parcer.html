@@ -7,7 +7,6 @@
 
 {% block content %}
 <center>
-<!--<a href="{% url 'add_data' %}"><b>Загрузить новые данные</b></a>-->
         <form action="" method="post" enctype="multipart/form-data" style="margin-top:1%">
             {% csrf_token %}
             <div style="max-width:500px">
@@ -16,7 +15,11 @@
                      <div class="input-group mb-3">
                        <select type="text" name="run" class="form-select" id="inputGroupSelect04">
                            {% for r in context.run %}
-                            <option value="{{r.id}}">{{r}}</option>
+                           {% if r == context.selected_run%}
+                           <option value="{{r.id}}" selected>{{r}}</option>
+                           {% else %}
+                           <option value="{{r.id}}">{{r}}</option>
+                           {% endif %}
                            {% endfor %}
                        </select>
                      </div>
@@ -113,7 +116,19 @@
         </form>
 </center>
 <script>
+
 $('#sortTable3').DataTable();
+
+
+   <!-- Отслеживаем чтобы пользователь ввел данные -->
+    function validForm(){
+    var f = document.forms['axe_form']['run'].value;
+
+    if (f=='Выберите рейс'){
+        alert("Необходимо выбрать рейс");
+        return false;
+        }
+    }
 </script>
 
 

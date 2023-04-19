@@ -2,7 +2,7 @@ from django.http import JsonResponse
 from django.shortcuts import render, redirect
 
 # Create your views here.
-# from .read_function import rewrite_ReportIndex, work_with_file
+from conf import server_ip
 from .function.api_func import get_index
 from .function.work_with_data import rewrite_ReportIndex, work_with_file
 from Field.models import get_all_run
@@ -12,7 +12,8 @@ def index(request):
     """Главная страница для генератора отчетов"""
 
     context = {"title": 'Отчет',
-               "run": get_all_run()}
+               "run": get_all_run(),
+               'server_ip': server_ip}
 
     if request.method == 'POST':
         index_id = rewrite_ReportIndex(request.POST.dict())  # перезапись индексов, получаем id текущего рейса
@@ -34,7 +35,6 @@ def index(request):
 def run_index(request):
     """Функция для fetch запроса"""
     if request.method == 'POST':
-        # print(request.POST.get('run_title'))
         return get_index(request)
     return JsonResponse({'Warning_Text': 'нужно обращение к post методу'})
 

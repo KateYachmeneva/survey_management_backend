@@ -5,19 +5,18 @@
 {% block content %}
 <center>
 <div style="max-width:5000px">
-
-        <form action="" method="post" enctype="multipart/form-data" style="margin-top:1%" name="axe_form" onsubmit="return validForm()">
+        <form action="{% url 'add_data' %}" method="post" enctype="multipart/form-data" style="margin-top:1%" name="axe_form" onsubmit="return validForm()">
             {% csrf_token %}
 
             <div style="max-width:500px; margin-top:1%">
                 <div style="max-width:500px">
-                        <a>Выберите рейс</a>
+                    <a>Выберите рейс</a>
                     <p></p>
                     <div class="input-group mb-3">
                         <select type="text" name="run" class="form-select" id="run">
                             <option value="Выберите рейс">Выберите рейс</option>
                              {% for r in context.run %}
-                            <option value="{{r.id}}">{{r}}</option>
+                                <option value="{{r.id}}" >{{r}}</option>
                              {% endfor %}
                         </select>
                     </div>
@@ -29,8 +28,12 @@
                 <p></p>
                 <div class="input-group mb-3">
                   <select type="text" name="device" class="form-select" id="inputGroupSelect01">
-                    {% for element in context.telesystem %}
-                    <option>{{element}}</option>
+                      {% for element in context.telesystem %}
+                        {% if element == context.last_form.device %}
+                          <option selected>{{element}}</option>
+                        {% else %}
+                          <option>{{element}}</option>
+                        {% endif %}
                       {% endfor %}
                   </select>
                 </div>
@@ -50,7 +53,7 @@
                         <h5 style="margin-top:2%">Имя(буква) столбца</h5>
                         <div class="input-group mb-3">
                               <span class="input-group-text">Глубина</span>
-                          <input type="text" class="form-control" name="manually_depth" id="inp_depth"  >
+                          <input type="text" class="form-control" name="manually_depth" id="inp_depth">
                           <span class="input-group-text">Gx</span>
                           <input type="text" class="form-control" name="manually_gx" id="inp_gx">
                                       <span class="input-group-text">Gy</span>
@@ -171,7 +174,7 @@
         var params = new FormData();
         params.set('run_title', e.target.value);
 
-        fetch('http://10.23.125.230:9613/axes/run_index', {
+        fetch('http://{{ context.server_ip }}/axes/run_index', {
         method: 'POST',
         body: params }).then(response=>response.json())
         .then(data=>{console.log(data);

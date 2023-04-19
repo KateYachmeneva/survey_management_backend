@@ -17,9 +17,8 @@ def toFixed(numObj, digits=0):
 def parcing_manually(path, manually_depth, manually_gx, manually_gy, manually_gz, manually_bx, manually_by, manually_bz,
                      manually_import=None) -> list():
     """
-    Просто ужас, тот кто это писал видит питон 2 раз в жизни. Нужно это будет переписать когда-нибудь.
     Считываем данные с экселя осей по указанным параметрам. Возращает list с list'ами.
-    Список замеров по строкам.
+    Лист замеров - лист нижней абстракции это набор параметров глубина - оси.
     """
     data: list = [[], [], [], [], [], [], []]
 

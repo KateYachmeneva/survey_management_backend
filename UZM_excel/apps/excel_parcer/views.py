@@ -1,6 +1,7 @@
 from django.shortcuts import render
 from django.core.files.storage import FileSystemStorage
 
+from conf import server_ip
 from .function.functions import *
 
 from django.http import JsonResponse, HttpResponse
@@ -13,18 +14,18 @@ from .models import Data, TelesystemIndex, Device
 
 def index(request):
     """
-    Оси вывод
-
+    Оси вывод по рейсам данных
     """
     context = {"title": 'Оси',
                "run": get_all_run(),
-               'data': [],
+               'selected_run': 'Выберите рейс'
                }
 
     if request.method == 'POST':
         current_run = Run.objects.get(id=request.POST['run'])
         context['well'] = current_run.section.wellbore.well_name
         context['data'] = Data.objects.filter(run=request.POST['run']).order_by('depth')
+        context['selected_run'] = current_run
     return render(request, 'excel_parcer/parcer.html', {'context': context, })
 
 
@@ -32,33 +33,36 @@ def file(request):
     """добавление данных \add"""
     context = {"telesystem": Device.objects.all(),
                "run": get_all_run(),
-               "title": 'Загрузка осей'}
+               "title": 'Загрузка осей',
+               'server_ip': server_ip,  # для прокидывания fetch запросов js
+                }
 
-    if request.method == 'POST' and 'file' in request.FILES:
-        doc = request.FILES['file']
-        fs = FileSystemStorage()
-        file_name = fs.save(doc.name, doc)  # сохраняем файл для дальнейшего считывания
-        current_run = Run.objects.get(id=request.POST.get('run'))
-        update_values = {'GX': request.POST.get('manually_gx'),
-                         'GY': request.POST.get('manually_gy'),
-                         'GZ': request.POST.get('manually_gz'),
-                         'BX': request.POST.get('manually_bx'),
-                         'BY': request.POST.get('manually_by'),
-                         'BZ': request.POST.get('manually_bz'),
-                         'depth': request.POST.get('manually_depth'),
-                         'units': request.POST.get('manually_measurement'),
-                         'string_index': request.POST.get('manually_import'),
-                         'device': Device.objects.get(device_title=request.POST.get('device'))}
-        TelesystemIndex.objects.update_or_create(run=current_run, defaults=update_values)
-        result = parcing_manually("./media/" + file_name, request.POST.get('manually_depth'),
-                                  request.POST.get('manually_gx'), request.POST.get('manually_gy'),
-                                  request.POST.get('manually_gz'), request.POST.get('manually_bx'),
-                                  request.POST.get('manually_by'), request.POST.get('manually_bz'),
-                                  request.POST.get('manually_import'))
-        result2 = new_measurements(result, request.POST.get('device'))
-        context['result2'] = result2
-        context['result'] = result
-        write_to_bd(result2, current_run)
+    if request.method == 'POST':
+        if 'file' in request.FILES:
+            doc = request.FILES['file']
+            fs = FileSystemStorage()
+            file_name = fs.save(doc.name, doc)  # сохраняем файл для дальнейшего считывания
+            current_run = Run.objects.get(id=request.POST.get('run'))
+            update_values = {'GX': request.POST.get('manually_gx'),
+                             'GY': request.POST.get('manually_gy'),
+                             'GZ': request.POST.get('manually_gz'),
+                             'BX': request.POST.get('manually_bx'),
+                             'BY': request.POST.get('manually_by'),
+                             'BZ': request.POST.get('manually_bz'),
+                             'depth': request.POST.get('manually_depth'),
+                             'units': request.POST.get('manually_measurement'),
+                             'string_index': request.POST.get('manually_import'),
+                             'device': Device.objects.get(device_title=request.POST.get('device'))}
+            TelesystemIndex.objects.update_or_create(run=current_run, defaults=update_values)
+            result = parcing_manually("./media/" + file_name, request.POST.get('manually_depth'),
+                                      request.POST.get('manually_gx'), request.POST.get('manually_gy'),
+                                      request.POST.get('manually_gz'), request.POST.get('manually_bx'),
+                                      request.POST.get('manually_by'), request.POST.get('manually_bz'),
+                                      request.POST.get('manually_import'))
+            result2 = new_measurements(result, request.POST.get('device'))
+            context['result2'] = result2
+            context['result'] = result
+            write_to_bd(result2, current_run)
 
     return render(request, 'excel_parcer/data.html', {'context': context, })
 
