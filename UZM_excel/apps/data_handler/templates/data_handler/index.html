@@ -3,19 +3,96 @@
 
 
 {% block content %}
+<style>
+.nav-pills .nav-link.active, .nav-pills .show>.nav-link{
+    color: var(--bs-nav-pills-link-active-color);
+    background-color: #fdb30d;}
+</style>
+
+
 <nav class="navbar navbar-expand-lg navbar-light bg-light">
   <div class="container-fluid">
     <div class="collapse navbar-collapse">
-      <ul class="navbar-nav m-auto">
-        <li class="nav-item"><a href="#" class="nav-link" style="font-size:large">Общие параметры</a></li>
-        <li class="nav-item"><a href="#" class="nav-link" style="font-size:large">Графики контроля</a></li>
-        <li class="nav-item"><a href="{% url 'traj' %}" class="nav-link" style="font-size:large">Траектории</a></li>
+      <ul class="nav nav-pills m-auto">
+        <li class="nav-item">
+          {% if context.active == 'param' %}
+          <a href="{% url 'param' %}" class="nav-link active" style="font-size:large">Общие параметры</a>
+          {% else %}
+          <a href="{% url 'param' %}" class="nav-link" style="font-size:large">Общие параметры</a>
+          {% endif %}
+        </li>
+        <li class="nav-item active">
+          {% if context.active == 'graph' %}
+          <a href="{% url 'graph' %}" class="nav-link active" style="font-size:large">Графики контроля</a>
+          {% else %}
+          <a href="{% url 'graph' %}" class="nav-link" style="font-size:large">Графики контроля</a>
+          {% endif %}
+        </li>
+        <li class="nav-item">
+          {% if context.active == 'traj'%}
+          <a href="{% url 'traj' %}" class="nav-link active" style="font-size:large">Траектории</a>
+          {% else %}
+          <a href="{% url 'traj' %}" class="nav-link" style="font-size:large">Траектории</a>
+          {% endif %}
+        </li>
       </ul>
     </div>
   </div>
 </nav>
-  {% block data %}
-  {% endblock %}
+<div class="bd-example">
+  <div class="row">
+    <div class="col-3">
+      <form style="margin: 1em 5em 5em 5em">
+          <fieldset>
+              <legend>Выбор модели</legend>
+              <div class="form-group" style="margin:1em">
+                  <label for="sel-client">Дочернее общество</label>
+                  <select id="sel-client" class="form-control">
+                      <option>Disabled select</option>
+                  </select>
+              </div>
+
+              <div class="form-group" style="margin:1em">
+                  <label for="sel-field">Месторождение</label>
+                  <select id="sel-field" class="form-control">
+                      <option>Disabled select</option>
+                  </select>
+              </div>
+
+              <div class="form-group" style="margin:1em">
+                  <label for="sel-pad">Куст</label>
+                  <select id="sel-pad" class="form-control">
+                      <option>Disabled select</option>
+                  </select>
+              </div>
+              <div class="form-group" style="margin:1em">
+                  <label for="sel-wellbore">Ствол</label>
+                  <select id="sel-wellbore" class="form-control">
+                      <option>Disabled select</option>
+                  </select>
+              </div>
+              <div class="form-group" style="margin:1em">
+                  <label for="sel-section">Секция</label>
+                  <select id="sel-section" class="form-control">
+                      <option>Disabled select</option>
+                  </select>
+              </div>
+
+              <div class="form-group" style="margin: 1em">
+                  <label for="sel-run">Рейс</label>
+                  <select id="sel-run" class="form-control">
+                      <option>Disabled select</option>
+                  </select>
+              </div>
+          </fieldset>
+      </form>
+    </div>
+    <div class="col-9">
+      {% block data %}
+      {% endblock %}
+    </div>
+  </div>
+</div>
 
 {% endblock %}
 

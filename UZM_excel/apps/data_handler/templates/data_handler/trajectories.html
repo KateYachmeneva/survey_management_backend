@@ -1,6 +1,91 @@
 {% extends 'data_handler/index.html' %}
 {% load static%}
 
+{%  block header %}
+    <link type="text/css" href="{% static 'css/data_handler/scroll.css' %}" rel="stylesheet" />
+{% endblock %}
+
 {% block data %}
-<h1>HI</h1>
+<div class="row" style="margin-top:1em">
+    <div class="col-1">
+        <label>Search:
+            <input type="search" class="form-control form-control-sm" placeholder="" aria-controls="dtDynamicVerticalScrollExample">
+        </label>
+
+    </div>
+    <div class="col-10" style="text-align: right;">
+        <br>
+        <button type="button" class="" placeholder="" aria-controls="dtDynamicVerticalScrollExample">
+            Отправить отчет
+        </button>
+
+        <button type="button" class="" placeholder="" aria-controls="dtDynamicVerticalScrollExample">
+            Редактировать значения
+        </button>
+
+    </div>
+</div>
+<div class="row align-items-start ">
+    <div class="col-5" >
+
+        <table id="igirgi_table" class="table table-light  table-bordered table-hover" style="margin-top:2%;">
+            <thead class="thead-dark">
+            <tr>
+                <th scope="col" colspan="3">Данные ИГиРГИ</th>
+            </tr>
+            <tr >
+                <th scope="col">Глубина</th>
+                <th scope="col">Угол</th>
+                <th scope="col">Азимут</th>
+            </tr>
+            </thead>
+
+            <tbody>
+            {% for i in context.igirgi_data%}
+            <tr>
+                <td scope="col">123</td>
+                <td scope="col">23</td>
+                <td scope="col">45</td>
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <div class="col-1"></div>
+    <div class="col-5" >
+        <table id="nnb_table" class="table table-light  table-bordered table-hover" style="margin-top:2%">
+            <thead class="thead-dark">
+            <tr>
+                <th scope="col" colspan="3">Данные ННБ</th>
+            </tr>
+            <tr clas="table-warning">
+                <th scope="col">Глубина</th>
+                <th scope="col">Угол</th>
+                <th scope="col">Азимут</th>
+            </tr>
+            </thead>
+
+            <tbody>
+            {% for i in context.nnb_data%}
+            <tr>
+                <td scope="col">2</td>
+                <td scope="col">3</td>
+                <td scope="col">4</td>
+            </tr>
+            {% endfor %}
+
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+$(document).ready(function () {
+  $('#igirgi_data').DataTable({
+    "scrollY": "50vh",
+    "scrollCollapse": true,
+  });
+  $('.dataTables_length').addClass('bs-select');
+});
+</script>
 {% endblock %}

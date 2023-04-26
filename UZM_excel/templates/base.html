@@ -70,7 +70,6 @@
                         Данные рейса (оси)
                     </a>
                     <ul class="dropdown-menu">
-                        <li><a class="dropdown-item" href="{% url 'axes_graph'%}">График (Тест)</a></li>
                         <li><a class="dropdown-item" href="{% url 'index'%}">Показать данные</a></li>
                         <li><hr class="dropdown-divider"></li>
                         <li><a class="dropdown-item" href="{% url 'add_data'%}">Загрузить новые данные</a></li>
@@ -84,8 +83,11 @@
                 </li>
 
                 <li class="nav-item">
-                    <a href="{% url 'data_info' %}" class="nav-link active">
-                        Работа с данными
+                    <a href="{% url 'data_info' %}" class="nav-link" style="color: currentColor;
+  cursor: not-allowed;
+  opacity: 0.5;
+  text-decoration: none;">
+                        Работа с данными (В разработке)
                     </a>
                 </li>
 

@@ -185,20 +185,20 @@ def write_data(excel: openpyxl.workbook.workbook.Workbook,
     for meas in zip(igirgi['Глубина'], igirgi['Угол'], igirgi['Азимут'], nnb['Угол'], nnb['Азимут'],
                     other['igirgi_TVDSS'], other['igirgi_delta_x'], other['igirgi_delta_y'], other['igirgi_TVD'],
                     other['nnb_delta_x'], other['nnb_delta_y'], other['nnb_TVD'], ):
-        excel_sheet.cell(row=row, column=1).value = Run.run_number  # Номер рейса
-        excel_sheet.cell(row=row, column=2).value = round(meas[0], 2)  # Глубина
-        excel_sheet.cell(row=row, column=3).value = round(meas[1], 2)  # Зенитный угол
-        excel_sheet.cell(row=row, column=4).value = round(meas[2], 2)  # Азимут картографический
+        # excel_sheet.cell(row=row, column=1).value = Run.run_number  # Номер рейса
+        excel_sheet.cell(row=row, column=1).value = round(meas[0], 2)  # Глубина
+        excel_sheet.cell(row=row, column=2).value = round(meas[1], 2)  # Зенитный угол
+        excel_sheet.cell(row=row, column=3).value = round(meas[2], 2)  # Азимут картографический
         if Well.dec is None:
-            excel_sheet.cell(row=row, column=5).value = '-'  # Азимут магнитный
+            excel_sheet.cell(row=row, column=4).value = '-'  # Азимут магнитный
         else:
-            excel_sheet.cell(row=row, column=5).value = round(meas[2] - Well.total_correction, 2)  # Азимут магнитный
+            excel_sheet.cell(row=row, column=4).value = round(meas[2] - Well.total_correction, 2)  # Азимут магнитный
 
-        excel_sheet.cell(row=row, column=6).value = round(meas[5], 2)  # Абсолютная отметка TVDSS
-        excel_sheet.cell(row=row, column=7).value = round(meas[3], 2)  # ННБ зенитный угол
-        excel_sheet.cell(row=row, column=8).value = round(meas[4], 2)  # ННБ азимут
-        excel_sheet.cell(row=row, column=9).value = round(meas[1] - meas[3], 2)  # разница зенитный угол
-        excel_sheet.cell(row=row, column=10).value = round(meas[2] - meas[4], 2)  # разница азимут
+        excel_sheet.cell(row=row, column=5).value = round(meas[5], 2)  # Абсолютная отметка TVDSS
+        excel_sheet.cell(row=row, column=6).value = round(meas[3], 2)  # ННБ зенитный угол
+        excel_sheet.cell(row=row, column=7).value = round(meas[4], 2)  # ННБ азимут
+        excel_sheet.cell(row=row, column=8).value = round(meas[1] - meas[3], 2)  # разница зенитный угол
+        excel_sheet.cell(row=row, column=9).value = round(meas[2] - meas[4], 2)  # разница азимут
         # пошли отходы
         Ex = (Well.EX if Well.EX is not None else 0)
         Ny = (Well.NY if Well.NY is not None else 0)
@@ -208,10 +208,10 @@ def write_data(excel: openpyxl.workbook.workbook.Workbook,
         X_igirgi = Ex + meas[7]
         Y_igigri = Ny + meas[6]
 
-        excel_sheet.cell(row=row, column=11).value = round(  # отход по горизонтали
+        excel_sheet.cell(row=row, column=10).value = round(  # отход по горизонтали
             sqrt((X_nnb - X_igirgi) ** 2 + (Y_nnb - Y_igigri) ** 2), 2)
-        excel_sheet.cell(row=row, column=12).value = round(meas[11] - meas[8], 2)  # отход по вертикали
-        excel_sheet.cell(row=row, column=13).value = round(  # отход общий
+        excel_sheet.cell(row=row, column=11).value = round(meas[11] - meas[8], 2)  # отход по вертикали
+        excel_sheet.cell(row=row, column=12).value = round(  # отход общий
             sqrt((X_nnb - X_igirgi) ** 2 + (Y_nnb - Y_igigri) ** 2 +
                  (meas[11] - meas[8]) ** 2), 2)
 

@@ -1,48 +1,22 @@
-{% extends 'base.html' %}
-{% load static %}
+{% extends 'data_handler/index.html' %}
+{% load static%}
 
-{% block head %}
-<script src="https://cdn.jsdelivr.net/npm/chart.js@latest/dist/Chart.min.js"></script>
-{% endblock %}
-
-{% block content %}
+{% block data %}
 <center>
 <div style="max-width:5000px">
 
-        <form action="" method="post" enctype="multipart/form-data" style="margin-top:1%" name="axe_form" onsubmit="return validForm()">
-            {% csrf_token %}
-
-            <div style="max-width:500px; margin-top:1%">
-                <div style="max-width:500px">
-                        <a>Выберите рейс</a>
-                    <p></p>
-                    <div class="input-group mb-3">
-                        <select type="text" name="run" class="form-select" id="run">
-                            <option value="Выберите рейс">Выберите рейс</option>
-                             {% for r in context.run %}
-                            <option value="{{r.id}}">{{r}}</option>
-                             {% endfor %}
-                        </select>
-                    </div>
-                </div>
-            </div>
-
-<!--            <picture>-->
-<!--                <img src="" class="img-fluid img-thumbnail" alt="Выберите рейс" id="axes_graph" hidden>-->
-<!--            </picture>-->
-        </form>
     <div class="container" style="height: 20px;">
-        <canvas id="grafica1" width="10" height="1"></canvas>
+        <canvas id="grafica1" width="10" height="3"></canvas>
 
-        <canvas id="grafica2" width="10" height="1"></canvas>
+        <canvas id="grafica2" width="10" height="3"></canvas>
 
-        <canvas id="grafica3" width="10" height="1"></canvas>
+        <canvas id="grafica3" width="10" height="3"></canvas>
 
-        <canvas id="grafica4" width="10" height="1"></canvas>
+        <canvas id="grafica4" width="10" height="3"></canvas>
 
-        <canvas id="grafica5" width="10" height="1"></canvas>
+        <canvas id="grafica5" width="10" height="3"></canvas>
 
-        <canvas id="grafica6" width="10" height="1"></canvas>
+        <canvas id="grafica6" width="10" height="3"></canvas>
     </div>
 </center>
 
@@ -61,7 +35,7 @@
         const tags = ["Январь", "Февраль", "Март", "Апрель"]
         // У нас может быть несколько наборов данных. Давайте начнем с одного
         const dataSales2020 = {
-            label: "Продажи за месяц",
+            label: "График",
             data: [5000, 1500, 8000, 5102], // Данные представляют собой массив, который должен иметь такое же количество значений, как и количество тегов.
             backgroundColor: 'rgba(54, 162, 235, 0.2)', // Цвет фона
             borderColor: 'rgba(54, 162, 235, 1)', // Цвет границ

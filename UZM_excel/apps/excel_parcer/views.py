@@ -35,7 +35,7 @@ def file(request):
                "run": get_all_run(),
                "title": 'Загрузка осей',
                'server_ip': server_ip,  # для прокидывания fetch запросов js
-                }
+               }
 
     if request.method == 'POST':
         if 'file' in request.FILES:
@@ -101,11 +101,13 @@ def get_run_index(request):
             })
 
 
+# FIXME удаляем(функция выгрузки картинок)
 def AxeGraphImage(request, run_id):
     with open(f'C:/Users/superuser/UZM_excel/files/Report_out/{run_id}.png', "rb") as f:
         return HttpResponse(f.read(), content_type="image/jpeg")
 
 
+# TODO переносим в data_handler
 def graph(request):
     """Страница с графиком первичного контроля"""
     context = {"title": 'График',
