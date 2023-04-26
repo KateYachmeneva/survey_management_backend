@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from django.core.files.storage import FileSystemStorage
 
-from conf import server_ip
+from UZM_excel.conf import server_ip
 from .function.functions import *
 
 from django.http import JsonResponse, HttpResponse

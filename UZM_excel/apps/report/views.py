@@ -2,7 +2,7 @@ from django.http import JsonResponse
 from django.shortcuts import render, redirect
 
 # Create your views here.
-from conf import server_ip
+from UZM_excel.conf import server_ip
 from .function.api_func import get_index
 from .function.work_with_data import rewrite_ReportIndex, work_with_file
 from Field.models import get_all_run

@@ -80,7 +80,10 @@ class Data(models.Model):
         azim = round(math.degrees(math.atan2(
             (self.CX * self.BY - self.CY * self.BX) * self.Gtotal(),
             self.BZ * (self.CX ** 2 + self.CY ** 2) - self.CZ * (self.CX * self.BX + self.CY * self.BY),
-        )) + self.run.section.wellbore.well_name.dec - self.run.section.wellbore.well_name.grid_convergence, 2)
+        )) + (self.run.section.wellbore.well_name.dec if self.run.section.wellbore.well_name.dec is not None else 0)
+                     - (
+                         self.run.section.wellbore.well_name.grid_convergence if self.run.section.wellbore.well_name.grid_convergence is not None else 0)
+                     , 2)
         return azim if azim > 0 else round(azim + 360, 2)
 
     def depth_dot(self) -> str:

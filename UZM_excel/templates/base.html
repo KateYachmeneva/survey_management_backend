@@ -83,6 +83,12 @@
                     </a>
                 </li>
 
+                <li class="nav-item">
+                    <a href="{% url 'data_info' %}" class="nav-link active">
+                        Работа с данными
+                    </a>
+                </li>
+
 
             </ul>
         </div>
@@ -106,13 +112,11 @@
         </span>
     </div>
 </nav>
-<br>
-<br>
-<br>
-<br>
+
+<div style="padding-top: 5.5em;">
 {%  block content %}
 {% endblock %}
-
+</div>
 </body>
 </html>
 

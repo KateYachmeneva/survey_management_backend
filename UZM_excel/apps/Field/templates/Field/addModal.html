@@ -10,6 +10,7 @@
 {% endblock %}
 
 {% block content %}
+    <br>
     <form class="container" action="{% url context.method %}" method="post">
         {% for f in context.form %}
         <div class="container__item">

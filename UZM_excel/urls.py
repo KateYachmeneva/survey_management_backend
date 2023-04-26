@@ -30,6 +30,7 @@ urlpatterns = [
     path('admin/', admin.site.urls, name="admin"),
     path('report/', include('report.urls')),
     path('main_data/', include('Field.urls')),
+    path('data_handler/', include('data_handler.urls')),
     # SWAGGER
     re_path(r'^swagger(?P<format>\.json|\.yaml)$', schema_view.without_ui(cache_timeout=0), name='schema-json'),
     path('swagger/', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),

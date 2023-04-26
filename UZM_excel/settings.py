@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'drf_yasg',
     'corsheaders',
     'rest_framework',
+    'data_handler',
     'excel_parcer.apps.ExcelParcerConfig',
     'report.apps.ReportConfig',
     'Field.apps.FieldConfig',

@@ -82,7 +82,7 @@ def get_graph_data(I: list, A: list, Depth: list, RKB: int, VSaz: int = 1) -> li
     TVD_list: list() = [0, ]
 
     all_measurement = list(zip(Depth, I, A))
-    print('-----------------------')
+    # print('-----------------------')
     for i, meas in enumerate(all_measurement):
         if meas[0] == all_measurement[-1][0]:
             # print(f'break - {all_measurement[-1][0]}')
