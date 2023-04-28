@@ -7,10 +7,7 @@ from .function.functions import *
 from django.http import JsonResponse, HttpResponse
 import re
 
-
-from excel_parcer.models import Data
 from Field.models import *
-
 from .models import Data, TelesystemIndex, Device
 
 
