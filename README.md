@@ -18,14 +18,14 @@
 ![image](https://user-images.githubusercontent.com/79474789/235149056-96bf3d1c-7892-41d2-bd52-6fdaab85b71e.png)
 ![image](https://user-images.githubusercontent.com/79474789/235149078-20b69f43-f89b-43fd-8016-4d70562e14f9.png)
 
-<h4><b>4. Проверяем наличие Python и PIP </b>  </h4>
-Прописываем команды:   
->python --version  
->pip --version  
-Если версия pip не выводится, 
-то требуется установить pip самостоятельно  
-(https://pythonru.com/baza-znanij/ustanovka-pip-dlja-python-i-bazovye-komandy).  
-Успешная проверка:  
+<h4><b>4. Проверяем наличие Python и PIP </b></h4>
+<br/>Прописываем команды:   
+<br/>> python --version  
+<br/>> pip --version  
+<br/>Если версия pip не выводится, 
+<br/>то требуется установить pip самостоятельно  
+<br/>(https://pythonru.com/baza-znanij/ustanovka-pip-dlja-python-i-bazovye-komandy).  
+<br/>Успешная проверка:  
 ![image](https://user-images.githubusercontent.com/79474789/235150465-ba2ebfae-dc96-43f6-ba28-9d07098327a9.png)
 
 <h4><b>5. Создаем и активируем виртуально окружение </b>  </h4>
