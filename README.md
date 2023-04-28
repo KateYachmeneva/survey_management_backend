@@ -20,8 +20,8 @@
 
 <h4><b>4. Проверяем наличие Python и PIP </b>  </h4>
 Прописываем команды:   
-> python --version  
-> pip --version  
+>python --version  
+>pip --version  
 Если версия pip не выводится, 
 то требуется установить pip самостоятельно  
 (https://pythonru.com/baza-znanij/ustanovka-pip-dlja-python-i-bazovye-komandy).  
