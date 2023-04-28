@@ -159,8 +159,12 @@ def graph(request):
                 depthDipmin.append({'x': survey.depth, 'y': well.min_dip()})
                 depthDipcorr.append({'x': survey.depth, 'y': survey.Dip()})
 
-    firstDepth = depthHSTF[0]['x']
-    lastDepth = depthHSTF[-1]['x']
+    try:
+        firstDepth = depthHSTF[0]['x']
+        lastDepth = depthHSTF[-1]['x']
+    except IndexError:
+        firstDepth = lastDepth = 0
+
     context = {
         'title': 'График',
         'well': get_all_well(),
