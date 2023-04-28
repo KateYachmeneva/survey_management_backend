@@ -17,33 +17,33 @@
 
 <b>4. Проверяем наличие Python и PIP </b>  
 Прописываем команды:   
-·python --version  
-·pip --version  
+> python --version  
+> pip --version  
 Если версия pip не выводится, 
-то требуется установить pip самостоятельно 
+то требуется установить pip самостоятельно  
 (https://pythonru.com/baza-znanij/ustanovka-pip-dlja-python-i-bazovye-komandy).  
 Успешная проверка:  
 ![image](https://user-images.githubusercontent.com/79474789/235150465-ba2ebfae-dc96-43f6-ba28-9d07098327a9.png)
 
 <b>5. Создаем и активируем виртуально окружение </b>  
-·python -m venv env   
-·env\Scripts\activate  
+> python -m venv env   
+> env\Scripts\activate  
 
 ![image](https://user-images.githubusercontent.com/79474789/235152459-60821dd4-c0dd-4dd1-99f0-457258d3c7ad.png)
 
 <b>6. Установка библиотек </b>  
-·pip install -r requerments.txt  
+> pip install -r requerments.txt  
 Проверка установки библиотек:  
-·pip list
+> pip list
 
 ![image](https://user-images.githubusercontent.com/79474789/235153388-dd2b0970-604b-41c9-8c01-6471d642f6d7.png)
 
 Если каких-то бибилотек нет в requirments.txt, для их установки используем:  
-·pip install <название библиотеки>  
+> pip install <название библиотеки>  
 
 <b>7. Запуск проекта </b>  
 Для запуска на локальном устройстве:  
-·python manage.py runserver   
+> python manage.py runserver   
 
 Успешный запуск проекта:  
 ![image](https://user-images.githubusercontent.com/79474789/235154129-0846adac-7f23-401d-b8f9-6c953eee95d1.png)
