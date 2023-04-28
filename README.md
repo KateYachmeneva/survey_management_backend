@@ -8,8 +8,8 @@
 
 <h3> Установка </h3>  
 <h4><b>1. Устанавливаем Python </b></h4> 
-(Официальный сайт: https://www.python.org/downloads/windows/)    
-Устанавливаем любую версию Python 3 старше 3.8    
+<br/>(Официальный сайт: https://www.python.org/downloads/windows/)    
+<br/>Устанавливаем любую версию Python 3 старше 3.8    
 
 <h4><b>2. Клонируем репозиторий </b></h4>
 ![image](https://user-images.githubusercontent.com/79474789/235148752-3631ffa7-706b-413a-9227-e5cbd2853cf2.png)
