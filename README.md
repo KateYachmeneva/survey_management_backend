@@ -13,7 +13,7 @@
 <br/>
 <h4><b>2. Клонируем репозиторий </b></h4>
 <br/>
-![image](https://user-images.githubusercontent.com/79474789/235148752-3631ffa7-706b-413a-9227-e5cbd2853cf2.png)
+<image src="https://user-images.githubusercontent.com/79474789/235148752-3631ffa7-706b-413a-9227-e5cbd2853cf2.png" alt="Текст с описанием картинки">
 <br/>
 <b>3. Открываем консоль с адресной строки проводника </b>  
 <br/>
