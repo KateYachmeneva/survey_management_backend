@@ -107,6 +107,12 @@ class Data(models.Model):
     def BZ_dot(self) -> str:
         return str(self.BZ).replace(",", ".")
 
+    def get_goxy(self) -> float:
+        return sqrt(self.CX ** 2 + self.CY ** 2)
+
+    def get_boxy(self) -> float:
+        return sqrt(self.BX ** 2 + self.BY ** 2)
+
 
 class TelesystemIndex(models.Model):
     """Индексы под загружаемые файлы осей"""

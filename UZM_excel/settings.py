@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     'excel_parcer.apps.ExcelParcerConfig',
     'report.apps.ReportConfig',
     'Field.apps.FieldConfig',
+    'chartjs',
 ]
 
 MIDDLEWARE = [

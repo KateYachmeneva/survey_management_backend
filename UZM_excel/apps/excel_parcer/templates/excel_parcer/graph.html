@@ -2,191 +2,653 @@
 {% load static %}
 
 {% block head %}
+<html lang="en">
+<link rel="stylesheet" href="css/styles.css">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-0evHe/X+R7YkIZDRvuzKMRqM+OrBnVFBL6DOitfPri4tjfHxaWutUpFmBp4vmVor" crossorigin="anonymous">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/hammer.js/2.0.8/hammer.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.bundle.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/chartjs-plugin-zoom/0.6.6/chartjs-plugin-zoom.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/js/bootstrap.bundle.min.js" integrity="sha384-pprn3073KE6tl6bjs2QrFaJGz5/SUsLqktiwsUTF55Jfv3qYSDhgCecCxMW52nD2" crossorigin="anonymous"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js">
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js">
+</script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js">
+</script>
+<link rel="stylesheet" href="https://cdn.datatables.net/1.10.22/css/dataTables.bootstrap4.min.css">
+<script src="https://cdn.datatables.net/1.10.22/js/jquery.dataTables.min.js">
+</script>
+<script src="https://cdn.datatables.net/1.10.22/js/dataTables.bootstrap4.min.js">
+</script>
+<meta charset="UTF-8">
+<title>Контроль качества</title>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@latest/dist/Chart.min.js"></script>
 {% endblock %}
 
 {% block content %}
 <center>
+
 <div style="max-width:5000px">
+    <form action="" method="post" enctype="multipart/form-data" style="margin-top:1%">
+        {% csrf_token %}
+        <div style="max-width:500px">
+            <a>Выберите скважину</a>
+                <p></p>
+                 <div class="input-group mb-3">
+                   <select name="well" class="form-select" id="inputGroupSelect04">
+                       {% for w in context.well %}
+                       {% if w == context.selected_well%}
+                       <option value="{{w.id}}" selected>{{w}}</option>
+                       {% else %}
+                       <option value="{{w.id}}">{{w}}</option>
+                       {% endif %}
+                       {% endfor %}
+                   </select>
+                 </div>
+        </div>
+        <button type="submit" style="border:1">Показать данные</button>
+    </form>
+</div>
 
-        <form action="" method="post" enctype="multipart/form-data" style="margin-top:1%" name="axe_form" onsubmit="return validForm()">
-            {% csrf_token %}
+<hr style="color:#FFC501;margin-top:1%;border-width: 3px">
 
-            <div style="max-width:500px; margin-top:1%">
-                <div style="max-width:500px">
-                        <a>Выберите рейс</a>
-                    <p></p>
-                    <div class="input-group mb-3">
-                        <select type="text" name="run" class="form-select" id="run">
-                            <option value="Выберите рейс">Выберите рейс</option>
-                             {% for r in context.run %}
-                            <option value="{{r.id}}">{{r}}</option>
-                             {% endfor %}
-                        </select>
-                    </div>
-                </div>
-            </div>
+<div class="container" >
+    <canvas id="grafica1" width="50" height="15"></canvas>
+<!--    <div class="container-form" >-->
+<!--      <form>-->
+<!--          <label>Ось х </label>-->
+<!--              <div class="mb-3">-->
+<!--                <label>Минимальное  значение: <input id="number" type="number" step="0.1"></label>-->
+<!--                <label>Максимальное значение: <input id="number" type="number" step="0.1"></label>-->
+<!--                <label>Шаг: <input id="number" type="number" step="0.1"></label>-->
+<!--              </div>-->
+<!--                <label>Ось y1 </label>-->
+<!--              <div class="mb-3">-->
+<!--                <label>Минимальное значение: <input id="number" type="number" step="0.1"></label>-->
+<!--                <label>Максимальное значение: <input id="number" type="number" step="0.1"></label>-->
+<!--                <label>Шаг: <input id="number" type="number" step="0.1"></label>-->
+<!--              </div>-->
+<!--                <label>Ось y2 </label>-->
+<!--              <div class="mb-3">-->
+<!--                <label>Минимальное значение: <input id="number" type="number" step="0.1"></label>-->
+<!--                <label>Максимальное значение: <input id="number" type="number" step="0.1"></label>-->
+<!--                <label>Шаг: <input id="number" type="number" step="0.1"></label>-->
+<!--              </div>-->
+<!--          <button type="submit" class="btn btn-primary">Submit</button>-->
+<!--      </form>-->
+<!--    </div>-->
+    <canvas id="grafica2" width="50" height="15"></canvas>
+    <canvas id="grafica3" width="50" height="15"></canvas>
+    <canvas id="grafica4" width="50" height="15"></canvas>
+    <canvas id="grafica5" width="50" height="15"></canvas>
+    <canvas id="grafica6" width="50" height="15"></canvas>
+</div>
 
-<!--            <picture>-->
-<!--                <img src="" class="img-fluid img-thumbnail" alt="Выберите рейс" id="axes_graph" hidden>-->
-<!--            </picture>-->
-        </form>
-    <div class="container" style="height: 20px;">
-        <canvas id="grafica1" width="10" height="1"></canvas>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/hammer.js/2.0.8/hammer.min.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.bundle.min.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/chartjs-plugin-zoom/0.6.6/chartjs-plugin-zoom.js"></script>
+<script type="text/javascript" >
 
-        <canvas id="grafica2" width="10" height="1"></canvas>
+// Получение ссылки на элемент canvas в DOM
+const grafica1 = document.querySelector('#grafica1');
+const grafica2 = document.querySelector('#grafica2');
+const grafica3 = document.querySelector('#grafica3');
+const grafica4 = document.querySelector('#grafica4');
+const grafica5 = document.querySelector('#grafica5');
+const grafica6 = document.querySelector('#grafica6');
 
-        <canvas id="grafica3" width="10" height="1"></canvas>
+// Goxy-Gz
+const depthGoxy = {{ context.depthGoxy | safe }};
+const depthGz = {{ context.depthGz | safe }};
 
-        <canvas id="grafica4" width="10" height="1"></canvas>
+let maxGz = 1;
+let minGz = 0;
+let stepGz = 0.1;
+let maxGoxy = 1;
+let minGoxy = 0.1;
+let stepGoxy = 0.1;
+let depthMin = 0;
+let depthMax = 1000;
+new Chart(grafica1,
+  {
+    type: 'scatter', // Тип графики
+    backgroundColor:'rgba(0, 0, 255)',
+    data: {
+      datasets: [
+        {
+          label: 'Goxy',
+          yAxisID: 'A',
+          data: depthGoxy,
+          showLine: true,
+          fill: false,
+          borderColor: 'rgba(0, 0, 255)',
 
-        <canvas id="grafica5" width="10" height="1"></canvas>
+        },
+        {
+          label: 'Gz',
+          yAxesID: 'B',
+          data: depthGz,
+          showLine: true,
+          fill: false,
+          borderColor: 'rgba(200, 0, 0, 1)',
+        },
+      ],
+    },
+    options: {
+      scales: {
+        yAxes: [{
+          id: 'A',
+          scaleLabel: {
+            display: true,
+            labelString: 'Goxy, G',
+          },
+          type: 'linear',
+          position: 'left',
+          ticks: {
+            max: maxGoxy,
+            min: minGoxy,
+            stepSize: stepGoxy,
+          },
+        },
+        {
+          id: 'B',
+          scaleLabel: {
+            display: true,
+            labelString: 'Gz, G',
+          },
+          type: 'linear',
+          position: 'right',
+          ticks: {
+            max: maxGz,
+            min: minGz,
+            stepSize: stepGz,
+          },
+        }],
+        xAxes: [{
+          ticks: {
+<!--            min:0,-->
+            stepSize: 100,
+            autoSkip: false,
+            },
+          scaleLabel: {
+            display: true,
+            labelString: 'Измеренная глубина, м',
+          },
+        }],
+      },
+      pan: {
+        enabled: true,
+        mode: 'xy',
+      },
+      zoom: {
+        enabled: true,
+        mode: 'xy',
+      },
+    },
+  });
 
-        <canvas id="grafica6" width="10" height="1"></canvas>
-    </div>
+// Gtotal
+const depthGref = {{ context.depthGref | safe }};
+const depthGtotal = {{ context.depthGtotal | safe }};
+const depthGmax = {{ context.depthGmax | safe }};
+const depthGmin = {{ context.depthGmin | safe }};
+
+  new Chart(grafica2,
+  {
+    type: 'scatter', // Тип графики
+    data: {
+      datasets: [
+        {
+          label: 'Gtotal',
+          yAxisID: 'A',
+          data: depthGtotal,
+          showLine: true,
+          fill: false,
+          borderColor: 'rgba(253, 233, 16)',
+        },
+        {
+
+          yAxesID: 'B',
+          label: 'Gref',
+          data: depthGref,
+          showLine: true,
+          showLabel: false,
+          fill: false,
+          borderColor: 'rgba(102, 255, 0)',
+        },
+        {
+          yAxesID: 'C',
+          label: 'Gmax',
+          data: depthGmax,
+          showLine: true,
+          fill: false,
+          borderColor: 'rgba( 255,0,51)',
+        },
+        {
+          yAxesID: 'D',
+          data: depthGmin,
+          label: 'Gmin',
+          showLine: true,
+          fill: false,
+          borderColor: 'rgba( 255,0,51)',
+        },
+      ],
+    },
+    options: {
+      scales: {
+        yAxes: [{
+          id: 'A',
+          scaleLabel: {
+            display: true,
+            labelString: 'Gtotal, G',
+          },
+          type: 'linear',
+          position: 'left',
+        }],
+        // for zooming
+        xAxes: [{
+          ticks: {
+<!--            min:0,-->
+            stepSize: 100,
+            autoSkip: false,
+            },
+          scaleLabel: {
+            display: true,
+            labelString: 'Измеренная глубина, м',
+          },
+        }],
+      },
+      pan: {
+        enabled: true,
+        mode: 'xy',
+      },
+      zoom: {
+        enabled: true,
+        mode: 'xy',
+      },
+    },
+  });
+
+// Boxy-Bz
+const depthBoxy = {{ context.depthBoxy | safe }};
+const depthBz = {{ context.depthBz | safe }};
+
+new Chart(grafica3,
+  {
+    type: 'scatter', // Тип графики
+    data: {
+      datasets: [
+        {
+          label: 'Boxy',
+          yAxisID: 'A',
+          data: depthBoxy,
+          showLine: true,
+          fill: false,
+          borderColor: 'rgba(0, 0, 255)',
+        },
+        {
+          label: 'Bz',
+          yAxesID: 'B',
+          data: depthBz,
+          showLine: true,
+          fill: false,
+          borderColor: 'rgba(200, 0, 0, 1)',
+        },
+      ],
+    },
+    options: {
+      scales: {
+        yAxes: [{
+          id: 'A',
+          scaleLabel: {
+            display: true,
+            labelString: 'Boxy, нТл',
+          },
+          type: 'linear',
+          position: 'left',
+          ticks: {
+            max: 70000,
+            min: -5000,
+            stepSize:5000,
+          },
+        },
+        {
+          id: 'B',
+          scaleLabel: {
+            display: true,
+            labelString: 'Bz, нТл',
+          },
+          type: 'linear',
+          position: 'right',
+          ticks: {
+            max: 70000,
+            min: -5000,
+            stepSize:5000,
+          },
+        }],
+        // for zooming
+        xAxes: [{
+          scaleLabel: {
+            display: true,
+            labelString: 'Измеренная глубина, м',
+          },
+        }],
+      },
+      pan: {
+        enabled: true,
+        mode: 'xy',
+      },
+      zoom: {
+        enabled: true,
+        mode: 'xy',
+      },
+    },
+  });
+
+// Btotal
+const depthBref = {{ context.depthBref | safe }};
+const depthBraw = {{ context.depthBtotal | safe }};
+const depthBmax = {{ context.depthBmax | safe }};
+const depthBmin = {{ context.depthBmin | safe }};
+const depthBcorr = {{ context.depthBcorr | safe }};
+
+  new Chart(grafica4,
+  {
+    type: 'scatter', // Тип графики
+    data: {
+      datasets: [
+        {
+          label: 'Btotal',
+          yAxisID: 'A',
+          data: depthBraw,
+          showLine: true,
+          fill: false,
+          borderColor: 'rgba(253, 233, 16)',
+        },
+        {
+          yAxesID: 'B',
+          data: depthBcorr,
+          label: 'Bcorr',
+          showLine: true,
+          fill: false,
+          borderColor:  'rgba(0, 0, 255)',
+          borderWidth: 2,
+        },
+        {
+          yAxesID: 'C',
+          label: 'Bmax',
+          data: depthBmax,
+          showLine: true,
+          fill: false,
+          borderColor: 'rgba( 255,0,51)',
+        },
+                  {
+
+          yAxesID: 'D',
+          label: 'Bref',
+          data: depthBref,
+          showLine: true,
+          showLabel: false,
+          fill: false,
+          borderColor: 'rgba(102, 255, 0)',
+        },
+        {
+          yAxesID: 'E',
+          data: depthBmin,
+          label: 'Bmin',
+          showLine: true,
+          fill: false,
+          borderColor: 'rgba( 255,0,51)',
+        },
+      ],
+    },
+    options: {
+      scales: {
+        yAxes: [{
+          id: 'A',
+          scaleLabel: {
+            display: true,
+            labelString: 'Btotal,нТл ',
+          },
+          type: 'linear',
+          position: 'left',
+        }],
+        // for zooming
+        xAxes: [{
+          scaleLabel: {
+            display: true,
+            labelString: 'Измеренная глубина, м',
+          },
+        }],
+      },
+      pan: {
+        enabled: true,
+        mode: 'xy',
+      },
+      zoom: {
+        enabled: true,
+        mode: 'xy',
+      },
+    },
+  });
+
+  const depthHSTF= [
+{ x: 52.60,	y: 185},
+{ x: 464.05, y: 287},
+{ x: 538.38, y: 14},
+{ x: 625.00, y: 75},
+{ x: 699.18, y: 318},
+{ x: 897.19, y: 129},
+{ x: 1072.41, y: 150},
+{ x: 1150.30, y: 75},
+];
+let lastDepth;// глубина последне предоставленной точки замера
+lastDepth =1150.3
+const hstf90 = [
+{ x: 0,	y:90},
+{ x: lastDepth, y: 90 },
+];
+const hstf180  = [{ x: 0, y: 180 },
+  { x: lastDepth, y:180 },
+];
+
+const hstf270 = [{ x: 0, y: 270 },
+  { x: lastDepth, y: 270 },
+];
+const hstf360 = [{ x: 0, y: 360 },
+  { x: lastDepth, y: 360 },
+];
+new Chart(grafica5,
+  {
+    type: 'scatter', // Тип графики
+    data: {
+      datasets: [
+        {
+          label: 'HSTF',
+          yAxisID: 'A',
+          data: depthHSTF,
+          showLine: false,
+          fill: false,
+          borderColor: 'rgba(253, 233, 16)',
+          borderWidth: 3,
+          position: 'left',
+          },
+              {
+          yAxesID: 'B',
+          display: false,
+          data: hstf90 ,
+          showLine: true,
+          fill: false,
+          borderWidth: 1,
+          borderColor: 'rgba( 255,0,51)',
+          },
+        {
+          yAxesID: 'C',
+          display: false,
+          data: hstf180 ,
+          showLine: true,
+          fill: false,
+          borderWidth: 1,
+          borderColor: 'rgba( 255,0,51)',
+                 },
+        {
+          yAxesID: 'D',
+          display: false,
+          data: hstf270 ,
+          showLine: true,
+          fill: false,
+          borderWidth: 1,
+          borderColor: 'rgba( 255,0,51)',
+          },
+        {
+          yAxesID: 'E',
+          data: hstf360 ,
+          display: false,
+          showLine: true,
+          fill: false,
+          borderWidth: 1,
+          borderColor: 'rgba( 255,0,51)',
+          },
+      ],
+    },
+    options: {
+      plugins: {
+            legend: false,
+            },
+       scales: {
+        yAxes: [{
+          legend: {
+          display: false,
+         },
+          id: 'A',
+          scaleLabel: {
+            display: true,
+            labelString: 'HSTF',
+          },
+
+          type: 'linear',
+          position: 'left',
+          ticks: {
+            max: 360,
+            min: 0,
+            stepSize:90,
+          },
+        }],
+        // for zooming
+        xAxes: [{
+          scaleLabel: {
+            display: true,
+            labelString: 'Измеренная глубина, м',
+          },
+          ticks: {
+            max: lastDepth,
+            min: 0,
+            stepSize:100,
+          },
+        }],
+      },
+      pan: {
+        enabled: true,
+        mode: 'xy',
+      },
+      zoom: {
+        enabled: true,
+        mode: 'xy',
+      },
+    },
+  });
+
+// Dip
+const depthDipref = {{ context.depthDipref | safe }};
+const depthDipraw = {{ context.depthDipraw | safe }};
+const depthDipmax = {{ context.depthDipmax | safe }};
+const depthDipmin = {{ context.depthDipmin | safe }};
+const depthDipcorr = {{ context.depthDipcorr | safe }};
+
+new Chart(grafica6,
+  {
+    type: 'scatter', // Тип графики
+    data: {
+      datasets: [
+        {
+          label: 'DipRaw',
+          yAxisID: 'A',
+          data: depthDipraw,
+          showLine: true,
+          fill: false,
+          borderColor: 'rgba(255, 179, 0)',
+        },
+        {
+
+          yAxesID: 'B',
+          label: 'DipRef',
+          data: depthDipref,
+          showLine: true,
+          showLabel: false,
+          fill: false,
+          borderColor: 'rgba(102, 255, 0)',
+        },
+        {
+          yAxesID: 'C',
+          label: 'DipMax',
+          data: depthDipmax,
+          showLine: true,
+          fill: false,
+          borderColor: 'rgba( 255,0,51)',
+        },
+        {
+          yAxesID: 'D',
+          data: depthDipmin,
+          label: 'DipMin',
+          showLine: true,
+          fill: false,
+          borderColor: 'rgba( 255,0,51)',
+        },
+        {
+          yAxesID: 'E',
+          data: depthDipcorr,
+          label: 'DipCorr',
+          showLine: true,
+          fill: false,
+          borderColor: 'rgba(0, 0, 255)',
+        },
+      ],
+    },
+    options: {
+      scales: {
+        yAxes: [{
+          ticks: {
+<!--            max: 81,-->
+<!--            min: 79,-->
+            stepSize:0.5,
+          },
+          id: 'A',
+          scaleLabel: {
+            display: true,
+            labelString: 'Магнитное наклонение,гр ',
+          },
+          type: 'linear',
+          position: 'left',
+        }],
+        // for zooming
+        xAxes: [{
+          scaleLabel: {
+            display: true,
+            labelString: 'Измеренная глубина, м',
+          },
+        }],
+      },
+      pan: {
+        enabled: true,
+        mode: 'xy',
+      },
+      zoom: {
+        enabled: true,
+        mode: 'xy',
+      },
+    },
+  });
+</script>
+
 </center>
-
-
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.bundle.min.js"></script>
-    <script>
-        // Получение ссылки на элемент canvas в DOM
-        const grafica1 = document.querySelector("#grafica1");
-        const grafica2 = document.querySelector("#grafica2");
-        const grafica3 = document.querySelector("#grafica3");
-        const grafica4 = document.querySelector("#grafica4");
-        const grafica5 = document.querySelector("#grafica5");
-        const grafica6 = document.querySelector("#grafica6");
-
-        // Tags - это метки, которые идут по оси X.
-        const tags = ["Январь", "Февраль", "Март", "Апрель"]
-        // У нас может быть несколько наборов данных. Давайте начнем с одного
-        const dataSales2020 = {
-            label: "Продажи за месяц",
-            data: [5000, 1500, 8000, 5102], // Данные представляют собой массив, который должен иметь такое же количество значений, как и количество тегов.
-            backgroundColor: 'rgba(54, 162, 235, 0.2)', // Цвет фона
-            borderColor: 'rgba(54, 162, 235, 1)', // Цвет границ
-            borderWidth: 1,// Толщина границ
-        };
-        new Chart(grafica1, {
-            type: 'line',// Тип графики
-            data: {
-                labels: tags,
-                datasets: [
-                    dataSales2020,
-                    // Больше данных здесь....
-                ]
-            },
-            options: {
-                scales:{
-                  yAxes: [{
-                    scaleLabel: {
-                      display: true,
-                      labelString: 'Goxy, G'
-                    }
-                  }],
-                  xAxes: [{
-                    scaleLabel: {
-                      display: true,
-                      labelString: 'Измеренная глубина, м'
-                    }
-                  }],
-                },
-            }
-        });
-        new Chart(grafica2, {
-            type: 'line',// Тип графики
-            data: {
-                labels: tags,
-                datasets: [
-                    dataSales2020,
-                    // Больше данных здесь....
-                ]
-            },
-            options: {
-                scales: {
-                    yAxes: [{
-                        ticks: {
-                            beginAtZero: true
-                        }
-                    }],
-                },
-            }
-        });
-        new Chart(grafica3, {
-            type: 'line',// Тип графики
-            data: {
-                labels: tags,
-                datasets: [
-                    dataSales2020,
-                    // Больше данных здесь....
-                ]
-            },
-            options: {
-                scales: {
-                    yAxes: [{
-                        ticks: {
-                            beginAtZero: true
-                        }
-                    }],
-                },
-            }
-        });
-        new Chart(grafica4, {
-            type: 'line',// Тип графики
-            data: {
-                labels: tags,
-                datasets: [
-                    dataSales2020,
-                    // Больше данных здесь....
-                ]
-            },
-            options: {
-                scales: {
-                    yAxes: [{
-                        ticks: {
-                            beginAtZero: true
-                        }
-                    }],
-                },
-            }
-        });
-        new Chart(grafica5, {
-            type: 'line',// Тип графики
-            data: {
-                labels: tags,
-                datasets: [
-                    dataSales2020,
-                    // Больше данных здесь....
-                ]
-            },
-            options: {
-                scales: {
-                    yAxes: [{
-                        ticks: {
-                            beginAtZero: true
-                        }
-                    }],
-                },
-            }
-        });
-        new Chart(grafica6, {
-            type: 'line',// Тип графики
-            data: {
-                labels: tags,
-                datasets: [
-                    dataSales2020,
-                    // Больше данных здесь....
-                ]
-            },
-            options: {
-                scales: {
-                    yAxes: [{
-                        ticks: {
-                            beginAtZero: true
-                        }
-                    }],
-                },
-            }
-        });
-    </script>
 {% endblock %}
