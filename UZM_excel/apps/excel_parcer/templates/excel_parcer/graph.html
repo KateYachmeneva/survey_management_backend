@@ -432,32 +432,27 @@ const depthBcorr = {{ context.depthBcorr | safe }};
     },
   });
 
-  const depthHSTF= [
-{ x: 52.60,	y: 185},
-{ x: 464.05, y: 287},
-{ x: 538.38, y: 14},
-{ x: 625.00, y: 75},
-{ x: 699.18, y: 318},
-{ x: 897.19, y: 129},
-{ x: 1072.41, y: 150},
-{ x: 1150.30, y: 75},
-];
-let lastDepth;// глубина последне предоставленной точки замера
-lastDepth =1150.3
+// HSTF
+const depthHSTF = {{ context.depthHSTF | safe }};
+const firstDepth = {{ context.firstDepth | safe }};
+const lastDepth = {{ context.lastDepth | safe }};
 const hstf90 = [
-{ x: 0,	y:90},
+{ x: firstDepth, y: 90},
 { x: lastDepth, y: 90 },
 ];
-const hstf180  = [{ x: 0, y: 180 },
-  { x: lastDepth, y:180 },
+const hstf180 = [
+{ x: firstDepth, y: 180},
+{ x: lastDepth, y: 180 },
+];
+const hstf270 = [
+{ x: firstDepth, y: 270},
+{ x: lastDepth, y: 270 },
+];
+const hstf360 = [
+{ x: firstDepth, y: 360},
+{ x: lastDepth, y: 360 },
 ];
 
-const hstf270 = [{ x: 0, y: 270 },
-  { x: lastDepth, y: 270 },
-];
-const hstf360 = [{ x: 0, y: 360 },
-  { x: lastDepth, y: 360 },
-];
 new Chart(grafica5,
   {
     type: 'scatter', // Тип графики
@@ -542,7 +537,7 @@ new Chart(grafica5,
           },
           ticks: {
             max: lastDepth,
-            min: 0,
+<!--            min: 0,-->
             stepSize:100,
           },
         }],

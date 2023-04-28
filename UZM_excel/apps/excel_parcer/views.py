@@ -125,7 +125,7 @@ def graph(request):
     depthDipmax = []
     depthDipmin = []
     depthDipcorr = []  # пока нет функционала для Dipcorr, временно берем Dipraw
-
+    depthHSTF = []
 
     if request.method == 'POST':
         well = Well.objects.get(id=request.POST['well'])
@@ -150,6 +150,8 @@ def graph(request):
                 depthBmax.append({'x': survey.depth, 'y': well.max_btotal()})
                 depthBmin.append({'x': survey.depth, 'y': well.min_btotal()})
                 depthBcorr.append({'x': survey.depth, 'y': survey.Btotal()})
+                # График HSTF
+                depthHSTF.append({'x': survey.depth, 'y': survey.get_hstf()})
                 # График Dip
                 depthDipraw.append({'x': survey.depth, 'y': survey.Dip()})
                 depthDipref.append({'x': survey.depth, 'y': well.dip})
@@ -157,6 +159,8 @@ def graph(request):
                 depthDipmin.append({'x': survey.depth, 'y': well.min_dip()})
                 depthDipcorr.append({'x': survey.depth, 'y': survey.Dip()})
 
+    firstDepth = depthHSTF[0]['x']
+    lastDepth = depthHSTF[-1]['x']
     context = {
         'title': 'График',
         'well': get_all_well(),
@@ -178,6 +182,9 @@ def graph(request):
         'depthDipmax': depthDipmax,
         'depthDipmin': depthDipmin,
         'depthDipcorr': depthDipcorr,
+        'depthHSTF': depthHSTF,
+        'firstDepth': firstDepth,
+        'lastDepth': lastDepth,
     }
 
     return render(request, 'excel_parcer/graph.html', {'context': context, })

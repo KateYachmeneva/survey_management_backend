@@ -1,5 +1,5 @@
 import math
-from math import sqrt
+from math import sqrt, atan2, degrees
 
 from django.db import models
 from django import forms
@@ -112,6 +112,10 @@ class Data(models.Model):
 
     def get_boxy(self) -> float:
         return sqrt(self.BX ** 2 + self.BY ** 2)
+
+    def get_hstf(self) -> int:
+        hstf = (degrees(atan2(-self.CX, -self.CY)) - 90) % 360
+        return int(hstf)
 
 
 class TelesystemIndex(models.Model):
