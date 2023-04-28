@@ -22,7 +22,7 @@
 Если версия pip не выводится, 
 то требуется установить pip самостоятельно 
 (https://pythonru.com/baza-znanij/ustanovka-pip-dlja-python-i-bazovye-komandy).  
-Успешная проверка:
+Успешная проверка:  
 ![image](https://user-images.githubusercontent.com/79474789/235150465-ba2ebfae-dc96-43f6-ba28-9d07098327a9.png)
 
 <b>5. Создаем и активируем виртуально окружение </b>  
