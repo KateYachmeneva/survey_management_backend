@@ -332,3 +332,10 @@ def get_all_run() -> QuerySet:
     runs = Run.objects.all()
     itog = sorted(runs, key=lambda x: str(x))
     return itog
+
+
+def get_all_well() -> QuerySet:
+    """Получить все скважины"""
+    wells = Well.objects.all()
+    result = sorted(wells, key=lambda x: str(x))
+    return result
