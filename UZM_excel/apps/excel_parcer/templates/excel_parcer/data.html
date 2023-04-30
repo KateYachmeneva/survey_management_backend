@@ -1,10 +1,35 @@
 {% extends 'base.html' %}
+{% load static %}
 
-
+{%  block header %}
+<!-- Стиль для вспылвающих подсказок-->
+<style>
+   [data-tooltip] {
+    position: relative; /* Относительное позиционирование */
+   }
+   [data-tooltip]::after {
+    content: attr(data-tooltip); /* Выводим текст */
+    position: absolute; /* Абсолютное позиционирование */
+    width: 15em; /* Ширина подсказки */
+    right: -7em; bottom: 1.5em; /* Положение подсказки */
+    background: #3989c9; /* Синий цвет фона */
+    color: #fff; /* Цвет текста */
+    padding: 0.5em; /* Поля вокруг текста */
+    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3); /* Параметры тени */
+    pointer-events: none; /* Подсказка */
+    opacity: 0; /* Подсказка невидима */
+    transition: 1s; /* Время появления подсказки */
+   }
+   [data-tooltip]:hover::after {
+    opacity: 1; /* Показываем подсказку */
+    /*bottom: 0em;  Положение подсказки */
+   }
+ </style>
+{% endblock %}
 
 {% block content %}
 <center>
-<div style="max-width:5000px">
+<div>
         <form action="{% url 'add_data' %}" method="post" enctype="multipart/form-data" style="margin-top:1%" name="axe_form" onsubmit="return validForm()">
             {% csrf_token %}
 
@@ -42,38 +67,45 @@
 
             <hr style="color:#FFC501;margin-top:1%;border-width: 3px">
 
-            <div class="container">
-                  <div class="row">
-                    <div class="col-sm">
-                      <h4 style="margin-top:3%">Загрузите файл с осями</h4>
-                            {% csrf_token %}
-                        <input  type="file" name="file" style="margin-top:1%">
-                    </div>
-                    <div class="col-sm">
-                        <h5 style="margin-top:2%">Имя(буква) столбца</h5>
+            <div class="container" style="max-width:90%">
+                  <div class="row justify-content-between" style="margin-left:0px;
+                                                                  margin-right:0px;">
+                      <div class="col col-6 align-self-center">
+                          <h4 style="margin-top:2%">Загрузите файл с осями</h4>
+                          {% csrf_token %}
+                          <input  type="file" accept=".xls,.xlsx,.las,.txt,.sur,.csv" name="file" style="margin-top:1%">
+                          <a data-tooltip="Файлы с разрешение .xls .xlsx .las .txt .sur">
+                              <img class="circle" src="{% static 'img/report/question.png'%}"
+                                                  alt="question"
+                                                  style="height: 16px;width: 16px;">
+                          </a>
+                      </div>
+
+                      <div class="col col-6 align-self-center">
+                        <h4 style="margin-top:2%">Имя(буква) столбца</h4>
                         <div class="input-group mb-3">
-                              <span class="input-group-text">Глубина</span>
-                          <input type="text" class="form-control" name="manually_depth" id="inp_depth">
-                          <span class="input-group-text">Gx</span>
-                          <input type="text" class="form-control" name="manually_gx" id="inp_gx">
-                                      <span class="input-group-text">Gy</span>
-                          <input type="text" class="form-control" name="manually_gy" id="inp_gy">
-                                      <span class="input-group-text">Gz</span>
-                          <input type="text" class="form-control" name="manually_gz" id="inp_gz">
-                                      <span class="input-group-text">Bx</span>
-                          <input type="text" class="form-control" name="manually_bx" id="inp_bx">
-                                      <span class="input-group-text">By</span>
-                          <input type="text" class="form-control" name="manually_by" id="inp_by">
-                                      <span class="input-group-text">Bz</span>
-                          <input type="text" class="form-control" name="manually_bz" id="inp_bz">
+                            <span class="input-group-text">Глубина</span>
+                            <input type="text" class="form-control" name="manually_depth" id="inp_depth">
+                            <span class="input-group-text">Gx</span>
+                            <input type="text" class="form-control" name="manually_gx" id="inp_gx">
+                            <span class="input-group-text">Gy</span>
+                            <input type="text" class="form-control" name="manually_gy" id="inp_gy">
+                            <span class="input-group-text">Gz</span>
+                            <input type="text" class="form-control" name="manually_gz" id="inp_gz">
+                            <span class="input-group-text">Bx</span>
+                            <input type="text" class="form-control" name="manually_bx" id="inp_bx">
+                            <span class="input-group-text">By</span>
+                            <input type="text" class="form-control" name="manually_by" id="inp_by">
+                            <span class="input-group-text">Bz</span>
+                            <input type="text" class="form-control" name="manually_bz" id="inp_bz">
                         </div>
                         <div class="input-group mb-3">
-                          <span class="input-group-text">Строка единиц измерений</span>
+                            <span class="input-group-text">Строка единиц измерений</span>
                             <input type="text" class="form-control"  name="manually_measurement" id="inp_unit">
-                          <span class="input-group-text" >Импорт со строки</span>
+                            <span class="input-group-text" >Импорт со строки</span>
                             <input type="text" class="form-control" name="manually_import" id="inp_string">
                         </div>
-                    </div>
+                      </div>
                   </div>
             </div>
 

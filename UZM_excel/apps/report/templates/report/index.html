@@ -30,7 +30,7 @@
     opacity: 1; /* Показываем подсказку */
     /*bottom: 0em;  Положение подсказки */
    }
-  </style>
+ </style>
 
 {% endblock %}
 
@@ -38,10 +38,10 @@
 
 {% block content %}
     <form action="{% url 'report' %}" class="container" method="post" enctype="multipart/form-data"
-          onsubmit="return validForm()" name="file_form">
+          onsubmit="return validForm()" name="file_form" >
       <div class="container__line"></div>
       <div class="container__item">
-        <label class="container__label" for="run">Рейс</label>
+        <label class="container__label" for="run" style="text-align: center;">Рейс</label>
         <select class="container__selector selector" name="run" id="run">
           <option value="Выберите рейс">Выберите рейс</option>
           {% for r in context.run %}
@@ -54,11 +54,11 @@
 
       <div class="container__item">
         <div class="container__file">
-          <label class="container__label container__label_type_color"> Сырые динамические замеры </label>
+          <label class="container__label container__label_type_color" style="width:60%"> Сырые динамические замеры </label>
           <a data-tooltip="Файлы формата .las или .excel">
           <img class="circle" src="{% static 'img/report/question.png'%}"  alt="question">
           </a>
-          <input class="container__input" type="file" name="raw_file" />
+          <input class="container__input" type="file" accept=".xls,.xlsx,.las" name="raw_file" />
         </div>
         <div class="container__inputs">
           <select class="container__selector selector" id="raw_file_type">
@@ -128,7 +128,7 @@
       <div class="container__item">
         <div class="container__file">
           <label class="container__label container__label_type_color" >Замеры ННБ</label>
-          <input class="container__input" type="file" name="nnb_file" />
+          <input class="container__input" type="file" accept=".xls,.xlsx" name="nnb_file" />
         </div>
         <div class="container__inputs">
           <div class="container__text">
@@ -137,8 +137,8 @@
           <div class="container__text">
             <label class="container__label container__label_type_pos" >Глубина
             <a data-tooltip="Буквенный индекс колонки с искомым значением">
-             <img class="circle" src="{% static 'img/report/question.png'%}"  alt="question">
-             </a></label>
+                <img class="circle" src="{% static 'img/report/question.png'%}"  alt="question">
+            </a></label>
             <input type="text" name="nnb_static_depth" value="{{context.index.nnb_static_depth}}" />
           </div>
           <div class="container__text">
@@ -211,17 +211,17 @@
       <div class="container__line"></div>
       <div class="container__item">
         <div class="container__file">
-          <label class="container__label container__label_type_color" >Статические замеры ИГиРГИ</label>
+          <label class="container__label container__label_type_color" style="width:60%">Статические замеры ИГиРГИ</label>
           <a data-tooltip="Загружаем файл в .excel формате или вставляем данные вручную">
           <img class="circle" src="{% static 'img/report/question.png'%}"  alt="question">
           </a>
           {% if context.igirgi_data == True %}
           <!--     всё нормально ошибка из-за элементов  содинаковым id но на практике используется лишь один из них по условию шаблонизатора     -->
-          <input class="container__input" type="file" id='igirgi_file' name="igirgi_file" disabled/>
+          <input class="container__input" type="file" accept=".xls,.xlsx" id='igirgi_file' name="igirgi_file" disabled/>
           <input type="button" id="modal_with_data" value="Ввести данные">
           <input type="button" id="delete_igirgi_data" value="Очистить введенные данные">
           {% else %}
-          <input class="container__input" type="file" id='igirgi_file' name="igirgi_file"/>
+          <input class="container__input" type="file" accept=".xls,.xlsx" id='igirgi_file' name="igirgi_file"/>
           <input type="button" id="modal_with_data" value="Ввести данные">
           <input type="button" id="delete_igirgi_data" value="Очистить введенные данные" disabled>
           {% endif %}
@@ -270,8 +270,8 @@
       <div class="container__line"></div>
       <div class="container__item">
         <div class="container__file">
-          <label class="container__label container__label_type_color" >Плановая траектория</label>
-          <input class="container__input" type="file" name="plan_file" />
+          <label class="container__label container__label_type_color" style="width:60%">Плановая траектория</label>
+          <input class="container__input" type="file" accept=".xls,.xlsx" name="plan_file" />
         </div>
         <div class="container__inputs">
           <div class="container__text">

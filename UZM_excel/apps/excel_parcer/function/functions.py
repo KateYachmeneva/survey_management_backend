@@ -1,7 +1,10 @@
+import csv
 import re
 from typing import NoReturn
 
 import lasio
+import numpy as np
+# import pandas as pd
 from openpyxl import load_workbook
 from xls2xlsx import XLS2XLSX
 from excel_parcer.models import *
@@ -20,16 +23,67 @@ def parcing_manually(path, manually_depth, manually_gx, manually_gy, manually_gz
     Считываем данные с экселя осей по указанным параметрам. Возращает list с list'ами.
     Лист замеров - лист нижней абстракции это набор параметров глубина - оси.
     """
+    try:
+        manually_import = int(manually_import)
+    except:
+        manually_import = None
     data: list = [[], [], [], [], [], [], []]
 
     if "las" in re.findall(r".(las)", path):
+        """Для обработки las"""
         las_file = lasio.read(path)
 
         for i, name in enumerate(
                 [manually_bz, manually_by, manually_bx, manually_gz, manually_gy, manually_gx, manually_depth]):
             if name in las_file.keys():
-                data[i] = las_file[name]
+                data[i] = np.asarray(las_file[name])
+        data = np.asarray(data)
+        data = data[:, ~np.isnan(data).any(axis=0)]
+    # FIXME поправить вывод
+    elif "csv" in re.findall(r".(csv)", path):
+        """Для обработки csv"""
+        # with open(path, 'r', newline='') as csvfile:
+        #     spamreader = csv.reader(csvfile, delimiter=' ', quotechar='|')
+        #     for row in spamreader:
+        #         print(row)
+        with open(path, newline='') as csvfile:
+            reader = csv.DictReader(csvfile, delimiter=' ')
+            for row in reader:
+                print(row)
+    elif "sur" in re.findall(r".(sur)", path):
+        """Для обработки sur"""
+        name_List = [manually_bz, manually_by, manually_bx, manually_gz, manually_gy, manually_gx, manually_depth]
+        with open(path, encoding="utf-8") as f:
+            for number, word in enumerate(f.readline().split()):
+                for index, name in enumerate(name_List):
+                    if word == name:
+                        name_List[index] = number
+            for raw in f.readlines():
+                raw_list = raw.split()
+                if len(raw_list) == 0:
+                    continue
+                for d_index, n_index in enumerate(name_List):
+                    data[d_index].append(float(raw_list[int(n_index)]))
+    elif "txt" in re.findall(r".(txt)", path):
+        """Для обработки txt"""
+        name_List = [manually_bz, manually_by, manually_bx, manually_gz, manually_gy, manually_gx, manually_depth]
+        start_index = (manually_import if manually_import is not None else 31)
+        with open(path, encoding="utf-8") as f:
+            for i in range(int(start_index)):
+                f.readline()
+            for number, word in enumerate(f.readline().split(sep=',')):
+                for index, name in enumerate(name_List):
+                    if word == name:
+                        name_List[index] = number
+            for raw in f.readlines():
+                raw_list = raw.split(sep=',')
+                if len(raw_list) == 0:
+                    continue
+                for d_index, n_index in enumerate(name_List):
+                    data[d_index].append(float(raw_list[int(n_index)]))
+        print(data)
     else:
+        """Для обработки excel"""
         try:
             wb = load_workbook(filename=path, data_only=True)
         except:
