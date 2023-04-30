@@ -27,7 +27,7 @@
 <br/>Успешная проверка:
 <image src="https://user-images.githubusercontent.com/79474789/235150465-ba2ebfae-dc96-43f6-ba28-9d07098327a9.png">
 <br/>
-<h4><b>5. Создаем и активируем виртуально окружение </b>  </h4>
+<h4><b>5. Создаем и активируем виртуальное окружение </b>  </h4>
 > python -m venv env   
 <br/>> env\Scripts\activate 
 <image src="https://user-images.githubusercontent.com/79474789/235152459-60821dd4-c0dd-4dd1-99f0-457258d3c7ad.png">
