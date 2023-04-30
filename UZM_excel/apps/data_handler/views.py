@@ -38,7 +38,6 @@ def param(request):
     return render(request, 'data_handler/param.html', {'context': context, })
 
 
-# TODO переносим в data_handler
 def graph(request):
     """Страница с графиком первичного контроля"""
     depthGoxy = []

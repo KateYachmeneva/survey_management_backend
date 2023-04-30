@@ -3,7 +3,6 @@
 .env.local
 .env.staging
 env
-__pycache__
 UZM_excel\conf.py
 media
 files
