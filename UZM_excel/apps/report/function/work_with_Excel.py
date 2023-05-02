@@ -223,9 +223,9 @@ def write_data(excel: openpyxl.workbook.workbook.Workbook,
 
 def table_hat(excel_sheet: openpyxl.workbook.workbook.Workbook.worksheets, Well: object) -> NoReturn:
     """Шапка колонок таблицы"""
-    excel_sheet['D16'].value = '-' if Well.north_direction is None else Well.get_north_direction()
-    excel_sheet['H16'].value = '-' if Well.north_direction is None else Well.get_north_direction()
-    excel_sheet['J16'].value = '-' if Well.north_direction is None else Well.get_north_direction()
+    excel_sheet['C16'].value = '-' if Well.north_direction is None else Well.get_north_direction()
+    excel_sheet['G16'].value = '-' if Well.north_direction is None else Well.get_north_direction()
+    excel_sheet['I16'].value = '-' if Well.north_direction is None else Well.get_north_direction()
 
 
 def write_hat(excel_sheet: openpyxl.workbook.workbook.Workbook.worksheets, Well: object) -> NoReturn:
