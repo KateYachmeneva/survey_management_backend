@@ -4,15 +4,15 @@
 
 {% block head %}
 <html lang="en">
-<link rel="stylesheet" href="css/styles.css">
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.bundle.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/chartjs-plugin-zoom/0.6.6/chartjs-plugin-zoom.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@latest/dist/Chart.min.js"></script>
+
 {% endblock %}
 
 {% block data %}
-
+<link type="text/css" href="{% static 'css/data_handler/chart.css' %}" rel="stylesheet" />
 <center>
 
 <div style="max-width:5000px">
@@ -41,36 +41,147 @@
 
 <hr style="color:#FFC501;margin-top:1%;border-width: 3px">
 
+<div class="well-header">
+  <h2>  местрождение Куст 1 скважина 1</h2>
+<label class = "status">В бурении</label></div>
 <div class="container" >
-    <canvas id="grafica1" width="50" height="15"></canvas>
-<!--    <div class="container-form" >-->
-<!--      <form>-->
-<!--          <label>Ось х </label>-->
-<!--              <div class="mb-3">-->
-<!--                <label>Минимальное  значение: <input id="number" type="number" step="0.1"></label>-->
-<!--                <label>Максимальное значение: <input id="number" type="number" step="0.1"></label>-->
-<!--                <label>Шаг: <input id="number" type="number" step="0.1"></label>-->
-<!--              </div>-->
-<!--                <label>Ось y1 </label>-->
-<!--              <div class="mb-3">-->
-<!--                <label>Минимальное значение: <input id="number" type="number" step="0.1"></label>-->
-<!--                <label>Максимальное значение: <input id="number" type="number" step="0.1"></label>-->
-<!--                <label>Шаг: <input id="number" type="number" step="0.1"></label>-->
-<!--              </div>-->
-<!--                <label>Ось y2 </label>-->
-<!--              <div class="mb-3">-->
-<!--                <label>Минимальное значение: <input id="number" type="number" step="0.1"></label>-->
-<!--                <label>Максимальное значение: <input id="number" type="number" step="0.1"></label>-->
-<!--                <label>Шаг: <input id="number" type="number" step="0.1"></label>-->
-<!--              </div>-->
-<!--          <button type="submit" class="btn btn-primary">Submit</button>-->
-<!--      </form>-->
-<!--    </div>-->
-    <canvas id="grafica2" width="50" height="15"></canvas>
-    <canvas id="grafica3" width="50" height="15"></canvas>
-    <canvas id="grafica4" width="50" height="15"></canvas>
-    <canvas id="grafica5" width="50" height="15"></canvas>
-    <canvas id="grafica6" width="50" height="15"></canvas>
+  <div class="container-form" >  
+  <div class="chart-header"> График соотношения показаний осевого и поперечных акселерометров </div>
+  <canvas id="grafica1" width="50" height="15"></canvas>
+  <form id ="form">
+  <label>Глубина, м </label>
+  <div class="mb-3">
+<label>Минимальное  значение: <input id="depthMin" type="number" step="10"></label>
+<label>Максимальное значение: <input id="depthMax" type="number" step="10"></label>
+<label>Шаг: <input id="depthStep" type="number" step="10"></label>
+</div>
+<label>Goxy,G</label>
+<div class="mb-3">
+<label>Минимальное значение: <input id="minGoxy" type="number" step="0.1"></label>
+<label>Максимальное значение: <input id="maxGoxy" type="number" step="0.1"></label>
+<label>Шаг: <input id="stepGoxy" type="number" step="0.1"></label>
+</div>   
+<label>Gz,G </label>
+<div class="mb-3">
+<label>Минимальное значение: <input id="minGz" type="number" step="0.1"></label>
+<label>Максимальное значение: <input id="maxGz" type="number" step="0.1"></label>
+<label>Шаг: <input id="stepGz" type="number" step="0.1"></label>
+</div>    
+<div class="container-btn" >   
+<button type="submit" id="sbtn">Submit</button>
+<button type="submit" id="undo">Undo</button>
+</div>
+</form></div>
+<div class="container-form" > 
+  <div class="chart-header"> График напряженности гравитационного поля </div>
+<canvas id="grafica2" width="50" height="15"></canvas> 
+<form id ="formGtotal">
+  <label>Глубина, м </label>
+  <div class="mb-3">
+<label>Минимальное  значение: <input id="depthMin" type="number" step="10"></label>
+<label>Максимальное значение: <input id="depthMax" type="number" step="10"></label>
+<label>Шаг: <input id="depthStep" type="number" step="10"></label>
+</div>
+<label>Gtotal,G</label>
+<div class="mb-3">
+<label>Минимальное значение: <input id="minGtotal" type="number" step="0.01"></label>
+<label>Максимальное значение: <input id="maxGtotal" type="number" step="0.01"></label>
+<label>Шаг: <input id="stepGtotal" type="number" step="0.001"></label>
+</div>   
+<div class="container-btn" >   
+<button type="submit" id="sbtnGtotal">Submit</button>
+<button type="submit" id="undoGtotal">Undo</button>
+</div>
+</form>
+</div>
+<div class="container-form" >
+  <div class="chart-header"> График соотношений показаний осевых и поперечных магнитометров </div>
+  <canvas id="grafica3" width="50" height="15"></canvas>
+  <form id ="formB">
+    <label>Глубина, м </label>
+    <div class="mb-3">
+  <label>Минимальное  значение: <input id="depthMin" type="number" step="10"></label>
+  <label>Максимальное значение: <input id="depthMax" type="number" step="10"></label>
+  <label>Шаг: <input id="depthStep" type="number" step="10"></label>
+  </div>
+  <label>Boxy,нТл</label>
+  <div class="mb-3">
+  <label>Минимальное значение: <input id="minBoxy" type="number" step="10"></label>
+  <label>Максимальное значение: <input id="maxBoxy" type="number" step="10"></label>
+  <label>Шаг: <input id="stepBoxy" type="number" step="50"></label>
+  </div>   
+  <label>Bz,нТл </label>
+  <div class="mb-3">
+  <label>Минимальное значение: <input id="minBz" type="number" step="50"></label>
+  <label>Максимальное значение: <input id="maxBz" type="number" step="50"></label>
+  <label>Шаг: <input id="stepBz" type="number" step="50"></label>
+  </div>    
+  <div class="container-btn" >   
+  <button type="submit" id="sbtn">Submit</button>
+  <button type="submit" id="undoB">Undo</button>
+  </div>
+  </form>
+</div>
+<div class="container-form" > 
+  <div class="chart-header"> График напряженности геомагнитного поля </div>
+  <canvas id="grafica4" width="50" height="15"></canvas>
+  <form id ="formBt">
+    <label>Глубина, м </label>
+    <div class="mb-3">
+  <label>Минимальное  значение: <input id="depthMin" type="number" step="10"></label>
+  <label>Максимальное значение: <input id="depthMax" type="number" step="10"></label>
+  <label>Шаг: <input id="depthStep" type="number" step="10"></label>
+  </div>
+  <label>Btotal,нТл</label>
+  <div class="mb-3">
+  <label>Минимальное значение: <input id="minBtot" type="number" step="10"></label>
+  <label>Максимальное значение: <input id="maxBtot" type="number" step="10"></label>
+  <label>Шаг: <input id="stepBtot" type="number" step="50"></label>
+  </div>   
+  <div class="container-btn" >   
+  <button type="submit" id="sbtn">Submit</button>
+  <button type="submit" id="undoBt">Undo</button>
+  </div>
+  </form>
+</div>
+<div class="container-form" >
+  <div class="chart-header"> HSTF</div>
+<canvas id="grafica5" width="50" height="15"></canvas>
+<form id ="formHSTF">
+  <label>Глубина, м </label>
+  <div class="mb-3">
+<label>Минимальное  значение: <input id="depthMin" type="number" step="10"></label>
+<label>Максимальное значение: <input id="depthMax" type="number" step="10"></label>
+<label>Шаг: <input id="depthStep" type="number" step="10"></label>
+</div> 
+<div class="container-btn" >   
+<button type="submit" id="sbtn">Submit</button>
+<button type="submit" id="undoHSTF">Undo</button>
+</div>
+</form>
+</div>
+<div class="container-form" >
+  <div class="chart-header"> График магнитного наклонения </div>
+  <canvas id="grafica6" width="50" height="15"></canvas> 
+  <form id ="formDip">
+    <label>Глубина, м </label>
+    <div class="mb-3">
+  <label>Минимальное  значение: <input id="depthMin" type="number" step="10"></label>
+  <label>Максимальное значение: <input id="depthMax" type="number" step="10"></label>
+  <label>Шаг: <input id="depthStep" type="number" step="10"></label>
+  </div>
+  <label>Dip,гр</label>
+  <div class="mb-3">
+  <label>Минимальное значение: <input id="minDip" type="number" step="0.1"></label>
+  <label>Максимальное значение: <input id="maxDip" type="number" step="0.1"></label>
+  <label>Шаг: <input id="stepDip" type="number" step="0.1"></label>
+  </div>           
+  <div class="container-btn" >   
+  <button type="submit" id="sbtn">Submit</button>
+  <button type="submit" id="undoDip">Undo</button>
+  </div>
+  </form>
+  </div>
 </div>
 
 <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/hammer.js/2.0.8/hammer.min.js"></script>
@@ -78,27 +189,120 @@
 <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/chartjs-plugin-zoom/0.6.6/chartjs-plugin-zoom.js"></script>
 <script type="text/javascript" >
 
-// Получение ссылки на элемент canvas в DOM
+/// Получение ссылки на элемент canvas в DOM
 const grafica1 = document.querySelector('#grafica1');
 const grafica2 = document.querySelector('#grafica2');
 const grafica3 = document.querySelector('#grafica3');
 const grafica4 = document.querySelector('#grafica4');
 const grafica5 = document.querySelector('#grafica5');
 const grafica6 = document.querySelector('#grafica6');
+ 
+//Получаем ссылкии на кнопки в DOM
+let form = document.getElementById('form');
+let formGtotal = document.getElementById('formGtotal');
+let formB = document.getElementById('formB');
+let formBt = document.getElementById('formBt');
+let formHSTF = document.getElementById('formHSTF');
+let formDip = document.getElementById('formDip');
+let undBtn = document.getElementById('undo');
+let undBtnGtot = document.getElementById('undoGtotal');
+let undBtnB = document.getElementById('undoB');
+let undBtnBt = document.getElementById('undoBt');
+let undBtnHSTF = document.getElementById('undoHSTF');
+let undBtnDip = document.getElementById('undoDip');
+
+//Получаем массивы для отрисовки данных
 
 // Goxy-Gz
+
 const depthGoxy = {{ context.depthGoxy | safe }};
 const depthGz = {{ context.depthGz | safe }};
 
-let maxGz = 1;
-let minGz = 0;
-let stepGz = 0.1;
-let maxGoxy = 1;
-let minGoxy = 0.1;
-let stepGoxy = 0.1;
-let depthMin = 0;
-let depthMax = 1000;
-new Chart(grafica1,
+// Gtotal
+const depthGref = {{ context.depthGref | safe }};
+const depthGtotal = {{ context.depthGtotal | safe }};
+
+
+
+// Boxy-Bz
+const depthBoxy = {{ context.depthBoxy | safe }};
+const depthBz = {{ context.depthBz | safe }};
+
+
+// Btotal
+const depthBref = {{ context.depthBref | safe }};
+const depthBraw = {{ context.depthBtotal | safe }};
+const depthBcorr = {{ context.depthBcorr | safe }};
+
+
+// HSTF
+const depthHSTF = {{ context.depthHSTF | safe }};
+
+//DIP
+const depthDipref = {{ context.depthDipref | safe }};
+const depthDipraw = {{ context.depthDipraw | safe }};
+const depthDipcorr = {{ context.depthDipcorr | safe }};
+
+
+//обработка отправки формы
+let reload = (cl) =>{
+  cl.addEventListener('click',(e) =>{
+  e.preventDefault();
+  location.reload();
+});
+}
+reload(undBtn);
+reload(undBtnGtot);
+reload(undBtnB);
+reload(undBtnBt);
+reload(undBtnHSTF);
+reload(undBtnDip);
+function getXmaxValue(array) {
+var coords = [];
+for (let i = 0; i < array.length; i+=1) {
+   coords.push(array[i].x)
+} 
+return coords;
+};
+function getYmaxValue(array) {
+var coords = [];
+for (let i = 0; i < array.length; i+=1) {
+   coords.push(array[i].y)
+} 
+return coords;
+};
+
+//Обработка кнопки Submit и получаем значение полей ввода для графика осевых акселерометров
+form.addEventListener('submit',(e) => {
+  minGoxy = Number((form.querySelector('[id="minGoxy"]')).value),
+  maxGoxy = Number((form.querySelector('[id="maxGoxy"]')).value),
+  stepGoxy = Number((form.querySelector('[id="stepGz"]')).value),
+  depthMin = Number((form.querySelector('[id="depthMin"]')).value),
+  depthMax = Number((form.querySelector('[id="depthMax"]')).value),
+  depthStep = Number((form.querySelector('[id="depthStep"]')).value),
+  minGz = Number((form.querySelector('[id="minGz"]')).value),
+  maxGz = Number((form.querySelector('[id="maxGz"]')).value),
+  stepGz = Number((form.querySelector('[id="stepGz"]')).value),
+  e.preventDefault();
+  
+  // заменяем график
+  c = document.createElement('canvas');
+  c.setAttribute("id", "grafica7");
+  c.setAttribute("width", "50");
+  c.setAttribute("height", "15");
+  grafica1.replaceWith(c);
+  grafica7 = document.querySelector('#grafica7');
+  arr = getXmaxValue(depthGoxy);
+  arr1 = getYmaxValue(depthGoxy);
+  arr2 = getYmaxValue(depthGz);
+  if (depthMax == 0 )
+   depthMax = Math.max(...arr);
+  if (maxGz == 0)
+     maxGz = Math.max(...arr2) + 0.5;
+  if (maxGoxy == 0)
+  maxGoxy = Math.max(...arr1) + 0.5;
+   
+  new Chart(grafica7,
   {
     type: 'scatter', // Тип графики
     backgroundColor:'rgba(0, 0, 255)',
@@ -111,8 +315,7 @@ new Chart(grafica1,
           showLine: true,
           fill: false,
           borderColor: 'rgba(0, 0, 255)',
-
-        },
+         },
         {
           label: 'Gz',
           yAxesID: 'B',
@@ -128,8 +331,8 @@ new Chart(grafica1,
         yAxes: [{
           id: 'A',
           scaleLabel: {
-            display: true,
-            labelString: 'Goxy, G',
+          display: true,
+          labelString: 'Goxy, G',
           },
           type: 'linear',
           position: 'left',
@@ -155,8 +358,9 @@ new Chart(grafica1,
         }],
         xAxes: [{
           ticks: {
-<!--            min:0,-->
-            stepSize: 100,
+            min:depthMin,
+            max:depthMax,
+            stepSize: depthStep,
             autoSkip: false,
             },
           scaleLabel: {
@@ -175,14 +379,37 @@ new Chart(grafica1,
       },
     },
   });
+})
 
-// Gtotal
-const depthGref = {{ context.depthGref | safe }};
-const depthGtotal = {{ context.depthGtotal | safe }};
-const depthGmax = {{ context.depthGmax | safe }};
-const depthGmin = {{ context.depthGmin | safe }};
+//Обработка кнопки Submit и получаем значение полей ввода для графика Gtotal
 
-  new Chart(grafica2,
+formGtotal.addEventListener('submit',(e) => {
+  e.preventDefault();
+ //получаем значение полей ввода
+  minGtotal = Number((formGtotal.querySelector('[id="minGtotal"]')).value),
+  maxGtotal = Number((formGtotal.querySelector('[id="maxGtotal"]')).value),
+  stepGtotal = Number((formGtotal.querySelector('[id="stepGtotal"]')).value),
+
+  depthMin = Number((formGtotal.querySelector('[id="depthMin"]')).value),
+  depthMax = Number((formGtotal.querySelector('[id="depthMax"]')).value),
+  depthStep = Number((formGtotal.querySelector('[id="depthStep"]')).value)
+
+  c = document.createElement('canvas');
+  c.setAttribute("id", "grafica8");
+  c.setAttribute("width", "50");
+  c.setAttribute("height", "15");
+  grafica2.replaceWith(c);
+  grafica8 = document.querySelector('#grafica8');
+  arr = getXmaxValue(depthGtotal);
+  arr1 = getYmaxValue(depthGtotal);
+  if (depthMax == 0 )
+    depthMax = Math.max(...arr);
+  if (maxGtotal == 0)
+     maxGtotal= Math.max(...arr1);
+  if (minGtotal == 0 )
+     minGtotal = Math.min(...arr1)-0.005;
+
+  new Chart(grafica8,
   {
     type: 'scatter', // Тип графики
     data: {
@@ -196,10 +423,642 @@ const depthGmin = {{ context.depthGmin | safe }};
           borderColor: 'rgba(253, 233, 16)',
         },
         {
-
           yAxesID: 'B',
           label: 'Gref',
-          data: depthGref,
+          data: depthGrefFixed,
+          showLine: true,
+          showLabel: false,
+          fill: false,
+          borderColor: 'rgba(102, 255, 0)',
+        },
+        {
+          yAxesID: 'C',
+          label: 'Gmax',
+          data: depthGmax,
+          showLine: true,
+          fill: false,
+          borderColor: 'rgba( 255,0,51)',
+        },
+        {
+          yAxesID: 'D',
+          data: depthGmin,
+          label: 'Gmin',
+          showLine: true,
+          fill: false,
+          borderColor: 'rgba( 255,0,51)',
+        },
+      ],
+    },
+    options: {
+      scales: {
+        yAxes: [{
+          id: 'A',
+          scaleLabel: {
+            display: true,
+            labelString: 'Gtotal, G',
+          },
+          type: 'linear',
+          position: 'left',
+          ticks: {
+            max: maxGtotal,
+            min: minGtotal,
+            stepSize: stepGtotal,
+          },
+        }],
+        // for zooming
+        xAxes: [{
+          ticks: {
+            min:depthMin,
+            max:depthMax,
+            stepSize: depthStep,
+            autoSkip: false,
+            },
+          scaleLabel: {
+            display: true,
+            labelString: 'Измеренная глубина, м',
+          },
+        }],
+      },
+      pan: {
+        enabled: true,
+        mode: 'xy',
+      },
+      zoom: {
+        enabled: true,
+        mode: 'xy',
+      },
+    },
+  });
+  });
+
+//Обработка кнопки Submit и получаем значение полей ввода для графика осевых магнитометров
+
+formB.addEventListener('submit',(e) => {
+  e.preventDefault();
+  minBoxy = Number((formB.querySelector('[id="minBoxy"]')).value),
+  maxBoxy = Number((formB.querySelector('[id="maxBoxy"]')).value),
+  stepBoxy = Number((formB.querySelector('[id="stepBoxy"]')).value),
+  depthMin = Number((formB.querySelector('[id="depthMin"]')).value),
+  depthMax = Number((formB.querySelector('[id="depthMax"]')).value),
+  depthStep = Number((formB.querySelector('[id="depthStep"]')).value),
+  minBz = Number((formB.querySelector('[id="minBz"]')).value),
+  maxBz = Number((formB.querySelector('[id="maxBz"]')).value),
+  stepBz = Number((formB.querySelector('[id="stepBz"]')).value),
+  
+  
+  // заменяем график
+
+  c = document.createElement('canvas');
+  c.setAttribute("id", "grafica9");
+  c.setAttribute("width", "50");
+  c.setAttribute("height", "15");
+  grafica3.replaceWith(c);
+  grafica9 = document.querySelector('#grafica9');
+  arr = getXmaxValue(depthBoxy);
+  arr1 = getYmaxValue(depthBoxy);
+  arr2 = getYmaxValue(depthBz);
+
+  if (depthMax == 0 )
+   depthMax = Math.max(...arr);
+  if (minBoxy == 0)
+  minBoxy = Math.min(...arr1) ;
+  if (maxBz == 0)
+     maxBz = Math.max(...arr2) ;
+  if (maxBoxy == 0)
+  maxBoxy = Math.max(...arr1) + maxBz/2 ;
+  if (minBz == 0)
+     minBz = Math.min(...arr2) ;
+
+  new Chart(grafica9,
+  {
+    type: 'scatter', // Тип графики
+    data: {
+      datasets: [
+        {
+          label: 'Boxy',
+          yAxisID: 'A',
+          data: depthBoxy,
+          showLine: true,
+          fill: false,
+          borderColor: 'rgba(0, 0, 255)',
+        },
+        {
+          label: 'Bz',
+          yAxesID: 'B',
+          data: depthBz,
+          showLine: true,
+          fill: false,
+          borderColor: 'rgba(200, 0, 0, 1)',
+        },
+      ],
+    },
+    options: {
+      scales: {
+        yAxes: [{
+          id: 'A',
+          scaleLabel: {
+            display: true,
+            labelString: 'Boxy, нТл',
+          },
+          type: 'linear',
+          position: 'left',
+          ticks: {
+            max: maxBoxy,
+            min: minBoxy,
+            stepSize:stepBoxy,
+          },
+        },
+        {
+          id: 'B',
+          scaleLabel: {
+            display: true,
+            labelString: 'Bz, нТл',
+          },
+          type: 'linear',
+          position: 'right',
+          ticks: {
+            max: maxBz,
+            min: minBz,
+            stepSize:stepBz,
+          },
+        }],
+        // for zooming
+        xAxes: [{
+          scaleLabel: {
+            display: true,
+            labelString: 'Измеренная глубина, м',
+          },
+          ticks: {
+            max: depthMax,
+            min: depthMin,
+            stepSize:depthStep,
+          },
+        }],
+      },
+      pan: {
+        enabled: true,
+        mode: 'xy',
+      },
+      zoom: {
+        enabled: true,
+        mode: 'xy',
+      },
+    },
+  });
+});
+
+//Обработка кнопки Submit и получаем значение полей ввода для графика Btotal
+
+formBt.addEventListener('submit',(e) => {
+  e.preventDefault();
+
+  minBtotal = Number((formBt.querySelector('[id="minBtot"]')).value),
+  maxBtotal = Number((formBt.querySelector('[id="maxBtot"]')).value),
+  stepBtotal = Number((formBt.querySelector('[id="stepBtot"]')).value),
+
+  depthMin = Number((formBt.querySelector('[id="depthMin"]')).value),
+  depthMax = Number((formBt.querySelector('[id="depthMax"]')).value),
+  depthStep = Number((formBt.querySelector('[id="depthStep"]')).value)
+
+  c = document.createElement('canvas');
+  c.setAttribute("id", "grafica10");
+  c.setAttribute("width", "50");
+  c.setAttribute("height", "15");
+  grafica4.replaceWith(c);
+  grafica10 = document.querySelector('#grafica10');
+  arr = getXmaxValue(depthBraw);
+  arr1 = getYmaxValue(depthBraw);
+  if (depthMax == 0 )
+    depthMax = Math.max(...arr);
+  if (maxBtotal == 0)
+     maxBtotal= Math.max(...arr1);
+  if (minBtotal == 0 )
+     minBtotal = Math.min(...arr1) - maxBtotal/20;
+
+  new Chart(grafica10,
+  {
+    type: 'scatter', // Тип графики
+    data: {
+      datasets: [
+        {
+          label: 'Bt_Raw',
+          yAxisID: 'A',
+          data: depthBraw,
+          showLine: true,
+          fill: false,
+          borderColor: 'rgba(253, 233, 16)',
+        },
+        {
+          yAxesID: 'B',
+          data: depthBcorr,
+          label: 'Bcorr',
+          showLine: true,
+          fill: false,
+          borderColor:  'rgba(0, 0, 255)',
+          borderWidth: 2,
+        },
+        {
+          yAxesID: 'C',
+          label: 'Bmax',
+          data: depthBmax,
+          showLine: true,
+          fill: false,
+          borderColor: 'rgba( 255,0,51)',
+        },
+        {          
+          yAxesID: 'D',
+          label: 'Bref',
+          data: depthBrefFixed,
+          showLine: true,
+          showLabel: false,
+          fill: false,
+          borderColor: 'rgba(102, 255, 0)',
+        },
+        {
+          yAxesID: 'E',
+          data: depthBmin,
+          label: 'Bmin',
+          showLine: true,
+          fill: false,
+          borderColor: 'rgba( 255,0,51)',
+        },
+      ],
+    },
+    options: {
+      scales: {
+        yAxes: [{
+          id: 'A',
+          scaleLabel: {
+            display: true,
+            labelString: 'Btotal,нТл ',
+          },
+          type: 'linear',
+          position: 'left',
+          ticks: {
+            max: maxBtotal,
+            min: minBtotal,
+            stepSize: stepBtotal,
+          },
+        }],
+        // for zooming
+        xAxes: [{
+          ticks: {
+            min:depthMin,
+            max:depthMax,
+            stepSize: depthStep,
+            autoSkip: false,
+            },
+          scaleLabel: {
+            display: true,
+            labelString: 'Измеренная глубина, м',
+          },
+        }],
+      },
+      pan: {
+        enabled: true,
+        mode: 'xy',
+      },
+      zoom: {
+        enabled: true,
+        mode: 'xy',
+      },
+    },
+  });
+});
+
+
+//Обработка кнопки Submit и получаем значение полей ввода для графика HSTF
+formHSTF.addEventListener('submit',(e) => {
+  e.preventDefault();
+  depthMin = Number((formHSTF.querySelector('[id="depthMin"]')).value),
+  depthMax = Number((formHSTF.querySelector('[id="depthMax"]')).value),
+  depthStep = Number((formHSTF.querySelector('[id="depthStep"]')).value),
+  
+  // заменяем график
+  c = document.createElement('canvas');
+  c.setAttribute("id", "grafica11");
+  c.setAttribute("width", "50");
+  c.setAttribute("height", "15");
+  grafica5.replaceWith(c);
+  grafica11 = document.querySelector('#grafica11');
+  arr = getXmaxValue(depthHSTF);
+  if (depthMax == 0 )
+    depthMax = Math.max(...arr);
+   
+  new Chart(grafica11,
+  {
+    type: 'scatter', // Тип графики
+    data: {
+      datasets: [
+        {
+          label: 'HSTF',
+          yAxisID: 'A',
+          data: depthHSTF,
+          showLine: false,
+          fill: false,
+          borderColor: 'rgba(253, 233, 16)',
+          borderWidth: 3,
+          position: 'left',
+          },
+              {
+          yAxesID: 'B',
+          display: false,
+          data: hstf90 ,
+          showLine: true,
+          fill: false,
+          borderWidth: 1,
+          borderColor: 'rgba( 255,0,51)',
+          },
+        {
+          yAxesID: 'C',
+          display: false,
+          data: hstf180 ,
+          showLine: true,
+          fill: false,
+          borderWidth: 1,
+          borderColor: 'rgba( 255,0,51)',
+         },
+        {
+          yAxesID: 'D',
+          display: false,
+          data: hstf270 ,
+          showLine: true,
+          fill: false,
+          borderWidth: 1,
+          borderColor: 'rgba( 255,0,51)',
+          },
+        {
+          yAxesID: 'E',
+          data: hstf360 ,
+          display: false,
+          showLine: true,
+          fill: false,
+          borderWidth: 1,
+          borderColor: 'rgba( 255,0,51)',
+          },
+      ],
+    },
+    options: {
+      plugins: {
+            legend: false,
+            },
+      scales: {
+        yAxes: [{
+          legend: {
+          display: false,
+         },
+          id: 'A',
+          scaleLabel: {
+            display: true,
+            labelString: 'HSTF',
+          },
+         
+          type: 'linear',
+          position: 'left',
+          ticks: {
+            max: 360,
+            min: 0,
+            stepSize:90,
+          },
+        }],
+        // for zooming
+        xAxes: [{
+          scaleLabel: {
+            display: true,
+            labelString: 'Измеренная глубина, м',
+          },
+          ticks: {
+            max: depthMax,
+            min: depthMin,
+            stepSize:depthStep,
+          },
+        }],
+      },
+      pan: {
+        enabled: true,
+        mode: 'xy',
+      },
+      zoom: {
+        enabled: true,
+        mode: 'xy',
+      },
+    },
+});
+});
+
+//Обработка кнопки Submit и получаем значение полей ввода для графика Dip
+
+formDip.addEventListener('submit',(e) => {
+  e.preventDefault();
+  minDip = Number((formDip.querySelector('[id="minDip"]')).value),
+  maxDip = Number((formDip.querySelector('[id="maxDip"]')).value),
+  stepDip = Number((formDip.querySelector('[id="stepDip"]')).value),
+
+  depthMin = Number((formDip.querySelector('[id="depthMin"]')).value),
+  depthMax = Number((formDip.querySelector('[id="depthMax"]')).value),
+  depthStep = Number((formDip.querySelector('[id="depthStep"]')).value)
+
+  c = document.createElement('canvas');
+  c.setAttribute("id", "grafica12");
+  c.setAttribute("width", "50");
+  c.setAttribute("height", "15");
+  grafica6.replaceWith(c);
+  grafica12 = document.querySelector('#grafica12');
+  arr = getXmaxValue(depthDipraw);
+  arr1 = getYmaxValue(depthDipraw);
+  if (depthMax == 0 )
+   depthMax = Math.max(...arr);
+  if (maxDip == 0)
+     maxDip= Math.max(...arr1);
+  if (minDip == 0 )
+  minDip = Math.min(...arr1);
+
+  new Chart(grafica12,
+  {
+    type: 'scatter', // Тип графики
+    data: {
+      datasets: [
+        {
+          label: 'DipRaw',
+          yAxisID: 'A',
+          data: depthDipraw,
+          showLine: true,
+          fill: false,
+          borderColor: 'rgba(253, 233, 16',
+        },
+        {
+          
+          yAxesID: 'B',
+          label: 'DipRef',
+          data: depthDiprefFixed,
+          showLine: true,
+          showLabel: false,
+          fill: false,
+          borderColor: 'rgba(102, 255, 0)',
+        },
+        {
+          yAxesID: 'C',
+          label: 'DipMax',
+          data: depthDipmax,
+          showLine: true,
+          fill: false,
+          borderColor: 'rgba( 255,0,51)',
+        },
+        {
+          yAxesID: 'D',
+          data: depthDipmin,
+          label: 'DipMin',
+          showLine: true,
+          fill: false,
+          borderColor: 'rgba( 255,0,51)',
+        },
+        {
+          yAxesID: 'E',
+          data: depthDipcorr,
+          label: 'DipCorr',
+          showLine: true,
+          fill: false,
+          borderColor: 'rgba(0, 0, 255)',
+        },
+      ],
+    },
+    options: {
+      scales: {
+        yAxes: [{
+          ticks: {
+            max: maxDip,
+            min: minDip,
+            stepSize:stepDip,
+          },
+          id: 'A',
+          scaleLabel: {
+            display: true,
+            labelString: 'Магнитное наклонение,гр ',
+          },
+          type: 'linear',
+          position: 'left',
+        }],
+        // for zooming
+        xAxes: [{
+          scaleLabel: {
+            display: true,
+            labelString: 'Измеренная глубина, м',
+          },
+          ticks: {
+            max: depthMax,
+            min: depthMin,
+            stepSize:depthStep,
+          },
+        }],
+      },
+      pan: {
+        enabled: true,
+        mode: 'xy',
+      },
+      zoom: {
+        enabled: true,
+        mode: 'xy',
+      },
+    },
+  });
+});
+
+new Chart(grafica1,
+  {
+    type: 'scatter', // Тип графики
+    backgroundColor:'rgba(0, 0, 255)',
+    data: {
+      datasets: [
+        {
+          label: 'Goxy',
+          yAxisID: 'A',
+          data: depthGoxy,
+          showLine: true,
+          fill: false,
+          borderColor: 'rgba(0, 0, 255)',
+         
+        },
+        {
+          label: 'Gz',
+          yAxesID: 'B',
+          data: depthGz,
+          showLine: true,
+          fill: false,
+          borderColor: 'rgba(200, 0, 0, 1)',
+        },
+      ],
+    },
+    options: {
+      scales: {
+        yAxes: [{
+          id: 'A',
+          scaleLabel: {
+            display: true,
+            labelString: 'Goxy, G',
+          },
+          type: 'linear',
+          position: 'left',
+         },
+        {
+          id: 'B',
+          scaleLabel: {
+            display: true,
+            labelString: 'Gz, G',
+          },
+          type: 'linear',
+          position: 'right',
+          }],
+        xAxes: [{
+           scaleLabel: {
+            display: true,
+            labelString: 'Измеренная глубина, м',
+          },
+        }],
+      },
+      pan: {
+        enabled: true,
+        mode: 'xy',
+      },
+      zoom: {
+        enabled: true,
+        mode: 'xy',
+      },
+    },
+  });
+const Gref = Math.max(...getYmaxValue(depthGref));;
+const Gmax = Gref + 0.003;
+const Gmin = Gref - 0.003;
+fDepthG =  Math.min(...getXmaxValue(depthBref));
+lDepthG = Math.max(...getXmaxValue(depthBref));
+
+const depthGrefFixed = [
+{ x: fDepthG,	y: Gref},
+{ x: lDepthG, y: Gref},
+];
+const depthGmax = [{ x: fDepthG, y: Gmax },
+  { x: lDepthG, y:Gmax },
+ ];
+
+const depthGmin = [{ x: fDepthG, y: Gmin },
+  { x: lDepthG, y: Gmin },
+];
+new Chart(grafica2,
+  {
+    type: 'scatter', // Тип графики
+    data: {
+      datasets: [
+        {
+          label: 'Gtotal',
+          yAxisID: 'A',
+          data: depthGtotal,
+          showLine: true,
+          fill: false,
+          borderColor: 'rgba(253, 233, 16)',
+        },
+        {
+          yAxesID: 'B',
+          label: 'Gref',
+          data: depthGrefFixed,
           showLine: true,
           showLabel: false,
           fill: false,
@@ -237,7 +1096,7 @@ const depthGmin = {{ context.depthGmin | safe }};
         // for zooming
         xAxes: [{
           ticks: {
-<!--            min:0,-->
+            min:0,
             stepSize: 100,
             autoSkip: false,
             },
@@ -257,10 +1116,6 @@ const depthGmin = {{ context.depthGmin | safe }};
       },
     },
   });
-
-// Boxy-Bz
-const depthBoxy = {{ context.depthBoxy | safe }};
-const depthBz = {{ context.depthBz | safe }};
 
 new Chart(grafica3,
   {
@@ -295,12 +1150,7 @@ new Chart(grafica3,
           },
           type: 'linear',
           position: 'left',
-          ticks: {
-            max: 70000,
-            min: -5000,
-            stepSize:5000,
           },
-        },
         {
           id: 'B',
           scaleLabel: {
@@ -311,10 +1161,10 @@ new Chart(grafica3,
           position: 'right',
           ticks: {
             max: 70000,
-            min: -5000,
-            stepSize:5000,
+            min: 0,
+            stepSize:3500,
           },
-        }],
+         }],
         // for zooming
         xAxes: [{
           scaleLabel: {
@@ -333,21 +1183,30 @@ new Chart(grafica3,
       },
     },
   });
+const Bref = Math.max(...getYmaxValue(depthBref));
+const Bmax = Bref + 300;
+const Bmin = Bref - 300;
+fDepthB =  Math.min(...getXmaxValue(depthBref));
+lDepthB = Math.max(...getXmaxValue(depthBref))
+const depthBrefFixed = [
+{ x: fDepthB, y:Bref},
+{ x: lDepthB, y:Bref},
+];
 
-// Btotal
-const depthBref = {{ context.depthBref | safe }};
-const depthBraw = {{ context.depthBtotal | safe }};
-const depthBmax = {{ context.depthBmax | safe }};
-const depthBmin = {{ context.depthBmin | safe }};
-const depthBcorr = {{ context.depthBcorr | safe }};
+const depthBmax = [{ x: fDepthB, y: Bmax },
+  { x: lDepthB, y:Bmax },
+];
 
+const depthBmin = [{ x: fDepthB, y: Bmin },
+  { x: lDepthB, y: Bmin },
+];
   new Chart(grafica4,
   {
     type: 'scatter', // Тип графики
     data: {
       datasets: [
         {
-          label: 'Btotal',
+          label: 'Bt_Raw',
           yAxisID: 'A',
           data: depthBraw,
           showLine: true,
@@ -371,11 +1230,10 @@ const depthBcorr = {{ context.depthBcorr | safe }};
           fill: false,
           borderColor: 'rgba( 255,0,51)',
         },
-                  {
-
+        {          
           yAxesID: 'D',
           label: 'Bref',
-          data: depthBref,
+          data: depthBrefFixed,
           showLine: true,
           showLabel: false,
           fill: false,
@@ -421,27 +1279,22 @@ const depthBcorr = {{ context.depthBcorr | safe }};
     },
   });
 
-// HSTF
-const depthHSTF = {{ context.depthHSTF | safe }};
-const firstDepth = {{ context.firstDepth | safe }};
-const lastDepth = {{ context.lastDepth | safe }};
+// глубина последне предоставленной точки замера
+let lastDepth = Math.max(...getXmaxValue(depthHSTF));
 const hstf90 = [
-{ x: firstDepth, y: 90},
+{ x: 0,	y:90},
 { x: lastDepth, y: 90 },
 ];
-const hstf180 = [
-{ x: firstDepth, y: 180},
-{ x: lastDepth, y: 180 },
-];
-const hstf270 = [
-{ x: firstDepth, y: 270},
-{ x: lastDepth, y: 270 },
-];
-const hstf360 = [
-{ x: firstDepth, y: 360},
-{ x: lastDepth, y: 360 },
+const hstf180  = [{ x: 0, y: 180 },
+  { x: lastDepth, y:180 },
 ];
 
+const hstf270 = [{ x: 0, y: 270 },
+  { x: lastDepth, y: 270 },
+];
+const hstf360 = [{ x: 0, y: 360 },
+  { x: lastDepth, y: 360 },
+];
 new Chart(grafica5,
   {
     type: 'scatter', // Тип графики
@@ -499,7 +1352,7 @@ new Chart(grafica5,
       plugins: {
             legend: false,
             },
-       scales: {
+      scales: {
         yAxes: [{
           legend: {
           display: false,
@@ -509,7 +1362,7 @@ new Chart(grafica5,
             display: true,
             labelString: 'HSTF',
           },
-
+         
           type: 'linear',
           position: 'left',
           ticks: {
@@ -526,7 +1379,7 @@ new Chart(grafica5,
           },
           ticks: {
             max: lastDepth,
-<!--            min: 0,-->
+            min: 0,
             stepSize:100,
           },
         }],
@@ -542,13 +1395,27 @@ new Chart(grafica5,
     },
   });
 
-// Dip
-const depthDipref = {{ context.depthDipref | safe }};
-const depthDipraw = {{ context.depthDipraw | safe }};
-const depthDipmax = {{ context.depthDipmax | safe }};
-const depthDipmin = {{ context.depthDipmin | safe }};
-const depthDipcorr = {{ context.depthDipcorr | safe }};
+// данные которые нужно сформировать в apps из моделей;
+;
 
+const DipRef =  Math.max(...getYmaxValue(depthDipref));
+const DipMax = DipRef + 0.3;
+const DipMin = DipRef - 0.3;
+let fDepth =  Math.min(...getXmaxValue(depthDipref));
+let lDepth = Math.max(...getXmaxValue(depthDipref));
+
+
+const depthDiprefFixed = [
+{ x: fDepth, y:DipRef},
+{ x: lDepth, y:DipRef},
+];
+const depthDipmax = [{ x: fDepth, y: DipMax },
+  { x: lDepth, y:DipMax },
+];
+
+const depthDipmin = [{ x: fDepth, y: DipMin },
+  { x: lDepth, y: DipMin },
+];
 new Chart(grafica6,
   {
     type: 'scatter', // Тип графики
@@ -560,13 +1427,13 @@ new Chart(grafica6,
           data: depthDipraw,
           showLine: true,
           fill: false,
-          borderColor: 'rgba(255, 179, 0)',
+          borderColor: 'rgba(253, 233, 16',
         },
         {
-
+          
           yAxesID: 'B',
           label: 'DipRef',
-          data: depthDipref,
+          data: depthDiprefFixed,
           showLine: true,
           showLabel: false,
           fill: false,
@@ -601,18 +1468,13 @@ new Chart(grafica6,
     options: {
       scales: {
         yAxes: [{
-          ticks: {
-<!--            max: 81,-->
-<!--            min: 79,-->
-            stepSize:0.5,
+           id: 'A',
+        scaleLabel: {
+           display: true,
+           labelString: 'Магнитное наклонение,гр ',
           },
-          id: 'A',
-          scaleLabel: {
-            display: true,
-            labelString: 'Магнитное наклонение,гр ',
-          },
-          type: 'linear',
-          position: 'left',
+        type: 'linear',
+        position: 'left',
         }],
         // for zooming
         xAxes: [{
