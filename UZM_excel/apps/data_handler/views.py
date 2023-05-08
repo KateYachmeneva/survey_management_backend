@@ -1,4 +1,5 @@
 from django.shortcuts import render
+from pytest import console_main
 from Field.models import Well, Run, get_all_well
 from excel_parcer.models import Data
 # Create your views here.
@@ -59,7 +60,6 @@ def graph(request):
     depthDipmin = []
     depthDipcorr = []  # пока нет функционала для Dipcorr, временно берем Dipraw
     depthHSTF = []
-
     if request.method == 'POST':
         well = Well.objects.get(id=request.POST['well'])
         runs = Run.objects.filter(section__wellbore__well_name=well)
@@ -123,6 +123,7 @@ def graph(request):
         'depthHSTF': depthHSTF,
         'firstDepth': firstDepth,
         'lastDepth': lastDepth,
+                 
     }
 
     return render(request, 'data_handler/graph.html', {'context': context, })
