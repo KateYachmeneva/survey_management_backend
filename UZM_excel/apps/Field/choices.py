@@ -25,7 +25,7 @@ WELL_TYPE_CHOICES = [
 
 NORTH_DIRECTION_CHOICES = [
     ('GRID', 'Картографический'),
-    ('TRUE', 'Истинный'),
+    ('TRUE', 'Географический'),
     ('MAGN', 'Магнитный'),
 ]
 

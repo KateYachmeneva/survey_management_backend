@@ -115,14 +115,25 @@ class Well(models.Model):
     active_from = models.FloatField('Глубина начала активной фазы', null=True, blank=True)
     WELL_STATUS_CHOICES = [
         ('PLAN', 'Планируется'),
-        ('NOTA', 'Активная фаза'),
-        ('ACTV', 'В активной фазе'),
+        ('NOTA', 'В бурении'),
+        ('STOP', 'Приостановлена'),
         ('FINI', 'Добурена'),
     ]
     status = models.CharField(
-        'Статус',
+        'Статус состояния скважины',
         max_length=4,
         choices=WELL_STATUS_CHOICES,
+        null=True,
+        blank=True
+    )
+    DRILL_STATUS_CHOICES = [
+        ('ACTV', 'Активная стадия'),
+        ('NOACT', 'Неактивная стадия'),
+    ]
+    status_drilling = models.CharField(
+        'Статус бурения',
+        max_length=5,
+        choices=DRILL_STATUS_CHOICES,
         null=True,
         blank=True
     )

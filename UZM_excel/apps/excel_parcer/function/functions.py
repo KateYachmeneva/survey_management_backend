@@ -42,28 +42,25 @@ def parcing_manually(path, manually_depth, manually_gx, manually_gy, manually_gz
     # FIXME поправить вывод
     elif "csv" in re.findall(r".(csv)", path):
         """Для обработки csv"""
-        # with open(path, 'r', newline='') as csvfile:
-        #     spamreader = csv.reader(csvfile, delimiter=' ', quotechar='|')
-        #     for row in spamreader:
-        #         print(row)
-        with open(path, newline='') as csvfile:
-            reader = csv.DictReader(csvfile, delimiter=' ')
-            for row in reader:
-                print(row)
-    elif "sur" in re.findall(r".(sur)", path):
-        """Для обработки sur"""
-        name_List = [manually_bz, manually_by, manually_bx, manually_gz, manually_gy, manually_gx, manually_depth]
-        with open(path, encoding="utf-8") as f:
-            for number, word in enumerate(f.readline().split()):
-                for index, name in enumerate(name_List):
-                    if word == name:
-                        name_List[index] = number
-            for raw in f.readlines():
-                raw_list = raw.split()
-                if len(raw_list) == 0:
+        with open(path, 'r', newline='') as csvfile:
+            i: int = 0
+            name_List = [manually_bz, manually_by, manually_bx, manually_gz, manually_gy, manually_gx, manually_depth]
+            datareader = csv.reader(csvfile, delimiter=';', quotechar='|')
+            for raw in datareader:
+                if i == 0:
+                    for number, word in enumerate(raw):
+                        for index, name in enumerate(name_List):
+                            if word == name:
+                                name_List[index] = number
+                i += 1
+                if len(raw) == 0:
                     continue
                 for d_index, n_index in enumerate(name_List):
-                    data[d_index].append(float(raw_list[int(n_index)]))
+                    try:
+                        data[d_index].append(float(raw[int(n_index)]))
+                    except:
+                        pass
+
     elif "txt" in re.findall(r".(txt)", path):
         """Для обработки txt"""
         name_List = [manually_bz, manually_by, manually_bx, manually_gz, manually_gy, manually_gx, manually_depth]
