@@ -1,91 +1,140 @@
-{% extends 'base.html' %}
+{% extends 'Field/addModal.html' %}
 {% load static%}
 
 
+{% block data_field %}
 
-{%  block header %}
-    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link type="text/css" href="{% static 'css/run/styles.css' %}" rel="stylesheet" />
-{% endblock %}
-
-{% block content %}
-    <form class="container" action="{% url 'add_well' %}" method="post">
-        {% for f in context.form %}
-        <div class="container__item">
-            <label class="container__label" for="{{f.id_for_label}}">
-                {{f.label}}:
-            </label>
-            {{f}}
-        </div>
+<div class="container__item">
+    <label class="container__label" >
+        ДО:
+    </label>
+    <select id="Do_name">
+        <option value="-" selected>---------</option>
+        {% for f in context.DO %}
+        <option value="{{f.id}}"> {{f}}</option>
         {% endfor %}
+    </select>
+</div>
+<div class="container__item">
+    <label class="container__label">
+        Месторождение:
+    </label>
+    <select id="Field_name">
+        <option value="-" selected>---------</option>
+    </select>
+</div>
 
-<!--      {{context.form.as_p}}-->
-      <button type="submit">Добавить</button>
-    </form>
-    <script src="{% static 'js/run/script.js' %}"></script>
-{% endblock %}
+<div class="container__item">
+    <label class="container__label">
+        Куст:
+    </label>
+    <select name="pad_name" required id="id_pad_name">
+        <option value="-" selected>---------</option>
+        <option value="3">Северо-Комсомольское; Куст.16.1</option>
+        <option value="8">им.Малыка; Куст.1УБ_М</option>
+        <option value="22">Радонежское; Куст.1</option>
+        <option value="23">Самотлорское; Куст.2469</option>
+        <option value="24">Северо-Тямкинское; Куст.1</option>
+        <option value="26">Ефремовское; Куст.106</option>
+        <option value="27">Северо-Комсомольское; Куст.22</option>
+        <option value="28">им.Малыка; Куст.1УБ_Ю</option>
+        <option value="29">им.Малыка; Куст.2Ю</option>
+        <option value="30">Немчиновское; Куст.1</option>
+        <option value="31">Северо-Комсомольское; Куст.18208</option>
+        <option value="32">им.Малыка; Куст.8Бис</option>
+    </select>
+</div>
+
+<div id="main_form">
+{% for f in context.form %}
+
+    <div class="container__item">
+        {% if f.label == 'Куст' %}
+        {% else %}
+        <label class="container__label" for="{{f.id_for_label}}">
+            {{f.label}}:
+        </label>
+        {{f}}
+        {% endif %}
+    </div>
+
+
+{% endfor %}
+</div>
 
 
 
-<!-- <div class="container__item">-->
-<!--        <label class="container__label" for="field">Месторождение</label>-->
-<!--        <select class="container__selector selector" name="field" id="field">-->
-<!--          <option value="">Выберите месторождение</option>-->
-<!--          <option value="Самотлорское">Самотлорское</option>-->
-<!--          <option value="Гун-Еганское">Гун-Еганское</option>-->
-<!--        </select>-->
-<!--      </div>-->
-<!--      <div class="container__item">-->
-<!--        <label class="container__label" for="rig">Куст</label>-->
-<!--        <select-->
-<!--          class="container__selector selector"-->
-<!--          name="rig"-->
-<!--          id="rig"-->
-<!--          disabled-->
-<!--        >-->
-<!--          <option value="">Выберите Куст</option>-->
-<!--          <option value="1">1</option>-->
-<!--          <option value="2">2</option>-->
-<!--        </select>-->
-<!--      </div>-->
-<!--      <div class="container__item">-->
-<!--        <label class="container__label" for="well">Скважина</label>-->
-<!--        <select-->
-<!--          class="container__selector selector"-->
-<!--          name="well"-->
-<!--          id="well"-->
-<!--          disabled-->
-<!--        >-->
-<!--          <option value="">Выберите скважину</option>-->
-<!--          <option value="11111">11111</option>-->
-<!--          <option value="22222">22222</option>-->
-<!--        </select>-->
-<!--      </div>-->
-<!--      <div class="container__item">-->
-<!--        <label class="container__label" for="bore">Ствол</label>-->
-<!--        <select-->
-<!--          class="container__selector selector"-->
-<!--          name="bore"-->
-<!--          id="bore"-->
-<!--          disabled-->
-<!--        >-->
-<!--          <option value="">Выберите ствол</option>-->
-<!--          <option value="1 ствол">1 ствол</option>-->
-<!--          <option value="2 ствол">2 ствол</option>-->
-<!--        </select>-->
-<!--      </div>-->
-<!--      <div class="container__item">-->
-<!--        <label class="container__label" for="section">Рейс</label>-->
-<!--        <select-->
-<!--          class="container__selector selector"-->
-<!--          name="section"-->
-<!--          id="section"-->
-<!--          disabled-->
-<!--        >-->
-<!--          <option value="">Выберите рейс</option>-->
-<!--          <option value="1 рейс">1 рейс</option>-->
-<!--          <option value="2 рейс">2 рейс</option>-->
-<!--        </select>-->
-<!--      </div>-->
-<!--      <button type="submit" class="container__button">Готово</button>-->
+<script>
+   <!-- Выбрали Месторождение -->
+    document.getElementById("Field_name").addEventListener("change",function(e){
+         pad_select = document.getElementById("id_pad_name");
+         pad_select.innerHTML = '';
+         console.log("Selected " + e.target.value);
+         var params = new FormData();
+         params.set('field_id', e.target.value);
+
+         fetch('http://{{ context.server_ip }}/main_data/api/get_pad',
+         { method: 'POST', body: params })
+         .then(response=>response.json()).
+         then(data=>{
+            console.log(data);
+            for (key in data){
+            let newOption = new Option(data[key], key)
+            pad_select.append(newOption);
+            }
+         });
+          });
+
+    <!-- Выбрали ДО -->
+    document.getElementById("Do_name").addEventListener("change",function(e){
+         field_select = document.getElementById("Field_name");
+         field_select.innerHTML = '';
+         if (e.target.value == "-"){
+         document.getElementById("id_pad_name").innerHTML = '';
+         return
+         }
+         console.log("Selected " + e.target.value);
+         var params = new FormData();
+         params.set('do_id', e.target.value);
+
+         fetch('http://{{ context.server_ip }}/main_data/api/get_field',
+         { method: 'POST', body: params })
+         .then(response=>response.json()).
+         then(data=>{
+                        console.log(data);
+                        for (key in data){
+                                          let newOption = new Option(data[key], key)
+                                          field_select.append(newOption);
+                                          }
+
+                        <!--  Если у нас всего одно месторождение в ДО сразу заполняем куст -->
+                        if (Object.keys(data).length == 1) {
+                            var params = new FormData();
+                            params.set('field_id', Object.keys(data)[0]);
+                            fetch('http://{{ context.server_ip }}/main_data/api/get_pad',
+                            { method: 'POST', body: params })
+                            .then(response=>response.json()).
+                            then(data=>{
+                               console.log(data);
+                               document.getElementById("id_pad_name").innerHTML = '';
+                                  for (key in data){
+                                     let newOption = new Option(data[key], key)
+                                        document.getElementById("id_pad_name").append(newOption);
+                                           }
+                                           });
+                        } else {
+                        document.getElementById("id_pad_name").innerHTML = '';
+                        }
+
+         });
+
+
+
+          });
+
+</script>
+
+
+{% endblock%}
+
+

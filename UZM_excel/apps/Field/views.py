@@ -1,9 +1,11 @@
+from django.http import JsonResponse
 from django.shortcuts import render, redirect
 
 # Create your views here.
 from . import serializer
 from .forms import *
-
+from .models import Client
+from UZM_excel.conf import server_ip
 
 def add_contractor_nnb(request):
     form = AddContractorNNBForm(request.POST)
@@ -67,12 +69,13 @@ def add_well(request):
         if form.is_valid():
             form.save()
         return redirect(add_wellbore)
-
     context = {"title": 'Скважина',
                "form": form,
-               "method": "add_well"}
+               "method": "add_well",
+               "server_ip": server_ip,
+               "DO": Client.objects.all()}
 
-    return render(request, 'Field/addModal.html', {'context': context, })
+    return render(request, 'Field/addWell.html', {'context': context, })
 
 
 def add_wellbore(request):

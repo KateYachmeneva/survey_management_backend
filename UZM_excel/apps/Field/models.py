@@ -350,3 +350,4 @@ def get_all_well() -> QuerySet:
     wells = Well.objects.all()
     result = sorted(wells, key=lambda x: str(x))
     return result
+
