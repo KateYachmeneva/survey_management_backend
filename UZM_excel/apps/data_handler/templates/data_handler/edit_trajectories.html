@@ -1,0 +1,58 @@
+{% extends 'data_handler/trajectories.html' %}
+{% load static%}
+
+{%  block header %}
+    <link type="text/css" href="{% static 'css/data_handler/scroll.css' %}" rel="stylesheet" />
+<style>
+.table>:not(caption)>*>* {
+	padding:0em;
+}
+td {
+    width:3rem;
+    height:2.5rem;
+}
+
+th  {
+    width:3rem;
+    height:2.5rem;
+}
+
+</style>
+{% endblock %}
+
+
+{% block top_button%}
+    <br>
+    <button type="button" class="" placeholder="" aria-controls="dtDynamicVerticalScrollExample">
+    <a href="{% url 'traj'%}" style="text-decoration: none;color: #000;">Назад</a>
+    </button>
+{% endblock %}
+
+
+{% block data_tr1%}
+<tr>
+    <td scope="col"><input type="number" value="{{i}}" style="text-align: center;Border: none; outline: none;width:100%;height:100%;"></td>
+    <td scope="col"><input type="number" value="23"    style="text-align: center;Border: none; outline: none;width:100%;height:100%;"></td>
+    <td scope="col"><input type="number" value="32"    style="text-align: center;Border: none; outline: none;width:100%;height:100%;"></td>
+</tr>
+{% endblock %}
+
+
+
+{% block data_tr2%}
+<tr>
+    <td scope="col"><input type="number" value="{{i}}" style="text-align: center;padding:0em; Border: none; outline: none;width:100%;height:100%;"></td>
+    <td scope="col"><input type="number" value="23"    style="text-align: center;padding:0em; Border: none; outline: none;width:100%;height:100%;"></td>
+    <td scope="col"><input type="number" value="32"    style="text-align: center;padding:0em; Border: none; outline: none;width:100%;height:100%;"></td>
+</tr>
+{% endblock %}
+
+{% block bottom_button%}
+<div class="row" style="margin-top:1em;margin-right:0.1em;">
+    <div class="col-11" style="text-align: right">
+       <button type="button" class="" placeholder="" data-toggle="modal" data-target="#data_Modal" style="width:100%" data-whatever="ИГиРГИ">
+            Сохранить
+        </button>
+    </div>
+</div>
+{% endblock %}

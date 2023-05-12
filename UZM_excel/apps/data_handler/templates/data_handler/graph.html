@@ -10,6 +10,8 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js@latest/dist/Chart.min.js"></script>
 
 {% endblock %}
+{% block left_panel %}
+{% endblock %}
 
 {% block data %}
 <link type="text/css" href="{% static 'css/data_handler/chart.css' %}" rel="stylesheet" />
@@ -25,7 +27,7 @@
                  <div class="input-group mb-3">
                    <select name="well" class="form-select" id="inputGroupSelect04">
                        {% for w in context.well %}
-                       {% if w == context.selected_well%}
+                       {% if w.id == context.selected.id%}
                        <option value="{{w.id}}" selected>{{w}}</option>
                        {% else %}
                        <option value="{{w.id}}">{{w}}</option>
@@ -42,7 +44,7 @@
 <hr style="color:#FFC501;margin-top:1%;border-width: 3px">
 
 <div class="well-header">
-  <h2>  местрождение Куст 1 скважина 1</h2>
+  <h2>  {{context.selected.well}}</h2>
 <label class = "status">В бурении</label></div>
 <div class="container" >
   <div class="container-form" >  

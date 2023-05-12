@@ -31,6 +31,21 @@ def traj(request):
     return render(request, 'data_handler/trajectories.html', {'context': context, })
 
 
+def edit_traj(request):
+    """Страница с редактированием траекторией ННБ и ИГиРГИ"""
+    context = {"title": 'Траектория',
+               "active": 'traj',
+               "igirgi_data": range(100),
+               "nnb_data": range(100),
+               }
+
+    if request.method == 'POST':
+
+        pass
+
+    return render(request, 'data_handler/edit_trajectories.html', {'context': context, })
+
+
 def param(request):
     """Страница с параметрами"""
     context = {"title": 'Параметры',
@@ -41,6 +56,7 @@ def param(request):
 
 def graph(request):
     """Страница с графиком первичного контроля"""
+    selected = dict()
     depthGoxy = []
     depthGz = []
     depthGtotal = []
@@ -63,6 +79,8 @@ def graph(request):
     if request.method == 'POST':
         well = Well.objects.get(id=request.POST['well'])
         runs = Run.objects.filter(section__wellbore__well_name=well)
+        selected["well"] = str(well)  # для отображения на странице
+        selected["id"] = request.POST['well']
         for run in runs:
             surveys = Data.objects.filter(run=run)
             for survey in surveys:
@@ -123,7 +141,7 @@ def graph(request):
         'depthHSTF': depthHSTF,
         'firstDepth': firstDepth,
         'lastDepth': lastDepth,
-                 
+        'selected': selected,
     }
 
     return render(request, 'data_handler/graph.html', {'context': context, })
