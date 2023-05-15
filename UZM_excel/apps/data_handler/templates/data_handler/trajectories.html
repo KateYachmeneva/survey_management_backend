@@ -9,14 +9,17 @@
 
 <!-- ВЕРХНИИ КНОПКИ-->
 <div class="row" style="margin-top:1em;margin-right:0.1em;">
-    <div class="col-1">
+    <div class="col-7">
         <label>Поиск:
             <input type="search" class="form-control form-control-sm" id="SearchInput"
                    onkeyup="SearchFilter()" placeholder="Введите число..." style="width:9em">
         </label>
+        <label>Выбрано:{{context.selected}}
+
+        </label>
 
     </div>
-    <div class="col-10" style="text-align: right;">
+    <div class="col-4" style="text-align: right;">
         {% block top_button%}
         <br>
         <button type="button" class="" placeholder="" aria-controls="dtDynamicVerticalScrollExample">
@@ -72,12 +75,12 @@
             <div class="col-5">
                 <table name="table-data" class="table table-light  table-bordered table-hover" style="margin-top:2%;">
                     <tbody>
-                    {% for i in context.igirgi_data%}
+                    {% for meas in context.igirgi_data%}
                     {% block data_tr1%}
                     <tr>
-                        <td scope="col">{{i}}</td>
-                        <td scope="col">23</td>
-                        <td scope="col">45</td>
+                        <td scope="col">{{meas.depth}}</td>
+                        <td scope="col">{{meas.corner}}</td>
+                        <td scope="col">{{meas.azimut}}</td>
                     </tr>
                     {% endblock %}
                     {% endfor %}
@@ -88,12 +91,12 @@
             <div class="col-5">
                 <table name="table-data" class="table table-light  table-bordered table-hover" style="margin-top:2%;">
                     <tbody>
-                    {% for i in context.igirgi_data%}
+                    {% for meas in context.igirgi_data%}
                     {% block data_tr2%}
                     <tr>
-                        <td scope="col">{{i}}</td>
-                        <td scope="col">23</td>
-                        <td scope="col">45</td>
+                        <td scope="col">{{meas.depth}}</td>
+                        <td scope="col">{{meas.corner}}</td>
+                        <td scope="col">{{meas.azimut}}</td>
                     </tr>
                     {% endblock %}
                     {% endfor %}

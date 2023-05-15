@@ -1,11 +1,9 @@
+import abc
 from datetime import datetime
 
 from django.core import validators
 from django.db import models
-
-# TODO здесь нам не нужен выбор client_name, т.к. можем просто создать 7 экхемпляров класса
 from django.db.models import QuerySet
-
 from . import choices
 from .choices import get_full_choices
 
@@ -80,6 +78,7 @@ class Field(models.Model):
     def __str__(self):
         return self.field_name
 
+    # FIXME найти зачем используется и убрать
     def get_client(self):
         return str(self.client)
 
@@ -196,7 +195,8 @@ class Well(models.Model):
             if len(sections) != 0:
                 runs = Run.objects.filter(section=sections[0])
                 for run in runs:
-                    if run.dd_contractor_name is not None and (run.end_date is None or run.end_date > datetime.now().date()):
+                    if run.dd_contractor_name is not None and (
+                            run.end_date is None or run.end_date > datetime.now().date()):
                         return run.dd_contractor_name
         return "None_contractor_name"
 
@@ -350,4 +350,3 @@ def get_all_well() -> QuerySet:
     wells = Well.objects.all()
     result = sorted(wells, key=lambda x: str(x))
     return result
-

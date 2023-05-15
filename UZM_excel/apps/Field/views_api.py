@@ -6,6 +6,7 @@ from rest_framework.viewsets import GenericViewSet
 
 from .models import *
 from .serializer import *
+from .serializerTree import Tree
 
 
 class ClientAPIView(APIView):
@@ -105,6 +106,12 @@ class WellWithRunViewSet(mixins.RetrieveModelMixin,
     """
     queryset = Well.objects.all()
     serializer_class = WellWithRunSerializer
+
+
+def get_tree() -> list:
+    """ Дерево для меню """
+    trees = Tree(Client.objects.all(), many=True).data
+    return trees
 
 
 # смежные api

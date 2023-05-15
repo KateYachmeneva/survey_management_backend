@@ -1,9 +1,11 @@
 from django.shortcuts import render
 from pytest import console_main
 from Field.models import Well, Run, get_all_well
-from excel_parcer.models import Data
-# Create your views here.
 
+from excel_parcer.models import Data
+from report.models import StaticNNBData, IgirgiStatic
+# Create your views here.
+from Field.views_api import get_tree
 
 def index(request):
     """Главная страница"""
@@ -20,12 +22,15 @@ def traj(request):
     """Страница с траекторией ННБ и ИГиРГИ"""
     context = {"title": 'Траектория',
                "active": 'traj',
-               "igirgi_data": range(100),
-               "nnb_data": range(100),
+               "tree": get_tree(),
                }
+    if request.method == "GET":
+        run_id = request.GET.get('run_id')
+        context['selected'] = str(Run.objects.get(id=run_id))
+        context["igirgi_data"] = IgirgiStatic.objects.filter(run=run_id)
+        context["nnb_data"] = StaticNNBData.objects.filter(run=run_id)
 
     if request.method == 'POST':
-
         pass
 
     return render(request, 'data_handler/trajectories.html', {'context': context, })

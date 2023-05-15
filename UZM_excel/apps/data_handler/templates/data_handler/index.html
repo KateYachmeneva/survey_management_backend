@@ -7,6 +7,10 @@
 .nav-pills .nav-link.active, .nav-pills .show>.nav-link{
     color: var(--bs-nav-pills-link-active-color);
     background-color: #fdb30d;}
+
+.link {
+  text-decoration: none;
+}
 </style>
 
 
@@ -43,115 +47,140 @@
   <div class="row" style="margin: 0em">
       {% block left_panel %}
     <div class="col-3">
-      <form style="margin: 1em 5em 5em 5em">
-          <fieldset>
-              <legend>Выбор модели</legend>
-              <div class="form-group" style="margin:1em">
-                  <label for="sel-client">Дочернее общество</label>
-                  <select id="sel-client" class="form-control">
-                      <option>Disabled select</option>
-                  </select>
-              </div>
+<!--      <form style="margin: 1em 5em 5em 5em">-->
+<!--          <fieldset>-->
+<!--              <legend>Выбор модели</legend>-->
+<!--              <div class="form-group" style="margin:1em">-->
+<!--                  <label for="sel-client">Дочернее общество</label>-->
+<!--                  <select id="sel-client" class="form-control">-->
+<!--                      <option>Disabled select</option>-->
+<!--                  </select>-->
+<!--              </div>-->
 
-              <div class="form-group" style="margin:1em">
-                  <label for="sel-field">Месторождение</label>
-                  <select id="sel-field" class="form-control">
-                      <option>Disabled select</option>
-                  </select>
-              </div>
+<!--              <div class="form-group" style="margin:1em">-->
+<!--                  <label for="sel-field">Месторождение</label>-->
+<!--                  <select id="sel-field" class="form-control">-->
+<!--                      <option>Disabled select</option>-->
+<!--                  </select>-->
+<!--              </div>-->
 
-              <div class="form-group" style="margin:1em">
-                  <label for="sel-pad">Куст</label>
-                  <select id="sel-pad" class="form-control">
-                      <option>Disabled select</option>
-                  </select>
-              </div>
-              <div class="form-group" style="margin:1em">
-                  <label for="sel-wellbore">Ствол</label>
-                  <select id="sel-wellbore" class="form-control">
-                      <option>Disabled select</option>
-                  </select>
-              </div>
-              <div class="form-group" style="margin:1em">
-                  <label for="sel-section">Секция</label>
-                  <select id="sel-section" class="form-control">
-                      <option>Disabled select</option>
-                  </select>
-              </div>
+<!--              <div class="form-group" style="margin:1em">-->
+<!--                  <label for="sel-pad">Куст</label>-->
+<!--                  <select id="sel-pad" class="form-control">-->
+<!--                      <option>Disabled select</option>-->
+<!--                  </select>-->
+<!--              </div>-->
+<!--              <div class="form-group" style="margin:1em">-->
+<!--                  <label for="sel-wellbore">Ствол</label>-->
+<!--                  <select id="sel-wellbore" class="form-control">-->
+<!--                      <option>Disabled select</option>-->
+<!--                  </select>-->
+<!--              </div>-->
+<!--              <div class="form-group" style="margin:1em">-->
+<!--                  <label for="sel-section">Секция</label>-->
+<!--                  <select id="sel-section" class="form-control">-->
+<!--                      <option>Disabled select</option>-->
+<!--                  </select>-->
+<!--              </div>-->
 
-              <div class="form-group" style="margin: 1em">
-                  <label for="sel-run">Рейс</label>
-                  <select id="sel-run" class="form-control">
-                      <option>Disabled select</option>
-                  </select>
-              </div>
-          </fieldset>
-      </form>
+<!--              <div class="form-group" style="margin: 1em">-->
+<!--                  <label for="sel-run">Рейс</label>-->
+<!--                  <select id="sel-run" class="form-control">-->
+<!--                      <option>Disabled select</option>-->
+<!--                  </select>-->
+<!--              </div>-->
+<!--          </fieldset>-->
+<!--      </form>-->
+
+
+
+        <!-- Дерево -->
+        <div class="flex-shrink-0 p-3 bg-white" style="width: 280px;">
+            <a href="/" class="d-flex align-items-center pb-3 mb-3 link-dark text-decoration-none border-bottom">
+                <svg class="bi me-2" width="30" height="24"><use xlink:href="#bootstrap"></use></svg>
+                <span class="fs-5 fw-semibold">Выбор модели</span>
+            </a>
+            <!-- Начало дерева -->
+            <ul class="list-unstyled ps-0">
+                <!-- ДО -->
+                {% for dict in context.tree %}
+                <li class="mb-1">
+                    <a class="btn btn-toggle align-items-center rounded collapsed" data-bs-toggle="collapse"
+                       href="#{{ dict.client }}" role="button" aria-expanded="false">
+                        {{ dict.client }}
+                    </a>
+                    <div class="collapse" id="{{ dict.client }}" style="">
+                        <ul class="btn-toggle-nav ">
+                            <!-- Месторождение -->
+                            {% for field_dict in dict.fields %}
+                            <li><a href="#{{field_dict.field_name}}" class="link-dark rounded" data-toggle="collapse">
+                                {{field_dict.field_name}}_1</a>
+                                <div class="collapse" id="{{field_dict.field_name}}">
+                                    <ul class="btn-toggle-nav">
+                                        <!-- Куст -->
+                                        {% for pad_dict in field_dict.pads %}
+                                            <li><a href="#{{field_dict.field_name}}pad{{pad_dict.pad_name}}" class="link link-dark rounded" data-toggle="collapse">
+                                                Куст {{pad_dict.pad_name}}_2</a>
+                                                <div class="collapse" id="{{field_dict.field_name}}pad{{pad_dict.pad_name}}">
+                                                    <ul class="btn-toggle-nav">
+                                                        <!-- Скважина -->
+                                                        {% for well_dict in pad_dict.wells %}
+                                                        <li><a href="#{{field_dict.field_name}}well{{well_dict.well_name}}" class="link link-dark rounded" data-toggle="collapse">
+                                                            Скв. {{well_dict.well_name}}_3</a>
+                                                            <div class="collapse" id="{{field_dict.field_name}}well{{well_dict.well_name}}">
+                                                                <ul class="btn-toggle-nav">
+                                                                    <!-- Ствол-->
+                                                                    {% for wellbore_dict in well_dict.wellbores %}
+                                                                    <li><a href="#{{field_dict.field_name}}_{{wellbore_dict.wellbore}}" class="link link-dark rounded" data-toggle="collapse">
+                                                                        Ствол {{wellbore_dict.wellbore}}_4</a>
+                                                                        <div class="collapse" id="{{field_dict.field_name}}_{{wellbore_dict.wellbore}}">
+                                                                            <ul class="btn-toggle-nav">
+                                                                                <!-- Секция-->
+                                                                                {% for section_dict in wellbore_dict.sections %}
+                                                                                <li><a href="#{{field_dict.field_name}}_{{section_dict.section}}" class="link link-dark rounded" data-toggle="collapse">
+                                                                                    {{section_dict.section}}_5</a>
+                                                                                    <div class="collapse" id="{{field_dict.field_name}}_{{section_dict.section}}">
+                                                                                        <ul class="btn-toggle-nav">
+                                                                                            <!-- Рейс-->
+                                                                                            {% for run_dict in section_dict.runs %}
+                                                                                            <li><a href="trajectories?run_id={{run_dict.id}}">{{run_dict.run_number}}</a></li>
+                                                                                            {% endfor %}
+                                                                                            <!-- Конец Рейс-->
+                                                                                        </ul>
+                                                                                    </div>
+                                                                                </li>
+                                                                                {% endfor %}
+                                                                                <!-- Конец Секция-->
+                                                                            </ul>
+                                                                        </div>
+                                                                    </li>
+                                                                    {% endfor %}
+                                                                    <!-- Конец Ствол -->
+                                                                </ul>
+                                                            </div>
+                                                        </li>
+                                                        {% endfor %}
+                                                        <!-- Конец Скважина -->
+                                                    </ul>
+                                                </div>
+                                            </li>
+                                        {% endfor %}
+                                        </li>
+                                    </ul>
+                                </div>
+                            </li>
+                            {% endfor %}
+
+                        </ul>
+                    </div>
+                </li>
+                <!-- !Клиент -->
+                {% endfor %}
+          </ul>
+      </div>
+
     </div>
-      {% endblock %}
-
-<!--Здадатки под дерево-->
-<!--      <div class="flex-shrink-0 p-3 bg-white" style="width: 280px;">-->
-<!--          <a href="/" class="d-flex align-items-center pb-3 mb-3 link-dark text-decoration-none border-bottom">-->
-<!--              <svg class="bi me-2" width="30" height="24"><use xlink:href="#bootstrap"></use></svg>-->
-<!--              <span class="fs-5 fw-semibold">Выбор модели</span>-->
-<!--          </a>-->
-<!--          <ul class="list-unstyled ps-0">-->
-<!--              <li class="mb-1">-->
-<!--                  <button class="btn btn-toggle align-items-center rounded collapsed" data-bs-toggle="collapse" data-bs-target="#home-collapse" aria-expanded="false">-->
-<!--                      Home-->
-<!--                  </button>-->
-<!--                  <div class="collapse" id="home-collapse" style="">-->
-<!--                      <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small">-->
-<!--                          <li><a href="#" class="link-dark rounded">Overview</a></li>-->
-<!--                          <li><a href="#" class="link-dark rounded">Updates</a></li>-->
-<!--                          <li><a href="#" class="link-dark rounded">Reports</a></li>-->
-<!--                      </ul>-->
-<!--                  </div>-->
-<!--              </li>-->
-<!--              <li class="mb-1">-->
-<!--                  <button class="btn btn-toggle align-items-center rounded collapsed" data-bs-toggle="collapse" data-bs-target="#dashboard-collapse" aria-expanded="false">-->
-<!--                      Dashboard-->
-<!--                  </button>-->
-<!--                  <div class="collapse" id="dashboard-collapse">-->
-<!--                      <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small">-->
-<!--                          <li><a href="#" class="link-dark rounded">Overview</a></li>-->
-<!--                          <li><a href="#" class="link-dark rounded">Weekly</a></li>-->
-<!--                          <li><a href="#" class="link-dark rounded">Monthly</a></li>-->
-<!--                          <li><a href="#" class="link-dark rounded">Annually</a></li>-->
-<!--                      </ul>-->
-<!--                  </div>-->
-<!--              </li>-->
-<!--              <li class="mb-1">-->
-<!--                  <button class="btn btn-toggle align-items-center rounded collapsed" data-bs-toggle="collapse" data-bs-target="#orders-collapse" aria-expanded="false">-->
-<!--                      Orders-->
-<!--                  </button>-->
-<!--                  <div class="collapse" id="orders-collapse">-->
-<!--                      <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small">-->
-<!--                          <li><a href="#" class="link-dark rounded">New</a></li>-->
-<!--                          <li><a href="#" class="link-dark rounded">Processed</a></li>-->
-<!--                          <li><a href="#" class="link-dark rounded">Shipped</a></li>-->
-<!--                          <li><a href="#" class="link-dark rounded">Returned</a></li>-->
-<!--                      </ul>-->
-<!--                  </div>-->
-<!--              </li>-->
-<!--              <li class="border-top my-3"></li>-->
-<!--              <li class="mb-1">-->
-<!--                  <button class="btn btn-toggle align-items-center rounded collapsed" data-bs-toggle="collapse" data-bs-target="#account-collapse" aria-expanded="false">-->
-<!--                      Account-->
-<!--                  </button>-->
-<!--                  <div class="collapse" id="account-collapse">-->
-<!--                      <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small">-->
-<!--                          <li><a href="#" class="link-dark rounded">New...</a></li>-->
-<!--                          <li><a href="#" class="link-dark rounded">Profile</a></li>-->
-<!--                          <li><a href="#" class="link-dark rounded">Settings</a></li>-->
-<!--                          <li><a href="#" class="link-dark rounded">Sign out</a></li>-->
-<!--                      </ul>-->
-<!--                  </div>-->
-<!--              </li>-->
-<!--          </ul>-->
-<!--      </div>-->
-
+    {% endblock %}
     <div class="col">
       {% block data %}
       {% endblock %}
