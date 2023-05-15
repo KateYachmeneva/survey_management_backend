@@ -41,6 +41,24 @@ class WellSerializer(serializers.ModelSerializer):
         }
 
 
+class PadnameSerializer(serializers.ModelSerializer):
+    """Сериализатор для куста с именами (имя) ДЛЯ СОЗДАНИЯ МОДЕЛЕЙ """
+    field_name = serializers.CharField(source='get_field', read_only=True)
+
+    class Meta:
+        model = Pad
+        fields = ['id', 'field_name', 'pad_name']
+
+
+class FieldnameSerializer(serializers.ModelSerializer):
+    """Сериализатор для месторождение с именами (имя) ДЛЯ СОЗДАНИЯ МОДЕЛЕЙ """
+    client_name = serializers.CharField(source='get_client', read_only=True)
+
+    class Meta:
+        model = Field
+        fields = ['id', 'client_name', 'field_name', ]
+
+
 class PadSerializer(serializers.ModelSerializer):
     """Сериализатор для Куста с Скважиной"""
     wells = WellSerializer(many=True)

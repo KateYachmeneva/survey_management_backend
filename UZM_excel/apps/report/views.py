@@ -17,7 +17,6 @@ def index(request):
 
     if request.method == 'POST':
         index_id = rewrite_ReportIndex(request.POST.dict())  # перезапись индексов, получаем id текущего рейса
-
         igirgi_data = request.POST['igirgi_data'].replace(',', '.').replace(' ', '')\
             .replace('\r', '').replace('\n', '\t').split('\t')
 
