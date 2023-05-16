@@ -31,6 +31,10 @@ class AddWellForm(forms.ModelForm):
     class Meta:
         model = models.Well
         fields = '__all__'
+        widgets = {
+            'latitude': forms.TextInput(),
+            'longtitude': forms.TextInput(),
+        }
 
 
 class AddWellboreForm(forms.ModelForm):

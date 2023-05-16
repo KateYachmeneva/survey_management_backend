@@ -14,7 +14,7 @@
             <input type="search" class="form-control form-control-sm" id="SearchInput"
                    onkeyup="SearchFilter()" placeholder="Введите число..." style="width:9em">
         </label>
-        <label>Выбрано:{{context.selected}}
+        <label>Выбрано:{{context.selected_obj}}
 
         </label>
 
@@ -22,17 +22,24 @@
     <div class="col-4" style="text-align: right;">
         {% block top_button%}
         <br>
+        {% if context.selected_id is not None %}
         <button type="button" class="" placeholder="" aria-controls="dtDynamicVerticalScrollExample">
             <a href="mailto:DovidenkovAL@igirgi.rosneft.ru&body=TestMessage&subject=TestMailTo"
                style="text-decoration: none;color: #000;">Отправить отчет</a>
         </button>
 
         <button type="button" class="" placeholder="" aria-controls="dtDynamicVerticalScrollExample">
-            <a href="{% url 'edit_traj'%}" style="text-decoration: none;color: #000;">Редактировать значения</a>
+            <a href="{% url 'edit_traj' run_id=context.selected_id%} " style="text-decoration: none;color: #000;">Редактировать значения</a>
         </button>
+        {% endif %}
         {% endblock %}
     </div>
 </div>
+
+<!-- Для работы с таблицей как с ормой-->
+    {% block tag_form %}
+    <form>
+    {% endblock %}
 
 <!-- ТАБЛИЦА -->
 <div class="scroll-table" >
@@ -91,7 +98,7 @@
             <div class="col-5">
                 <table name="table-data" class="table table-light  table-bordered table-hover" style="margin-top:2%;">
                     <tbody>
-                    {% for meas in context.igirgi_data%}
+                    {% for meas in context.nnb_data%}
                     {% block data_tr2%}
                     <tr>
                         <td scope="col">{{meas.depth}}</td>
@@ -107,8 +114,11 @@
     </div>
 </div>
 
+
 <!-- НИЖНИИ КНОПКИ-->
 {% block bottom_button%}
+</form>
+
 <div class="row" style="margin-top:1em;margin-right:0.1em;">
     <div class="col-5" style="text-align: right">
        <button type="button" class="" placeholder="" data-toggle="modal" data-target="#data_Modal" style="width:100%" data-whatever="ИГиРГИ">

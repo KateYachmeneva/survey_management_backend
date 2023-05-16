@@ -30,18 +30,6 @@
     </label>
     <select name="pad_name" required id="id_pad_name">
         <option value="-" selected>---------</option>
-        <option value="3">Северо-Комсомольское; Куст.16.1</option>
-        <option value="8">им.Малыка; Куст.1УБ_М</option>
-        <option value="22">Радонежское; Куст.1</option>
-        <option value="23">Самотлорское; Куст.2469</option>
-        <option value="24">Северо-Тямкинское; Куст.1</option>
-        <option value="26">Ефремовское; Куст.106</option>
-        <option value="27">Северо-Комсомольское; Куст.22</option>
-        <option value="28">им.Малыка; Куст.1УБ_Ю</option>
-        <option value="29">им.Малыка; Куст.2Ю</option>
-        <option value="30">Немчиновское; Куст.1</option>
-        <option value="31">Северо-Комсомольское; Куст.18208</option>
-        <option value="32">им.Малыка; Куст.8Бис</option>
     </select>
 </div>
 
@@ -49,9 +37,9 @@
 {% for f in context.form %}
 
     <div class="container__item">
-        {% if f.label == 'Куст' %}
+        {% if f.label == 'Куст' %}  <!-- пропускаем поле Куст (добавили его выше с фильтром) -->
         {% else %}
-        <label class="container__label" for="{{f.id_for_label}}">
+        <label class="container__label">
             {{f.label}}:
         </label>
         {{f}}

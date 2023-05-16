@@ -7,6 +7,7 @@ from .forms import *
 from .models import Client
 from UZM_excel.conf import server_ip
 
+
 def add_contractor_nnb(request):
     form = AddContractorNNBForm(request.POST)
     if request.method == 'POST':
@@ -66,9 +67,30 @@ def add_pad(request):
 def add_well(request):
     form = AddWellForm(request.POST)
     if request.method == 'POST':
+        if form.data['latitude'] != '' or form.data['longtitude'] != '':  # Ввод КООРДИНАТЫ УСТЬЯ XX YY ZZ
+            _mutable = form.data._mutable  # изменяем QueryDicts
+            form.data._mutable = True
+            try:
+                lat_v = [float(idx) for idx in form.data['latitude'].replace(',', '.').split(' ')]
+                form.data['latitude'] = (round(float(lat_v[0]) + float(lat_v[1]) / 60 + float(lat_v[2]) / 3600, 3)
+                                         if len(lat_v) > 2 else float(lat_v[0]))
+
+            except:
+                form.data['latitude'] = ''
+
+            try:
+                long_v = [float(idx) for idx in form.data['longtitude'].replace(',', '.').split(' ')]
+                form.data['longtitude'] = (round(float(long_v[0]) + float(long_v[1]) / 60 + float(long_v[2]) / 3600, 3)
+                                           if len(long_v) > 2 else float(long_v[0]))
+            except:
+                form.data['longtitude'] = ''
+
+            form.data._mutable = _mutable
+
         if form.is_valid():
             form.save()
         return redirect(add_wellbore)
+
     context = {"title": 'Скважина',
                "form": form,
                "method": "add_well",
