@@ -34,8 +34,24 @@ def traj(request):
             context["nnb_data"] = StaticNNBData.objects.filter(run=run_id)
 
     if request.method == 'POST':
-        pass
+        run = Run.objects.get(id=request.GET.get('run_id'))
+        depth_data = request.POST['depth'].replace(',', '.').replace(' ', '') \
+            .replace('\r', '').replace('\n', '\t').split('\t')
+        corner_data = request.POST['corner'].replace(',', '.').replace(' ', '') \
+            .replace('\r', '').replace('\n', '\t').split('\t')
+        azimut_data = request.POST['azimut'].replace(',', '.').replace(' ', '') \
+            .replace('\r', '').replace('\n', '\t').split('\t')
+        # TODO протестировать на реальных замерах как вставляются замеры
+        # print(depth_data)
+        # print(request.POST)
+        if request.POST.get("data-type") == 'ННБ':
+            obj = StaticNNBData.objects
+        else:
+            obj = IgirgiStatic.objects
+        for meas in zip(depth_data, corner_data, azimut_data):
+            obj.get_or_create(run=run, depth=meas[0], corner=meas[1], azimut=meas[2])
 
+        return redirect(request.META.get('HTTP_REFERER'))  # вернуть на ту же страницу где и были
     return render(request, 'data_handler/trajectories.html', {'context': context, })
 
 
@@ -53,23 +69,24 @@ def edit_traj(request, run_id):
         context['selected_id'] = run_id
         context["igirgi_data"] = IgirgiStatic.objects.filter(run=run_id)
         context["nnb_data"] = StaticNNBData.objects.filter(run=run_id)
-        print(context["igirgi_data"][0].depth)
+        # print(context["igirgi_data"][0].depth)
 
     if request.method == 'POST':
         for items in request.POST.lists():
             key = str(items[0]).split(' ')
-            print(key)
+            # print(key)
             if 'nnb' in key:
                 obj = StaticNNBData.objects.get(id=key[0])
             else:
                 obj = IgirgiStatic.objects.get(id=key[0])
-            print(items[1])
-            obj.depth = float(items[1][0])
-            obj.corner = float(items[1][1])
-            obj.azimut = float(items[1][2])
-            obj.save()
-            # except:
-            #     obj.adelete()
+            # print(items[1]) - все 3 числа замеров
+            if items[1][0] == '' or items[1][1] == '' or items[1][2] == '':
+                obj.delete()
+            else:
+                obj.depth = float(items[1][0])
+                obj.corner = float(items[1][1])
+                obj.azimut = float(items[1][2])
+                obj.save()
 
         context['selected_obj'] = str(Run.objects.get(id=run_id))
         context['selected_id'] = run_id
