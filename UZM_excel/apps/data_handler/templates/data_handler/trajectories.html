@@ -31,6 +31,8 @@
         <button type="button" class="" placeholder="" aria-controls="dtDynamicVerticalScrollExample">
             <a href="{% url 'edit_traj' run_id=context.selected_id%} " style="text-decoration: none;color: #000;">Редактировать значения</a>
         </button>
+        {% else %}
+        Выберите рейс в меню слева
         {% endif %}
         {% endblock %}
     </div>
@@ -119,6 +121,7 @@
 {% block bottom_button%}
 </form>
 
+{% if context.selected_id is not None %} <!-- Не отображать кнопки добавления без выбранного рейса-->
 <div class="row" style="margin-top:1em;margin-right:0.1em;">
     <div class="col-5" style="text-align: right">
        <button type="button" class="" placeholder="" data-toggle="modal" data-target="#data_Modal" style="width:100%"
@@ -135,7 +138,7 @@
 
     </div>
 </div>
-
+{% endif %}
 
 
 <div class="modal fade" id="data_Modal" tabindex="-1" role="dialog">

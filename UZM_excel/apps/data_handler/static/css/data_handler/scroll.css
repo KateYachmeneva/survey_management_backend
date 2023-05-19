@@ -5,6 +5,13 @@
 	overflow-x: hidden;
 }
 
+.scroll-body {  /*Скрол по аналогии с таблице для div*/
+	height: 55em;
+	width: 100%;
+	overflow-y: auto;
+	overflow-x: hidden;
+}
+
 .scroll-table-head {
 	width: 99%;
 }

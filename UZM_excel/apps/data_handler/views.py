@@ -105,6 +105,14 @@ def param(request):
     return render(request, 'data_handler/param.html', {'context': context, })
 
 
+def well_param(request):
+    context = {"title": 'Параметры',
+               "active": 'param',
+               "tree": get_tree(),
+               }
+    return render(request, 'data_handler/parametrs/paramWll.html', {'context': context, })
+
+
 def graph(request):
     """Страница с графиком первичного контроля"""
     selected = dict()

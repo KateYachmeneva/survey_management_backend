@@ -14,6 +14,11 @@ class Letter:
         horiz = ''
         vert = ''
 
+    def __int__(self, run: object):
+        """Создание тела письма"""
+        self.field  = ''
+        pass
+
     def get_body(self):
         self.body = f"Контроль качетсва инклинометрии во время бурения:\n" \
                     f"Месторождение:{self.BodyData.field}\n" \

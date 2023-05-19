@@ -114,31 +114,31 @@
                             <!-- Месторождение -->
                             {% for field_dict in dict.fields %}
                             <li><a href="#{{field_dict.field_name}}" class="link-dark rounded" data-toggle="collapse">
-                                {{field_dict.field_name}}_1</a>
+                                {{field_dict.field_name}}</a>
                                 <div class="collapse" id="{{field_dict.field_name}}">
                                     <ul class="btn-toggle-nav">
                                         <!-- Куст -->
                                         {% for pad_dict in field_dict.pads %}
                                             <li><a href="#{{field_dict.field_name}}pad{{pad_dict.pad_name}}" class="link link-dark rounded" data-toggle="collapse">
-                                                Куст {{pad_dict.pad_name}}_2</a>
+                                                Куст {{pad_dict.pad_name}}</a>
                                                 <div class="collapse" id="{{field_dict.field_name}}pad{{pad_dict.pad_name}}">
                                                     <ul class="btn-toggle-nav">
                                                         <!-- Скважина -->
                                                         {% for well_dict in pad_dict.wells %}
                                                         <li><a href="#{{field_dict.field_name}}well{{well_dict.well_name}}" class="link link-dark rounded" data-toggle="collapse">
-                                                            Скв. {{well_dict.well_name}}_3</a>
+                                                            Скв. {{well_dict.well_name}}</a>
                                                             <div class="collapse" id="{{field_dict.field_name}}well{{well_dict.well_name}}">
                                                                 <ul class="btn-toggle-nav">
                                                                     <!-- Ствол-->
                                                                     {% for wellbore_dict in well_dict.wellbores %}
                                                                     <li><a href="#{{field_dict.field_name}}_{{wellbore_dict.wellbore}}" class="link link-dark rounded" data-toggle="collapse">
-                                                                        Ствол {{wellbore_dict.wellbore}}_4</a>
+                                                                        Ствол {{wellbore_dict.wellbore}}</a>
                                                                         <div class="collapse" id="{{field_dict.field_name}}_{{wellbore_dict.wellbore}}">
                                                                             <ul class="btn-toggle-nav">
                                                                                 <!-- Секция-->
                                                                                 {% for section_dict in wellbore_dict.sections %}
                                                                                 <li><a href="#{{field_dict.field_name}}_{{section_dict.section}}" class="link link-dark rounded" data-toggle="collapse">
-                                                                                    {{section_dict.section}}_5</a>
+                                                                                    {{section_dict.section}}</a>
                                                                                     <div class="collapse" id="{{field_dict.field_name}}_{{section_dict.section}}">
                                                                                         <ul class="btn-toggle-nav">
                                                                                             <!-- Рейс-->
