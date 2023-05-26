@@ -6,7 +6,7 @@ from excel_parcer.models import Data
 from report.models import StaticNNBData, IgirgiStatic
 # Create your views here.
 from Field.views_api import get_tree
-
+from .function.context_editer import *
 
 def index(request):
     """Главная страница"""
@@ -28,8 +28,12 @@ def traj(request):
     if request.method == "GET":
         if request.GET.get('run_id') is not None:  # если в get запросе не run_id выводим пустую страницу
             run_id = request.GET.get('run_id')
-            context['selected_obj'] = str(Run.objects.get(id=run_id))  # для отображения текцщей модели
-            context['selected_id'] = run_id  # для перенаправления пл id на редактирование
+            run = Run.objects.get(id=run_id)
+            context['selected_obj'] = str(run)  # для отображения текущей модели на странице
+            context['selected_id'] = run_id  # для перенаправления по id на редактирование
+
+            selected_for_tree(context, run)  # для раскрытия списка
+
             context["igirgi_data"] = IgirgiStatic.objects.filter(run=run_id)
             context["nnb_data"] = StaticNNBData.objects.filter(run=run_id)
 
@@ -42,8 +46,13 @@ def traj(request):
         azimut_data = request.POST['azimut'].replace(',', '.').replace(' ', '') \
             .replace('\r', '').replace('\n', '\t').split('\t')
         # TODO протестировать на реальных замерах как вставляются замеры
-        # print(depth_data)
-        # print(request.POST)
+        # f = open('on_form.txt', mode='w')
+        # f.write(depth_data)
+        # f.close()
+        print(depth_data)
+        print(corner_data)
+        print(azimut_data)
+        print(request.POST)
         if request.POST.get("data-type") == 'ННБ':
             obj = StaticNNBData.objects
         else:
@@ -55,7 +64,7 @@ def traj(request):
     return render(request, 'data_handler/trajectories.html', {'context': context, })
 
 
-def edit_traj(request, run_id):
+def edit_traj(request):
     """Страница с редактированием траекторией ННБ и ИГиРГИ"""
     context = {"title": 'Траектория',
                "active": 'traj',
@@ -64,12 +73,15 @@ def edit_traj(request, run_id):
                "nnb_data": range(100),
                }
 
+    run_id = request.GET.get('run_id')
+
     if request.method == "GET":
-        context['selected_obj'] = str(Run.objects.get(id=run_id))
+        run = Run.objects.get(id=request.GET.get('run_id'))
+        context['selected_obj'] = str(run)
         context['selected_id'] = run_id
+        selected_for_tree(context, run)  # для раскрытия списка
         context["igirgi_data"] = IgirgiStatic.objects.filter(run=run_id)
         context["nnb_data"] = StaticNNBData.objects.filter(run=run_id)
-        # print(context["igirgi_data"][0].depth)
 
     if request.method == 'POST':
         for items in request.POST.lists():

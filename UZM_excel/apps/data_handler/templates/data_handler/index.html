@@ -11,6 +11,11 @@
 .link {
   text-decoration: none;
 }
+
+.sel{
+    background-color: #fdb30d;
+}
+
 </style>
 
 
@@ -100,50 +105,50 @@
                 <svg class="bi me-2" width="30" height="24"><use xlink:href="#bootstrap"></use></svg>
                 <span class="fs-5 fw-semibold">Выбор модели</span>
             </a>
-            <!-- Начало дерева -->
-            <ul class="list-unstyled ps-0">
+            <!-- Начало дерева(по id работаем с деревом в js) -->
+            <ul class="list-unstyled ps-0" id="tree-menu">
                 <!-- ДО -->
                 {% for dict in context.tree %}
                 <li class="mb-1">
-                    <a class="btn btn-toggle align-items-center rounded collapsed" data-bs-toggle="collapse"
+                    <a class="btn btn-toggle align-items-center rounded collapsed " data-bs-toggle="collapse"
                        href="#{{ dict.client }}" role="button" aria-expanded="false">
                         {{ dict.client }}
                     </a>
-                    <div class="collapse" id="{{ dict.client }}" style="">
+                    <div class="collapse {% if dict.client == context.selected_client %} show {% endif %}" id="{{ dict.client }}" style="">
                         <ul class="btn-toggle-nav ">
                             <!-- Месторождение -->
                             {% for field_dict in dict.fields %}
-                            <li><a href="#{{field_dict.field_name}}" class="link-dark rounded" data-toggle="collapse">
+                            <li><a href="#{{field_dict.field_name}}" class="link-dark rounded field" data-toggle="collapse">
                                 {{field_dict.field_name}}</a>
-                                <div class="collapse" id="{{field_dict.field_name}}">
+                                <div class="collapse {% if field_dict.field_name == context.selected_field %} show {% endif %}" id="{{field_dict.field_name}}">
                                     <ul class="btn-toggle-nav">
                                         <!-- Куст -->
                                         {% for pad_dict in field_dict.pads %}
-                                            <li><a href="#{{field_dict.field_name}}pad{{pad_dict.pad_name}}" class="link link-dark rounded" data-toggle="collapse">
+                                            <li><a href="#{{field_dict.field_name}}pad{{pad_dict.pad_name}}" class="link link-dark rounded pad" data-toggle="collapse">
                                                 Куст {{pad_dict.pad_name}}</a>
-                                                <div class="collapse" id="{{field_dict.field_name}}pad{{pad_dict.pad_name}}">
+                                                <div class="collapse {% if pad_dict.pad_name == context.selected_pad %} show {% endif %}" id="{{field_dict.field_name}}pad{{pad_dict.pad_name}}">
                                                     <ul class="btn-toggle-nav">
                                                         <!-- Скважина -->
                                                         {% for well_dict in pad_dict.wells %}
-                                                        <li><a href="#{{field_dict.field_name}}well{{well_dict.well_name}}" class="link link-dark rounded" data-toggle="collapse">
+                                                        <li><a href="#{{field_dict.field_name}}well{{well_dict.well_name}}" class="link link-dark rounded well" data-toggle="collapse">
                                                             Скв. {{well_dict.well_name}}</a>
-                                                            <div class="collapse" id="{{field_dict.field_name}}well{{well_dict.well_name}}">
+                                                            <div class="collapse {% if well_dict.well_name == context.selected_well %} show {% endif %}" id="{{field_dict.field_name}}well{{well_dict.well_name}}">
                                                                 <ul class="btn-toggle-nav">
                                                                     <!-- Ствол-->
                                                                     {% for wellbore_dict in well_dict.wellbores %}
-                                                                    <li><a href="#{{field_dict.field_name}}_{{wellbore_dict.wellbore}}" class="link link-dark rounded" data-toggle="collapse">
+                                                                    <li><a href="#{{field_dict.field_name}}_{{wellbore_dict.wellbore}}" class="link link-dark rounded wellbore" data-toggle="collapse">
                                                                         Ствол {{wellbore_dict.wellbore}}</a>
-                                                                        <div class="collapse" id="{{field_dict.field_name}}_{{wellbore_dict.wellbore}}">
+                                                                        <div class="collapse {% if wellbore_dict.wellbore == context.selected_wellbore %} show {% endif %}" id="{{field_dict.field_name}}_{{wellbore_dict.wellbore}}">
                                                                             <ul class="btn-toggle-nav">
                                                                                 <!-- Секция-->
                                                                                 {% for section_dict in wellbore_dict.sections %}
-                                                                                <li><a href="#{{field_dict.field_name}}_{{section_dict.section}}" class="link link-dark rounded" data-toggle="collapse">
+                                                                                <li><a href="#{{field_dict.field_name}}_{{section_dict.section}}" class="link link-dark rounded section" data-toggle="collapse">
                                                                                     {{section_dict.section}}</a>
-                                                                                    <div class="collapse" id="{{field_dict.field_name}}_{{section_dict.section}}">
+                                                                                    <div class="collapse {% if well_dict.well_name == context.selected_well and section_dict.section == context.selected_section %} sel show {% endif %}" id="{{field_dict.field_name}}_{{section_dict.section}}">
                                                                                         <ul class="btn-toggle-nav">
                                                                                             <!-- Рейс-->
                                                                                             {% for run_dict in section_dict.runs %}
-                                                                                            <li><a href="?run_id={{run_dict.id}}">{{run_dict.run_number}}</a></li>
+                                                                                            <li><a href="?run_id={{run_dict.id}}" class="run">{{run_dict.run_number}}</a></li>
                                                                                             {% endfor %}
                                                                                             <!-- Конец Рейс-->
                                                                                         </ul>
@@ -187,6 +192,65 @@
     </div>
   </div>
 
+<script src="{% static 'js/nav_menu.js'%}"></script>
+<script>
+<!--    var client_elements   = document.querySelectorAll(".client");-->
+<!--    &lt;!&ndash; Фиксируем нажатие на клиента (ОГ) &ndash;&gt;-->
+<!--    for (var i = 0; i < client_elements.length; i++) {-->
+<!--      client_elements[i].onclick = function(){-->
+<!--          alert(client_elements[i]);-->
+<!--      };-->
+<!--    }-->
 
+<!--    var field_elements    = document.querySelectorAll(".field");-->
+<!--    &lt;!&ndash; Фиксируем нажатие на месторождение &ndash;&gt;-->
+<!--    for (var i = 0; i < field_elements.length; i++) {-->
+<!--      field_elements[i].onclick = function(){-->
+<!--          alert("Выбрано месторождение");-->
+<!--      };-->
+<!--    }-->
+
+<!--    var pad_elements      = document.querySelectorAll(".pad");-->
+<!--    &lt;!&ndash; Фиксируем нажатие на куст &ndash;&gt;-->
+<!--    for (var i = 0; i < pad_elements.length; i++) {-->
+<!--      pad_elements[i].onclick = function(){-->
+<!--          alert("Выбран куст");-->
+<!--      };-->
+<!--    }-->
+
+<!--    var well_elements     = document.querySelectorAll(".well");-->
+<!--    &lt;!&ndash; Фиксируем нажатие на скважину &ndash;&gt;-->
+<!--    for (var i = 0; i < well_elements.length; i++) {-->
+<!--      well_elements[i].onclick = function(){-->
+<!--          alert("Выбрана скважина");-->
+<!--      };-->
+<!--    }-->
+
+<!--    var wellbore_elements = document.querySelectorAll(".wellbore");-->
+<!--    &lt;!&ndash; Фиксируем нажатие на ствол &ndash;&gt;-->
+<!--    for (var i = 0; i < wellbore_elements.length; i++) {-->
+<!--      wellbore_elements[i].onclick = function(){-->
+<!--          alert("Выбран ствол");-->
+<!--      };-->
+<!--    }-->
+
+<!--    var section_elements  = document.querySelectorAll(".section");-->
+<!--    &lt;!&ndash; Фиксируем нажатие на секцию &ndash;&gt;-->
+<!--    for (var i = 0; i < section_elements.length; i++) {-->
+<!--      section_elements[i].onclick = function(){-->
+<!--          alert("Выбран секция");-->
+<!--      };-->
+<!--    }-->
+
+<!--    var run_elements      = document.querySelectorAll(".run");-->
+<!--    &lt;!&ndash; Фиксируем нажатие на рейс &ndash;&gt;-->
+<!--    for (var i = 0; i < run_elements.length; i++) {-->
+<!--      run_elements[i].onclick = function(){-->
+<!--          alert("Выбран рейс");-->
+<!--      };-->
+<!--    }-->
+
+
+</script>
 {% endblock %}
 
