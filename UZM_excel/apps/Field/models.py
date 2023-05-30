@@ -184,11 +184,15 @@ class Well(models.Model):
     T3_end = models.DateField('Окончание сопровождения до Т3', null=True, blank=True)
     critical_azimuth = models.BooleanField('Критический азимут', null=True, blank=True)
     comment = models.TextField('Комментарий', max_length=300, null=True, blank=True)
+    mail_To = models.TextField('Список рассылки почта "Кому"', max_length=300, null=True, blank=True)
+    mail_Cc = models.TextField('Список рассылки почта "Копия"', max_length=300, null=True, blank=True)
 
     def get_client(self):
+        """Получения ДО"""
         return str(self.pad_name.field.client)
 
     def get_contractor(self):
+        """Получение последнего подрядчика по бурению ННБ"""
         wellbores = Wellbore.objects.filter(well_name=self.id)
         if len(wellbores) != 0:
             sections = Section.objects.filter(wellbore=wellbores[0])
@@ -201,6 +205,7 @@ class Well(models.Model):
         return "None_contractor_name"
 
     def get_north_direction(self):
+        """Получить полное название направления на север (Для отображения)"""
         for variant in choices.NORTH_DIRECTION_CHOICES:
             if self.north_direction in variant:
                 return variant[1]

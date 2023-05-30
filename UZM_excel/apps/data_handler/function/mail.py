@@ -1,23 +1,27 @@
+from report.function.model_service import last_depth
+
+
 class Letter:
-    subject = ''  # тема письма
-    body = ''  # тело письма
-    mailto = ''  # кому отправить
-    cc = ''  # копия
-    bc = ''  # копия
+    """ Здесь хранятся данные для пиьсма """
+    def __init__(self, Well: object):
+        """ Передаем экземпляр скважины по которой отправляем отчёт """
+        # data_body = self.BodyData(Well)
+        self.subject = 'test'  # тема письма
+        self.body = 'Это тело письма'  # data_body.get_body()  # тело письма
+        self.mailto = Well.mail_To  # кому отправить
+        self.cc = Well.mail_Cc  # копия
 
     class BodyData:
-        field = ''
-        pad = ''
-        well = ''
-        depth = ''
-        departure = ''
-        horiz = ''
-        vert = ''
-
-    def __int__(self, run: object):
-        """Создание тела письма"""
-        self.field  = ''
-        pass
+        """ Даннные под тело письма get_body - формирует текст письма"""
+        def __int__(self, Well: object):
+            """Создание тела письма"""
+            self.field = Well.pad_name.field.field_name
+            self.pad = Well.pad_name.pad_name
+            self.well = Well.well_name
+            self.depth = last_depth(Well)
+            self.departure = ''
+            self.horiz = ''  # Горизантальные отходы
+            self.vert = ''  # вертикальные отходы
 
     def get_body(self):
         self.body = f"Контроль качетсва инклинометрии во время бурения:\n" \

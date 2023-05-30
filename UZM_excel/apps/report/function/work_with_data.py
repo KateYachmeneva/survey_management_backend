@@ -10,7 +10,7 @@ from django.http import FileResponse, HttpResponse, JsonResponse
 
 from .work_with_Excel import excel_open, write_data_in_Excel
 from ..models import ReportIndex, DynamicNNBData, Raw, IgirgiStatic, StaticNNBData, Plan, get_run_by_id, IgirgiDynamic
-from .data_bd import get_data
+from .model_service import get_data
 from Field.models import Run
 import lasio
 

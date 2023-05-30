@@ -7,6 +7,7 @@ from report.models import StaticNNBData, IgirgiStatic
 # Create your views here.
 from Field.views_api import get_tree
 from .function.context_editer import *
+from .function.mail import *
 
 def index(request):
     """Главная страница"""
@@ -36,6 +37,8 @@ def traj(request):
 
             context["igirgi_data"] = IgirgiStatic.objects.filter(run=run_id)
             context["nnb_data"] = StaticNNBData.objects.filter(run=run_id)
+
+            context['letter'] = Letter(run.section.wellbore.well_name)
 
     if request.method == 'POST':
         run = Run.objects.get(id=request.GET.get('run_id'))

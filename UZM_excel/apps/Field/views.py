@@ -66,6 +66,8 @@ def add_pad(request):
 
 def add_well(request):
     form = AddWellForm(request.POST)
+    form.base_fields['mail_To'].help_text = 'Введите адреса черех ";"'
+    form.base_fields['mail_Cc'].help_text = 'Введите адреса черех ";"'
     if request.method == 'POST':
         if form.data['latitude'] != '' or form.data['longtitude'] != '':  # Ввод КООРДИНАТЫ УСТЬЯ XX YY ZZ
             _mutable = form.data._mutable  # изменяем QueryDicts

@@ -43,6 +43,7 @@
             {{f.label}}:
         </label>
         {{f}}
+        {% if f.help_text != '' %}<li>{{f.help_text}}</li>{% endif %}
         {% endif %}
     </div>
 

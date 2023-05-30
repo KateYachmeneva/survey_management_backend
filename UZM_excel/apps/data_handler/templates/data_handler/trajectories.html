@@ -24,7 +24,7 @@
         <br>
         {% if context.selected_id is not None %}
         <button type="button" class="" placeholder="" aria-controls="dtDynamicVerticalScrollExample">
-            <a href="mailto:DovidenkovAL@igirgi.rosneft.ru&body=TestMessage&subject=TestMailTo"
+            <a href="mailto:{{context.letter.mailto}}&cc={{context.letter.cc}}&body={{context.letter.body}}&subject={{context.letter.subject}}"
                style="text-decoration: none;color: #000;">Отправить отчет</a>
         </button>
 
