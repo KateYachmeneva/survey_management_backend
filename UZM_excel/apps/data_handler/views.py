@@ -9,6 +9,7 @@ from Field.views_api import get_tree
 from .function.context_editer import *
 from .function.mail import *
 
+
 def index(request):
     """Главная страница"""
     context = {"title": 'Работа с данными',
@@ -48,20 +49,17 @@ def traj(request):
             .replace('\r', '').replace('\n', '\t').split('\t')
         azimut_data = request.POST['azimut'].replace(',', '.').replace(' ', '') \
             .replace('\r', '').replace('\n', '\t').split('\t')
-        # TODO протестировать на реальных замерах как вставляются замеры
-        # f = open('on_form.txt', mode='w')
-        # f.write(depth_data)
-        # f.close()
-        print(depth_data)
-        print(corner_data)
-        print(azimut_data)
-        print(request.POST)
+
         if request.POST.get("data-type") == 'ННБ':
             obj = StaticNNBData.objects
         else:
             obj = IgirgiStatic.objects
         for meas in zip(depth_data, corner_data, azimut_data):
-            obj.get_or_create(run=run, depth=meas[0], corner=meas[1], azimut=meas[2])
+            if meas[0] != '' and meas[1] != '' and meas[2] != '':  # Если значения не нулевые
+                new_obj = obj.get_or_create(run=run, depth=meas[0])
+                new_obj[0].corner = meas[1]
+                new_obj[0].azimut = meas[2]
+                new_obj[0].save()
 
         return redirect(request.META.get('HTTP_REFERER'))  # вернуть на ту же страницу где и были
     return render(request, 'data_handler/trajectories.html', {'context': context, })
