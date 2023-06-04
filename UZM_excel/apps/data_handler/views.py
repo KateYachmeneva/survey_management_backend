@@ -8,7 +8,8 @@ from report.models import StaticNNBData, IgirgiStatic
 from Field.views_api import get_tree
 from .function.context_editer import *
 from .function.mail import *
-
+from report.function.work_with_Excel import write_data_in_Excel
+from UZM_excel.conf import server_ip
 
 def index(request):
     """Главная страница"""
@@ -26,6 +27,7 @@ def traj(request):
     context = {"title": 'Траектория',
                "active": 'traj',
                "tree": get_tree(),
+               "server_ip": server_ip,
                }
     if request.method == "GET":
         if request.GET.get('run_id') is not None:  # если в get запросе не run_id выводим пустую страницу

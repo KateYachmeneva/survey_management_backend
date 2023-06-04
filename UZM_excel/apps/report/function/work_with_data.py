@@ -173,7 +173,7 @@ def processing_data(start_data: dict, run_id: int, index_id: int) -> FileRespons
 
     # перезапись данных (расширение подаваемых значений, данными БД)
     # FIXME - протестировать
-    # all_data = get_data(Run)
+    all_data = get_data(Run)
     # выдача файлов на скачивание
     file_type = 0 if start_data["response_type"] == "cut_version" else 1
     file_name = write_data_in_Excel(all_data, f'Единая_форма_отчета{file_type}.xlsx', file_type, Run)

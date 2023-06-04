@@ -23,9 +23,10 @@
         {% block top_button%}
         <br>
         {% if context.selected_id is not None %}
-        <button type="button" class="" placeholder="" aria-controls="dtDynamicVerticalScrollExample">
-            <a href="mailto:{{context.letter.mailto}}&cc={{context.letter.cc}}&body={{context.letter.body}}&subject={{context.letter.subject}}"
-               style="text-decoration: none;color: #000;">Отправить отчет</a>
+        <button type="button" class="" onclick="Send_mail()" aria-controls="dtDynamicVerticalScrollExample">
+            Отправить отчет
+<!--            <a style="text-decoration: none;color: #000;" href="mailto:{{context.letter.mailto}}&cc={{context.letter.cc}}&body={{context.letter.body}}&subject={{context.letter.subject}}"
+</a> -->
         </button>
 
         <button type="button" class="" placeholder="" aria-controls="dtDynamicVerticalScrollExample">
@@ -194,6 +195,51 @@
 {% endblock%}
 
 <script>
+<!-- Отправка отчёта -->
+function Send_mail() {
+    console.log('Отправляем сообщение');
+    <!--  Задаём в пост запрос номер рейса  -->
+    var params = new FormData();
+    params.set('run_id', {{context.selected_id}});
+
+
+    fetch('http://{{ context.server_ip }}/report/api/file_name',
+    { method: 'POST', body: params })
+    .then(response=>response.json()).
+    then(data=>{
+    var FileName = data['file_name'];
+    var Waste = data['waste'];
+    console.log(FileName);
+        <!--  Задаём в пост запрос имя файла на скачивании  -->
+        params = new FormData();
+        params.set('name', FileName);
+        <!--  Скачиваем файл  -->
+        fetch('http://{{ context.server_ip }}/report/api/get_file',
+        { method: 'POST', body: params })
+        .then(response=>response.blob()).
+        then(data=>{
+            const anchorElement = document.createElement('a');
+            const url = window.URL.createObjectURL(data);
+            anchorElement.href = url;
+            anchorElement.download = String(FileName);
+            anchorElement.click();
+         })
+
+    const a_mail = document.createElement('a');
+    const url = 'mailto:{{context.letter.mailto}}&cc={{context.letter.cc}}&body={{context.letter.body}}'+
+    Waste['common']+'{{context.letter.comm_waste}}{{context.letter.hor_waste}}'+Waste['hor']+'{{context.letter.ver_waste}}'+
+    Waste['ver']+'{{context.letter.endbody}}&subject='+String(FileName).slice(0, -5);
+    a_mail.href = url;
+    a_mail.click();
+
+
+
+    })
+
+
+
+}
+
 <!-- Функция поиска -->
 function SearchFilter() {
   // Объявление переменных

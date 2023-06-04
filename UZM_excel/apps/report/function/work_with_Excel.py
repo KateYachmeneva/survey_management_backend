@@ -79,7 +79,7 @@ def write_data_in_Excel(all_data: dict, filename: str, type: int, Run: object) -
     type - сокращенный файл или полный
     Well- скважина
 
-    На выходе получаем имя файла, которое отдаем на выдачу
+    На выходе получаем имя файла, которое отдаем на выдачу и параметры отходов
     """
     Well = Run.section.wellbore.well_name
     # построение графика
@@ -87,12 +87,18 @@ def write_data_in_Excel(all_data: dict, filename: str, type: int, Run: object) -
 
     file_folder = file_dir + '\\Шаблон\\' + filename
     excel_file = openpyxl.load_workbook(file_folder)
-    hor, ver = write_data(excel_file,
-                          all_data['Статические замеры ННБ'],
-                          all_data['Статические замеры ИГИРГИ'],
-                          other_data,
-                          Run,
-                          type)
+    print(all_data['Статические замеры ННБ'])
+    print(all_data['Статические замеры ИГИРГИ'])
+    hor, ver, common = write_data(excel_file,    # горизонтальные, вертикальные, общие отходы
+                                  all_data['Статические замеры ННБ'],
+                                  all_data['Статические замеры ИГИРГИ'],
+                                  other_data,
+                                  Run,
+                                  type)
+    waste = dict()
+    waste['hor'] = hor
+    waste['ver'] = ver
+    waste['common'] = common
 
     if type == 1:
         nnb_dynamic(excel_file, all_data['Динамические замеры ННБ'])
@@ -123,7 +129,7 @@ def write_data_in_Excel(all_data: dict, filename: str, type: int, Run: object) -
                                  departure_ver=ver,
                                  departure_horiz=hor, )
     excel_file.save(file_dir + '\\Report_out\\' + report_name)
-    return report_name
+    return report_name, waste
 
 
 def write_dynamic_igirgi(excel_file: openpyxl.workbook.workbook.Workbook,
@@ -216,7 +222,8 @@ def write_data(excel: openpyxl.workbook.workbook.Workbook,
                  (meas[11] - meas[8]) ** 2), 2)
 
         if row == (17 + len(igirgi['Глубина'])):  # забираем последнии значения отходов
-            return round(sqrt((X_nnb - X_igirgi) ** 2 + (Y_nnb - Y_igigri) ** 2), 2), round(meas[11] - meas[8], 2)
+            return round(sqrt((X_nnb - X_igirgi) ** 2 + (Y_nnb - Y_igigri) ** 2), 2), round(meas[11] - meas[8], 2), \
+                   round(sqrt((X_nnb - X_igirgi) ** 2 + (Y_nnb - Y_igigri) ** 2 + (meas[11] - meas[8]) ** 2), 2)
 
         row += 1
 
