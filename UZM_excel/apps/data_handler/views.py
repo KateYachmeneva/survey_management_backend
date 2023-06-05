@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from pytest import console_main
+# from pytest import console_main
 from Field.models import Well, Run, get_all_well
 from excel_parcer.models import Data
 # Create your views here.

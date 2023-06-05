@@ -1,58 +1,69 @@
-from django import forms
+from django.forms import ModelForm, widgets
 
 from . import models
 
 
-class AddContractorNNBForm(forms.ModelForm):
+class AddContractorNNBForm(ModelForm):
     class Meta:
         model = models.ContractorNNB
         fields = '__all__'
 
 
-class AddContractorDrillForm(forms.ModelForm):
+class AddContractorDrillForm(ModelForm):
     class Meta:
         model = models.ContractorDrill
         fields = '__all__'
 
 
-class AddFieldForm(forms.ModelForm):
+class AddFieldForm(ModelForm):
     class Meta:
         model = models.Field
         fields = '__all__'
 
 
-class AddPadForm(forms.ModelForm):
+class AddPadForm(ModelForm):
     class Meta:
         model = models.Pad
         fields = '__all__'
 
 
-class AddWellForm(forms.ModelForm):
+class AddWellForm(ModelForm):
     class Meta:
         model = models.Well
         fields = '__all__'
+        widgets = {
+            'geomagnetic_date': widgets.DateInput(attrs={'type': 'date'}),
+            'T1_start': widgets.DateInput(attrs={'type': 'date'}),
+            'T1_end': widgets.DateInput(attrs={'type': 'date'}),
+            'T3_start': widgets.DateInput(attrs={'type': 'date'}),
+            'T3_end': widgets.DateInput(attrs={'type': 'date'}),
+        }
 
 
-class AddWellboreForm(forms.ModelForm):
+class AddWellboreForm(ModelForm):
     class Meta:
         model = models.Wellbore
         fields = '__all__'
         # exclude = ['wellbore']
 
 
-class AddSectionForm(forms.ModelForm):
+class AddSectionForm(ModelForm):
     class Meta:
         model = models.Section
         fields = '__all__'
 
 
-class AddRunForm(forms.ModelForm):
+class AddRunForm(ModelForm):
     class Meta:
         model = models.Run
         fields = '__all__'
+        widgets = {
+            'start_date': widgets.DateInput(attrs={'type': 'date'}),
+            'end_date': widgets.DateInput(attrs={'type': 'date'}),
+        }
 
 
-class AddClientForm(forms.ModelForm):
+class AddClientForm(ModelForm):
     class Meta:
         model = models.Client
         fields = '__all__'
