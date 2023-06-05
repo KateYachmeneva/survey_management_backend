@@ -229,9 +229,10 @@ function Send_mail() {
     const url = 'mailto:{{context.letter.mailto}}&cc={{context.letter.cc}}&body={{context.letter.body}}'+
     Waste['common']+'{{context.letter.comm_waste}}{{context.letter.hor_waste}}'+Waste['hor']+'{{context.letter.ver_waste}}'+
     Waste['ver']+'{{context.letter.endbody}}&subject='+String(FileName).slice(0, -5);
+    console.log("Хочу перейти по ссылке:"+url);
     a_mail.href = url;
     a_mail.click();
-
+    console.log("Ура! Я в Outlook!");
 
 
     })
