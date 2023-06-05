@@ -9,6 +9,7 @@ from .function.mail import *
 from report.function.work_with_Excel import write_data_in_Excel
 from UZM_excel.conf import server_ip
 
+
 def index(request):
     """Главная страница"""
     context = {"title": 'Работа с данными',
@@ -115,15 +116,15 @@ def param(request):
                "active": 'param',
                "tree": get_tree(),
                }
+    if request.method == "GET":
+        if request.GET.get('run_id') is not None:
+            run_id = request.GET.get('run_id')
+            run = Run.objects.get(id=request.GET.get('run_id'))
+            context['selected_obj'] = str(run)
+            context['selected_id'] = run_id
+            selected_for_tree(context, run)  # для раскрытия списка
+
     return render(request, 'data_handler/param.html', {'context': context, })
-
-
-def well_param(request):
-    context = {"title": 'Параметры',
-               "active": 'param',
-               "tree": get_tree(),
-               }
-    return render(request, 'data_handler/parametrs/paramWll.html', {'context': context, })
 
 
 def graph(request):
