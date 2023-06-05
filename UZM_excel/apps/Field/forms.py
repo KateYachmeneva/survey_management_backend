@@ -37,6 +37,8 @@ class AddWellForm(ModelForm):
             'T1_end': widgets.DateInput(attrs={'type': 'date'}),
             'T3_start': widgets.DateInput(attrs={'type': 'date'}),
             'T3_end': widgets.DateInput(attrs={'type': 'date'}),
+            'latitude': forms.TextInput(),
+            'longtitude': forms.TextInput(),
         }
 
 

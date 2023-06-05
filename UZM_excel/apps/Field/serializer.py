@@ -29,24 +29,6 @@ class ContractorDrillSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
-class PadnameSerializer(serializers.ModelSerializer):
-    """Сериализатор для куста с именами (имя) """
-    field_name = serializers.CharField(source='get_field', read_only=True)
-
-    class Meta:
-        model = Pad
-        fields = ['id', 'field_name', 'pad_name']
-
-
-class FieldnameSerializer(serializers.ModelSerializer):
-    """Сериализатор для месторождение с именами (имя) """
-    client_name = serializers.CharField(source='get_client', read_only=True)
-
-    class Meta:
-        model = Field
-        fields = ['id', 'client_name', 'field_name', ]
-
-
 class WellSerializer(serializers.ModelSerializer):
     client_name = serializers.CharField(source='get_client', read_only=True)
     contractorNNB = serializers.CharField(source='get_contractor', read_only=True)
@@ -57,6 +39,24 @@ class WellSerializer(serializers.ModelSerializer):
         extra_kwargs = {
             'pad_id': {'source': 'pad_name'},
         }
+
+
+class PadnameSerializer(serializers.ModelSerializer):
+    """Сериализатор для куста с именами (имя) ДЛЯ СОЗДАНИЯ МОДЕЛЕЙ """
+    field_name = serializers.CharField(source='get_field', read_only=True)
+
+    class Meta:
+        model = Pad
+        fields = ['id', 'field_name', 'pad_name']
+
+
+class FieldnameSerializer(serializers.ModelSerializer):
+    """Сериализатор для месторождение с именами (имя) ДЛЯ СОЗДАНИЯ МОДЕЛЕЙ """
+    client_name = serializers.CharField(source='get_client', read_only=True)
+
+    class Meta:
+        model = Field
+        fields = ['id', 'client_name', 'field_name', ]
 
 
 class PadSerializer(serializers.ModelSerializer):
@@ -74,6 +74,7 @@ class PadSerializer(serializers.ModelSerializer):
 
 class FieldSerializer(serializers.ModelSerializer):
     """Сериализатор для месторождения"""
+
     # pads = PadSerializer(many=True)
 
     class Meta:
@@ -109,7 +110,7 @@ class WellboreSerializer(serializers.ModelSerializer):
 
 
 class WellWithRunSerializer(serializers.ModelSerializer):
-    full_name = serializers.SerializerMethodField(source='get_full_name', read_only=True)
+    full_name = serializers.SerializerMethodField(read_only=True) # по умолчанию берем данные из метода get_
     wellbores = WellboreSerializer(many=True, read_only=True)
 
     # sections = SectionSerializer(many=True, read_only=True)

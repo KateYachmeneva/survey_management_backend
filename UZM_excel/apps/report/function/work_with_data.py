@@ -10,7 +10,7 @@ from django.http import FileResponse, HttpResponse, JsonResponse
 
 from .work_with_Excel import excel_open, write_data_in_Excel
 from ..models import ReportIndex, DynamicNNBData, Raw, IgirgiStatic, StaticNNBData, Plan, get_run_by_id, IgirgiDynamic
-from .data_bd import get_data
+from .model_service import get_data
 from Field.models import Run
 import lasio
 
@@ -173,10 +173,10 @@ def processing_data(start_data: dict, run_id: int, index_id: int) -> FileRespons
 
     # перезапись данных (расширение подаваемых значений, данными БД)
     # FIXME - протестировать
-    # all_data = get_data(Run)
+    all_data = get_data(Run)
     # выдача файлов на скачивание
     file_type = 0 if start_data["response_type"] == "cut_version" else 1
-    file_name = write_data_in_Excel(all_data, f'Единая_форма_отчета{file_type}.xlsx', file_type, Run)
+    file_name, waste = write_data_in_Excel(all_data, f'Единая_форма_отчета{file_type}.xlsx', file_type, Run)
     return FileResponse(open(file_dir + "\\Report_out\\" + file_name, 'rb'))
 
 
@@ -402,8 +402,9 @@ def bd_Write_data(all_data: dict, run_id: int) -> NoReturn:
             model = StaticNNBData
         elif key == 'raw_file':
             model = Raw
-        elif key == 'plan_traj_file':
+        elif key == 'plan_file':
             model = Plan
+            print("Пишем план")
         elif key == 'igirgi_dynamic':
             model = IgirgiDynamic
         else:

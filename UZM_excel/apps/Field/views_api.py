@@ -1,3 +1,4 @@
+from django.http import JsonResponse
 from rest_framework import generics, viewsets, mixins
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -5,6 +6,7 @@ from rest_framework.viewsets import GenericViewSet
 
 from .models import *
 from .serializer import *
+from .serializerTree import Tree
 
 
 class ClientAPIView(APIView):
@@ -104,3 +106,26 @@ class WellWithRunViewSet(mixins.RetrieveModelMixin,
     """
     queryset = Well.objects.all()
     serializer_class = WellWithRunSerializer
+
+
+def get_tree() -> list:
+    """ Дерево для меню """
+    trees = Tree(Client.objects.all(), many=True).data
+    return trees
+
+
+# смежные api
+def get_field_by_do(request):
+    """Функция для фильтрации"""
+    field_data = dict()
+    for field in Field.objects.filter(client=request.POST.get("do_id")):
+        field_data[field.id] = field.field_name
+    return JsonResponse(field_data)
+
+
+def get_pad_by_field(request):
+    """Функция для фильтрации"""
+    pad_data = dict()
+    for pad in Pad.objects.filter(field=request.POST.get("field_id")):
+        pad_data[pad.id] = pad.pad_name
+    return JsonResponse(pad_data)

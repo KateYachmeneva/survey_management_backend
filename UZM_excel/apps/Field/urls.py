@@ -32,5 +32,7 @@ urlpatterns = [
     path('api/contractorDrill', ContractorDrillAPIView.as_view()),
     # path('api/full_field', FieldApiView.as_view()),
     # path('api/full_pad', PadApiView.as_view()),
-    path('api/', include(router.urls))
+    path('api/', include(router.urls)),
+    path('api/get_field', get_field_by_do, name='get_field_by_do'),
+    path('api/get_pad', get_pad_by_field, name='run_index'),
 ]

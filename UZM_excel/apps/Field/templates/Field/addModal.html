@@ -11,7 +11,9 @@
 
 {% block content %}
     <br>
+
     <form class="container" action="{% url context.method %}" method="post">
+        {% block data_field %}
         {% for f in context.form %}
         <div class="container__item">
             <label class="container__label" for="{{f.id_for_label}}">
@@ -20,10 +22,12 @@
             {{f}}
         </div>
         {% endfor %}
-
+        {% endblock %}
 <!--      {{context.form.as_p}}-->
       <button type="submit">Добавить</button>
+
     </form>
+
 
     <script src="{% static 'js/run/script.js' %}"></script>
     {% if context.data is not None %}

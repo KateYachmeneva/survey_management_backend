@@ -1,25 +1,25 @@
 {% extends 'data_handler/index.html' %}
 {% load static%}
 
+{%  block header %}
+    <link type="text/css" href="{% static 'css/data_handler/scroll.css' %}" rel="stylesheet" />
+{% endblock %}
+
+
 {% block data %}
-      <div data-spy="scroll" data-target="#navbar-example3" data-offset="0" class="scrollspy-example-2" style="margin-top:1em">
-        <h4 id="item-1">Здесь параметры</h4>
-        <p>Много параметров</p>
-        <h5 id="item-1-1">параметры</h5>
-        <p>Значения</p>
-        <h5 id="item-1-1">параметры</h5>
-        <p>Значения</p>
-        <h5 id="item-1-1">параметры</h5>
-        <p>Значения</p>
-        <h5 id="item-1-1">параметры</h5>
-        <p>Значения</p>
-        <h5 id="item-1-1">параметры</h5>
-        <p>Значения</p>
-        <h5 id="item-1-1">параметры</h5>
-        <p>Значения</p>
-        <h5 id="item-1-1">параметры</h5>
-        <p>Значения</p>
-        <h5 id="item-1-1">параметры</h5>
-        <p>Значения</p>
-      </div>
+<div class="scroll-body" style="margin-top:1em">
+  <hr style="color:#FFC501;margin-top:1%;border-width: 3px">
+
+  <form>
+    <div class="form-row">
+        <div class="form-group col-md-6">
+            <label for="inputEmail4">Параметр</label>
+            <input type="text" class="form-control" id="inputEmail4" placeholder="Значение">
+        </div>
+        <div class="form-group col-md-6">
+            <label for="inputPassword4">Параметр</label>
+            <input type="text" class="form-control" id="inputPassword4" placeholder="Значени">
+        </div>
+    </div>
+  </form>
 {% endblock %}

@@ -1,9 +1,13 @@
-from django.shortcuts import render
-# from pytest import console_main
+from django.shortcuts import render, redirect
+from pytest import console_main
 from Field.models import Well, Run, get_all_well
 from excel_parcer.models import Data
-# Create your views here.
-
+from report.models import StaticNNBData, IgirgiStatic
+from Field.views_api import get_tree
+from .function.context_editer import *
+from .function.mail import *
+from report.function.work_with_Excel import write_data_in_Excel
+from UZM_excel.conf import server_ip
 
 def index(request):
     """Главная страница"""
@@ -20,27 +24,111 @@ def traj(request):
     """Страница с траекторией ННБ и ИГиРГИ"""
     context = {"title": 'Траектория',
                "active": 'traj',
+               "tree": get_tree(),
+               "server_ip": server_ip,
+               }
+    if request.method == "GET":
+        if request.GET.get('run_id') is not None:  # если в get запросе не run_id выводим пустую страницу
+            run_id = request.GET.get('run_id')
+            run = Run.objects.get(id=run_id)
+            context['selected_obj'] = str(run)  # для отображения текущей модели на странице
+            context['selected_id'] = run_id  # для перенаправления по id на редактирование
+
+            selected_for_tree(context, run)  # для раскрытия списка
+
+            context["igirgi_data"] = IgirgiStatic.objects.filter(run=run_id)
+            context["nnb_data"] = StaticNNBData.objects.filter(run=run_id)
+
+            context['letter'] = Letter(run.section.wellbore.well_name)
+
+    if request.method == 'POST':
+        run = Run.objects.get(id=request.GET.get('run_id'))
+        depth_data = request.POST['depth'].replace(',', '.').replace(' ', '') \
+            .replace('\r', '').replace('\n', '\t').split('\t')
+        corner_data = request.POST['corner'].replace(',', '.').replace(' ', '') \
+            .replace('\r', '').replace('\n', '\t').split('\t')
+        azimut_data = request.POST['azimut'].replace(',', '.').replace(' ', '') \
+            .replace('\r', '').replace('\n', '\t').split('\t')
+
+        if request.POST.get("data-type") == 'ННБ':
+            obj = StaticNNBData.objects
+        else:
+            obj = IgirgiStatic.objects
+        for meas in zip(depth_data, corner_data, azimut_data):
+            if meas[0] != '' and meas[1] != '' and meas[2] != '':  # Если значения не нулевые
+                new_obj = obj.get_or_create(run=run, depth=meas[0])
+                new_obj[0].corner = meas[1]
+                new_obj[0].azimut = meas[2]
+                new_obj[0].save()
+
+        return redirect(request.META.get('HTTP_REFERER'))  # вернуть на ту же страницу где и были
+    return render(request, 'data_handler/trajectories.html', {'context': context, })
+
+
+def edit_traj(request):
+    """Страница с редактированием траекторией ННБ и ИГиРГИ"""
+    context = {"title": 'Траектория',
+               "active": 'traj',
+               "tree": get_tree(),
                "igirgi_data": range(100),
                "nnb_data": range(100),
                }
 
+    run_id = request.GET.get('run_id')
+
+    if request.method == "GET":
+        run = Run.objects.get(id=request.GET.get('run_id'))
+        context['selected_obj'] = str(run)
+        context['selected_id'] = run_id
+        selected_for_tree(context, run)  # для раскрытия списка
+        context["igirgi_data"] = IgirgiStatic.objects.filter(run=run_id)
+        context["nnb_data"] = StaticNNBData.objects.filter(run=run_id)
+
     if request.method == 'POST':
+        for items in request.POST.lists():
+            key = str(items[0]).split(' ')
+            # print(key)
+            if 'nnb' in key:
+                obj = StaticNNBData.objects.get(id=key[0])
+            else:
+                obj = IgirgiStatic.objects.get(id=key[0])
+            # print(items[1]) - все 3 числа замеров
+            if items[1][0] == '' or items[1][1] == '' or items[1][2] == '':
+                obj.delete()
+            else:
+                obj.depth = float(items[1][0])
+                obj.corner = float(items[1][1])
+                obj.azimut = float(items[1][2])
+                obj.save()
 
-        pass
+        context['selected_obj'] = str(Run.objects.get(id=run_id))
+        context['selected_id'] = run_id
+        context["igirgi_data"] = IgirgiStatic.objects.filter(run=run_id)
+        context["nnb_data"] = StaticNNBData.objects.filter(run=run_id)
 
-    return render(request, 'data_handler/trajectories.html', {'context': context, })
+    return render(request, 'data_handler/edit_trajectories.html', {'context': context, })
 
 
 def param(request):
     """Страница с параметрами"""
     context = {"title": 'Параметры',
                "active": 'param',
+               "tree": get_tree(),
                }
     return render(request, 'data_handler/param.html', {'context': context, })
 
 
+def well_param(request):
+    context = {"title": 'Параметры',
+               "active": 'param',
+               "tree": get_tree(),
+               }
+    return render(request, 'data_handler/parametrs/paramWll.html', {'context': context, })
+
+
 def graph(request):
     """Страница с графиком первичного контроля"""
+    selected = dict()
     depthGoxy = []
     depthGz = []
     depthGtotal = []
@@ -63,6 +151,8 @@ def graph(request):
     if request.method == 'POST':
         well = Well.objects.get(id=request.POST['well'])
         runs = Run.objects.filter(section__wellbore__well_name=well)
+        selected["well"] = str(well)  # для отображения на странице
+        selected["id"] = request.POST['well']
         for run in runs:
             surveys = Data.objects.filter(run=run)
             for survey in surveys:
@@ -123,7 +213,7 @@ def graph(request):
         'depthHSTF': depthHSTF,
         'firstDepth': firstDepth,
         'lastDepth': lastDepth,
-                 
+        'selected': selected,
     }
 
     return render(request, 'data_handler/graph.html', {'context': context, })

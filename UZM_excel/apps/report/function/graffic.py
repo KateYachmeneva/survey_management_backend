@@ -67,6 +67,7 @@ def get_graph_data(I: list, A: list, Depth: list, RKB: int, VSaz: int = 1) -> li
     NS_list - север/юг,
     Vsect_list, TVDSS_list, TVD_list
 
+    Возвращает данные в порядке EW_list, NS_list, Vsect_list, TVDSS_list, TVD_list
     """
     TVD = 0
     TVDSS = RKB

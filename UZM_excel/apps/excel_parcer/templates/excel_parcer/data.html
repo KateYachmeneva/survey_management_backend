@@ -74,7 +74,7 @@
                           <h4 style="margin-top:2%">Загрузите файл с осями</h4>
                           {% csrf_token %}
                           <input  type="file" accept=".xls,.xlsx,.las,.txt,.sur,.csv" name="file" style="margin-top:1%">
-                          <a data-tooltip="Файлы с разрешение .xls .xlsx .las .txt .sur">
+                          <a data-tooltip=".xls .xlsx .csv .las .txt .sur">
                               <img class="circle" src="{% static 'img/report/question.png'%}"
                                                   alt="question"
                                                   style="height: 16px;width: 16px;">

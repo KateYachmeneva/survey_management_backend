@@ -6,87 +6,289 @@
 {% endblock %}
 
 {% block data %}
-<div class="row" style="margin-top:1em">
-    <div class="col-1">
-        <label>Search:
-            <input type="search" class="form-control form-control-sm" placeholder="" aria-controls="dtDynamicVerticalScrollExample">
+
+<!-- ВЕРХНИИ КНОПКИ-->
+<div class="row" style="margin-top:1em;margin-right:0.1em;">
+    <div class="col-7">
+        <label>Поиск:
+            <input type="search" class="form-control form-control-sm" id="SearchInput"
+                   onkeyup="SearchFilter()" placeholder="Введите число..." style="width:9em">
+        </label>
+        <label> <b>Выбрано:</b> {{context.selected_obj}}
+
         </label>
 
     </div>
-    <div class="col-10" style="text-align: right;">
+    <div class="col-4" style="text-align: right;">
+        {% block top_button%}
         <br>
-        <button type="button" class="" placeholder="" aria-controls="dtDynamicVerticalScrollExample">
-            <a href="mailto:DovidenkovAL@igirgi.rosneft.ru&body=TestMessage&subject=TestMailTo" style="text-decoration: none;
-  color: #000;">Отправить отчет</a>
+        {% if context.selected_id is not None %}
+        <button type="button" class="" onclick="Send_mail()" aria-controls="dtDynamicVerticalScrollExample">
+            Отправить отчет
+<!--            <a style="text-decoration: none;color: #000;" href="mailto:{{context.letter.mailto}}&cc={{context.letter.cc}}&body={{context.letter.body}}&subject={{context.letter.subject}}"
+</a> -->
         </button>
 
         <button type="button" class="" placeholder="" aria-controls="dtDynamicVerticalScrollExample">
-            Редактировать значения
+            <a href="{% url 'edit_traj' %}?run_id={{context.selected_id}} " style="text-decoration: none;color: #000;">Редактировать значения</a>
+        </button>
+        {% else %}
+        Выберите рейс в меню слева
+        {% endif %}
+        {% endblock %}
+    </div>
+</div>
+
+<!-- Для работы с таблицей как с ормой-->
+    {% block tag_form %}
+    <form>
+    {% endblock %}
+
+<!-- ТАБЛИЦА -->
+<div class="scroll-table" >
+    <div class="scroll-table-head">
+        <div class="row align-items-start ">
+        <div class="col-5">
+            <table class="table table-light  table-bordered table-hover" style="margin-top:2%;">
+                <thead class="thead-dark">
+                <tr>
+                    <th scope="col" colspan="3">Данные ИГиРГИ</th>
+                </tr>
+                <tr >
+                    <th scope="col">Глубина</th>
+                    <th scope="col">Угол</th>
+                    <th scope="col">Азимут</th>
+                </tr>
+                </thead>
+            </table>
+        </div>
+        <div class="col-1"> </div>
+        <div class="col-5">
+            <table class="table table-light  table-bordered table-hover" style="margin-top:2%;">
+                <thead class="thead-dark">
+                <tr>
+                    <th scope="col" colspan="3">Данные ННБ</th>
+                </tr>
+                <tr >
+                    <th scope="col">Глубина</th>
+                    <th scope="col">Угол</th>
+                    <th scope="col">Азимут</th>
+                </tr>
+                </thead>
+            </table>
+        </div>
+        <div class="col-1"> </div>
+    </div>
+    </div>
+    <div class="scroll-table-body">
+        <div class="row align-items-start ">
+            <div class="col-5">
+                <table name="table-data" class="table table-light  table-bordered table-hover" style="margin-top:2%;">
+                    <tbody>
+                    {% for meas in context.igirgi_data%}
+                    {% block data_tr1%}
+                    <tr>
+                        <td scope="col">{{meas.depth}}</td>
+                        <td scope="col">{{meas.corner}}</td>
+                        <td scope="col">{{meas.azimut}}</td>
+                    </tr>
+                    {% endblock %}
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            <div class="col-1"> </div>
+            <div class="col-5">
+                <table name="table-data" class="table table-light  table-bordered table-hover" style="margin-top:2%;">
+                    <tbody>
+                    {% for meas in context.nnb_data%}
+                    {% block data_tr2%}
+                    <tr>
+                        <td scope="col">{{meas.depth}}</td>
+                        <td scope="col">{{meas.corner}}</td>
+                        <td scope="col">{{meas.azimut}}</td>
+                    </tr>
+                    {% endblock %}
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- НИЖНИИ КНОПКИ-->
+{% block bottom_button%}
+</form>
+
+{% if context.selected_id is not None %} <!-- Не отображать кнопки добавления без выбранного рейса-->
+<div class="row" style="margin-top:0.5em;margin-right:0.1em;">
+    <div class="col-5" style="text-align: right">
+       <button type="button" class="" placeholder="" data-toggle="modal" data-target="#data_Modal" style="width:100%"
+               data-whatever="ИГиРГИ" data-run="{{context.selected_obj}}">
+            Добавить значения
+        </button>
+    </div>
+    <div class="col-1"> </div>
+    <div class="col-5" style="text-align: right;">
+        <button type="button" class="" placeholder="" data-toggle="modal" data-target="#data_Modal" style="width:100%"
+                data-whatever="ННБ" data-run="{{context.selected_obj}}">
+            Добавить значения
         </button>
 
     </div>
 </div>
-<div class="row align-items-start ">
-    <div class="col-5" >
+{% endif %}
 
-        <table id="igirgi_table" class="table table-light  table-bordered table-hover" style="margin-top:2%;">
-            <thead class="thead-dark">
-            <tr>
-                <th scope="col" colspan="3">Данные ИГиРГИ</th>
-            </tr>
-            <tr >
-                <th scope="col">Глубина</th>
-                <th scope="col">Угол</th>
-                <th scope="col">Азимут</th>
-            </tr>
-            </thead>
 
-            <tbody>
-            {% for i in context.igirgi_data%}
-            <tr>
-                <td scope="col">123</td>
-                <td scope="col">23</td>
-                <td scope="col">45</td>
-            </tr>
-            {% endfor %}
-            </tbody>
-        </table>
-    </div>
-    <div class="col-1"></div>
-    <div class="col-5" >
-        <table id="nnb_table" class="table table-light  table-bordered table-hover" style="margin-top:2%">
-            <thead class="thead-dark">
-            <tr>
-                <th scope="col" colspan="3">Данные ННБ</th>
-            </tr>
-            <tr clas="table-warning">
-                <th scope="col">Глубина</th>
-                <th scope="col">Угол</th>
-                <th scope="col">Азимут</th>
-            </tr>
-            </thead>
+<div class="modal fade" id="data_Modal" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Добавление данных</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form action=""  method="post" name="data_form" >
+            <div class="modal-body">
+                    <div class="form-group">
+                        <label for="data-name" class="col-form-label">Данные для:</label>
+                        <input type="text" class="form-control" id="data-name" name="data-type">
+                    </div>
+                    <div class="form-group">
+                        <label for="run-name" class="col-form-label">Рейс:</label>
+                        <input type="text" class="form-control" id="run-name" name="run">
+                    </div>
+                    <div class="form-group row">
+                        <div class="form-group col-md-4">
+                            <a class="tooltip-test" title="Вставте значения глубины">
+                            <label for="depth-text">Глубина:</label></a>
+                            <textarea class="form-control" id="depth-text" rows="15" name="depth"></textarea>
+                        </div>
+                        <div class="form-group col-md-4">
+                            <a class="tooltip-test" title="Вставте значения угла">
+                            <label for="corner-text">Угол:</label></a>
+                            <textarea class="form-control" id="corner-text" rows="15" name="corner"></textarea>
+                        </div>
+                        <div class="form-group col-md-4">
+                            <a class="tooltip-test" title="Вставте значения азимута">
+                            <label for="azimut-text">Азимут:</label></a>
+                            <textarea class="form-control" id="azimut-text" rows="15" name="azimut"></textarea>
+                        </div>
+                    </div>
 
-            <tbody>
-            {% for i in context.nnb_data%}
-            <tr>
-                <td scope="col">2</td>
-                <td scope="col">3</td>
-                <td scope="col">4</td>
-            </tr>
-            {% endfor %}
 
-            </tbody>
-        </table>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Закрыть</button>
+                <button type="submit" class="btn btn-primary">Добавить</button>
+            </div>
+            </form>
+        </div>
     </div>
 </div>
+
+
+
+{% endblock%}
 
 <script>
-$(document).ready(function () {
-  $('#igirgi_data').DataTable({
-    "scrollY": "50vh",
-    "scrollCollapse": true,
-  });
-  $('.dataTables_length').addClass('bs-select');
-});
+<!-- Отправка отчёта -->
+function Send_mail() {
+    console.log('Отправляем сообщение');
+    <!--  Задаём в пост запрос номер рейса  -->
+    var params = new FormData();
+    params.set('run_id', {{context.selected_id}});
+
+
+    fetch('http://{{ context.server_ip }}/report/api/file_name',
+    { method: 'POST', body: params })
+    .then(response=>response.json()).
+    then(data=>{
+    var FileName = data['file_name'];
+    var Waste = data['waste'];
+    console.log(FileName);
+        <!--  Задаём в пост запрос имя файла на скачивании  -->
+        params = new FormData();
+        params.set('name', FileName);
+        <!--  Скачиваем файл  -->
+        fetch('http://{{ context.server_ip }}/report/api/get_file',
+        { method: 'POST', body: params })
+        .then(response=>response.blob()).
+        then(data=>{
+            const anchorElement = document.createElement('a');
+            const url = window.URL.createObjectURL(data);
+            anchorElement.href = url;
+            anchorElement.download = String(FileName);
+            anchorElement.click();
+         })
+
+    const a_mail = document.createElement('a');
+    const url = 'mailto:{{context.letter.mailto}}&cc={{context.letter.cc}}&body={{context.letter.body}}'+
+    Waste['common']+'{{context.letter.comm_waste}}{{context.letter.hor_waste}}'+Waste['hor']+'{{context.letter.ver_waste}}'+
+    Waste['ver']+'{{context.letter.endbody}}&subject='+String(FileName).slice(0, -5);
+    a_mail.href = url;
+    a_mail.click();
+
+
+
+    })
+
+
+
+}
+
+<!-- Функция поиска -->
+function SearchFilter() {
+  // Объявление переменных
+  var input, filter, tables, tr, td, i, txtValue;
+  input = document.getElementById("SearchInput");
+  filter = input.value.toUpperCase();
+  tables = document.getElementsByName("table-data");
+  tr1 = tables[0].getElementsByTagName("tr");
+  tr2 = tables[1].getElementsByTagName("tr");
+
+  // Цикл по всем строкам таблицы и сокрытие данных, что не подходят под поиск
+  for (i = 0; i < tr1.length; i++) {
+    td = tr1[i].getElementsByTagName("td")[0];
+    if (td) {
+      txtValue = td.textContent || td.innerText;
+      if (txtValue.toUpperCase().indexOf(filter) > -1) {
+        tr1[i].style.display = "";
+      } else {
+        tr1[i].style.display = "none";
+      }
+    }
+  }
+  // Цикл по всем строкам таблицы и сокрытие данных, что неподходят под поиск
+  for (i = 0; i < tr2.length; i++) {
+    td = tr2[i].getElementsByTagName("td")[0];
+    if (td) {
+      txtValue = td.textContent || td.innerText;
+      if (txtValue.toUpperCase().indexOf(filter) > -1) {
+        tr2[i].style.display = "";
+      } else {
+        tr2[i].style.display = "none";
+      }
+    }
+  }
+}
+
+<!--Функция для модального окна-->
+$('#data_Modal').on('show.bs.modal', function (event) {
+  var button = $(event.relatedTarget) // Button that triggered the modal
+  var recipient = button.data('whatever') // Extract info from data-* attributes
+  var data = button.data('run')
+  // If necessary, you could initiate an AJAX request here (and then do the updating in a callback).
+  // Update the modal's content. We'll use jQuery here, but you could use a data binding library or other methods instead.
+  var modal = $(this)
+  document.getElementById('run-name').value = data;
+  document.getElementById('data-name').value = recipient;
+
+  modal.find('.modal-title').text('Новые данные для ' + recipient)
+
+})
 </script>
 {% endblock %}

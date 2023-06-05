@@ -1,11 +1,9 @@
+import abc
 from datetime import datetime
 
 from django.core import validators
 from django.db import models
-
-# TODO здесь нам не нужен выбор client_name, т.к. можем просто создать 7 экхемпляров класса
 from django.db.models import QuerySet
-
 from . import choices
 from .choices import get_full_choices
 
@@ -80,6 +78,7 @@ class Field(models.Model):
     def __str__(self):
         return self.field_name
 
+    # FIXME найти зачем используется и убрать
     def get_client(self):
         return str(self.client)
 
@@ -185,22 +184,28 @@ class Well(models.Model):
     T3_end = models.DateField('Окончание сопровождения до Т3', null=True, blank=True)
     critical_azimuth = models.BooleanField('Критический азимут', null=True, blank=True)
     comment = models.TextField('Комментарий', max_length=300, null=True, blank=True)
+    mail_To = models.TextField('Список рассылки почта "Кому"', max_length=300, null=True, blank=True)
+    mail_Cc = models.TextField('Список рассылки почта "Копия"', max_length=300, null=True, blank=True)
 
     def get_client(self):
+        """Получения ДО"""
         return str(self.pad_name.field.client)
 
     def get_contractor(self):
+        """Получение последнего подрядчика по бурению ННБ"""
         wellbores = Wellbore.objects.filter(well_name=self.id)
         if len(wellbores) != 0:
             sections = Section.objects.filter(wellbore=wellbores[0])
             if len(sections) != 0:
                 runs = Run.objects.filter(section=sections[0])
                 for run in runs:
-                    if run.dd_contractor_name is not None and (run.end_date is None or run.end_date > datetime.now().date()):
+                    if run.dd_contractor_name is not None and (
+                            run.end_date is None or run.end_date > datetime.now().date()):
                         return run.dd_contractor_name
         return "None_contractor_name"
 
     def get_north_direction(self):
+        """Получить полное название направления на север (Для отображения)"""
         for variant in choices.NORTH_DIRECTION_CHOICES:
             if self.north_direction in variant:
                 return variant[1]
