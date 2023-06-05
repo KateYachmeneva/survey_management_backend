@@ -8,18 +8,168 @@
 
 {% block data %}
 <div class="scroll-body" style="margin-top:1em">
-  <hr style="color:#FFC501;margin-top:1%;border-width: 3px">
+
 
   <form>
     <div class="form-row">
-        <div class="form-group col-md-6">
-            <label for="inputEmail4">Параметр</label>
-            <input type="text" class="form-control" id="inputEmail4" placeholder="Значение">
+        <hr style="color:#FFC501;margin-top:1%;border-width: 3px">
+        <legend>Параметры скважины:</legend>
+        <div class="row">
+            <div class="form-group col-md-4">
+                <label> Скважина </label>
+                <input type="text" class="form-control" placeholder="Значение">
+            </div>
+            <div class="form-group col-md-4">
+                <label> Учитывать в статистике </label>
+                <select class="form-control form-control">
+                    <option>1</option>
+                </select>
+            </div>
+            <div class="form-group col-md-4">
+                <label> Глубина начала активной фазы </label>
+                <input type="text" class="form-control"  placeholder="Значение">
+            </div>
         </div>
-        <div class="form-group col-md-6">
-            <label for="inputPassword4">Параметр</label>
-            <input type="text" class="form-control" id="inputPassword4" placeholder="Значени">
+        <div class="row">
+            <div class="form-group col-md-4">
+                <label> Тип скважины</label>
+                <select class="form-control form-control">
+                    <option>1</option>
+                </select>
+            </div>
+            <div class="form-group col-md-4">
+                <label> Статус состояния скважины </label>
+                <select class="form-control form-control">
+                    <option>1</option>
+                </select>
+            </div>
+            <div class="form-group col-md-4">
+                <label> Статус бурения </label>
+                <select class="form-control form-control">
+                    <option>1</option>
+                </select>
+            </div>
         </div>
+        <div class="row">
+            <div class="form-group col-md-4">
+                <label> Альтитуда стола ротора </label>
+                <input type="text" class="form-control"  placeholder="Значение">
+            </div>
+            <div class="form-group col-md-4">
+                <label> Азимут вертикальной секции </label>
+                <input type="text" class="form-control"  placeholder="Значение">
+            </div>
+            <div class="form-group col-md-4">
+                <label> Система координат </label>
+                <input type="text" class="form-control"  placeholder="Значение">
+            </div>
+        </div>
+        <div class="row">
+            <div class="form-group col-md-3">
+                <label> Широта </label>
+                <input type="text" class="form-control"  placeholder="Значение">
+            </div>
+            <div class="form-group col-md-3">
+                <label> Долгота </label>
+                <input type="text" class="form-control"  placeholder="Значение">
+            </div>
+            <div class="form-group col-md-3">
+                <label>Широта (прямоугольные координаты)</label>
+                <input type="text" class="form-control"  placeholder="Значение">
+            </div>
+            <div class="form-group col-md-3">
+                <label>Долгота (прямоугольные координаты)</label>
+                <input type="text" class="form-control"  placeholder="Значение">
+            </div>
+        </div>
+        <div class="row">
+            <div class="form-group col-md-3">
+                <label>Направление на север</label>
+                <select class="form-control form-control">
+                    <option>1</option>
+                </select>
+            </div>
+            <div class="form-group col-md-3">
+                <label>Геомагнитная модель</label>
+                <input type="text" class="form-control"  placeholder="Значение">
+            </div>
+            <div class="form-group col-md-3">
+                <label>Дата геомагнитной привязки</label>
+                <input type="date" class="form-control"  placeholder="Значение">
+            </div>
+            <div class="form-group col-md-3">
+                <label>Напряженность геомагнитного поля</label>
+                <input type="text" class="form-control"  placeholder="Значение">
+            </div>
+        </div>
+        <div class="row">
+            <div class="form-group col-md-3">
+                <label>Магнитное наклонение</label>
+                <input type="text" class="form-control"  placeholder="Значение">
+            </div>
+            <div class="form-group col-md-3">
+                <label>Магнитное склонение</label>
+                <input type="text" class="form-control"  placeholder="Значение">
+            </div>
+            <div class="form-group col-md-3">
+                <label>Сближение меридианов</label>
+                <input type="text" class="form-control"  placeholder="Значение">
+            </div>
+            <div class="form-group col-md-3">
+                <label>Общая поправка</label>
+                <input type="text" class="form-control"  placeholder="Значение">
+            </div>
+        </div>
+        <div class="row">
+            <div class="form-group col-md-6">
+                <label>Напряженность гравитационного поля</label>
+                <input type="text" class="form-control"  placeholder="Значение">
+            </div>
+            <div class="form-group col-md-6">
+                <label>Критический азимут</label>
+                <select class="form-control form-control">
+                    <option>1</option>
+                </select>
+            </div>
+        </div>
+        <div class="row">
+            <div class="form-group col-md-3">
+                <label>Начало сопровождения до Т1</label>
+                <input type="date" class="form-control"  placeholder="Значение">
+            </div>
+            <div class="form-group col-md-3">
+                <label>Окончание сопровождения до Т1</label>
+                <input type="date" class="form-control"  placeholder="Значение">
+            </div>
+            <div class="form-group col-md-3">
+                <label>Начало сопровождения до Т3</label>
+                <input type="date" class="form-control"  placeholder="Значение">
+            </div>
+            <div class="form-group col-md-3">
+                <label>Окончание сопровождения до Т3</label>
+                <input type="date" class="form-control"  placeholder="Значение">
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="form-group col-md-6">
+                <label>Список рассылки почта "Кому"</label>
+                <textarea type="text" class="form-control"> </textarea>
+            </div>
+            <div class="form-group col-md-6">
+                <label>Список рассылки почта "Копия"</label>
+                <textarea type="text" class="form-control"> </textarea>
+            </div>
+        </div>
+        <div class="form-group col-md-12">
+            <label>Комментарий</label>
+            <textarea type="text" class="form-control"> </textarea>
+        </div>
+
+        <hr style="color:#FFC501;margin-top:1%;border-width: 3px">
+        <legend>Параметры секции:</legend>
+        <hr style="color:#FFC501;margin-top:1%;border-width: 3px">
+        <legend>Параметры рейса:</legend>
     </div>
   </form>
 {% endblock %}
