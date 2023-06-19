@@ -224,15 +224,12 @@ function Send_mail() {
             anchorElement.download = String(FileName);
             anchorElement.click();
          })
-
     const a_mail = document.createElement('a');
     const url = 'mailto:{{context.letter.mailto}}&cc={{context.letter.cc}}&body={{context.letter.body}}'+
-    Waste['common']+'{{context.letter.comm_waste}}{{context.letter.hor_waste}}'+Waste['hor']+'{{context.letter.ver_waste}}'+
-    Waste['ver']+'{{context.letter.endbody}}&subject='+String(FileName).slice(0, -5);
-    console.log("Хочу перейти по ссылке:"+url);
+    Waste['common'].toFixed(2)+'{{context.letter.comm_waste}}{{context.letter.hor_waste}}' + Waste['hor'].toFixed(2)+' м '+ Waste['word']['hor'] +'{{context.letter.ver_waste}}'+
+    Waste['ver'].toFixed(2)+' м '+Waste['word']['ver']+'{{context.letter.endbody}}&subject='+String(FileName).slice(0, -5);
     a_mail.href = url;
     a_mail.click();
-    console.log("Ура! Я в Outlook!");
 
 
     })

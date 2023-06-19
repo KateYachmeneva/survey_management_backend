@@ -11,11 +11,6 @@
 .link {
   text-decoration: none;
 }
-
-.sel{
-    background-color: #fdb30d;
-}
-
 </style>
 
 
@@ -77,9 +72,9 @@
                                     <ul class="btn-toggle-nav">
                                         <!-- Куст -->
                                         {% for pad_dict in field_dict.pads %}
-                                            <li><a href="#{{field_dict.field_name}}pad{{pad_dict.pad_name}}" class="link link-dark rounded pad" data-toggle="collapse">
+                                            <li><a href="#{{field_dict.field_name}}pad{{pad_dict.id}}" class="link link-dark rounded pad" data-toggle="collapse">
                                                 Куст {{pad_dict.pad_name}}</a>
-                                                <div class="collapse {% if pad_dict.pad_name == context.selected_pad %} show {% endif %}" id="{{field_dict.field_name}}pad{{pad_dict.pad_name}}">
+                                                <div class="collapse {% if pad_dict.pad_name == context.selected_pad %} show {% endif %}" id="{{field_dict.field_name}}pad{{pad_dict.id}}">
                                                     <ul class="btn-toggle-nav">
                                                         <!-- Скважина -->
                                                         {% for well_dict in pad_dict.wells %}
@@ -97,11 +92,15 @@
                                                                                 {% for section_dict in wellbore_dict.sections %}
                                                                                 <li><a href="#{{field_dict.field_name}}_{{section_dict.section}}" class="link link-dark rounded section" data-toggle="collapse">
                                                                                     {{section_dict.section}}</a>
-                                                                                    <div class="collapse {% if well_dict.well_name == context.selected_well and section_dict.section == context.selected_section %} sel show {% endif %}" id="{{field_dict.field_name}}_{{section_dict.section}}">
+                                                                                    <div class="collapse {% if well_dict.well_name == context.selected_well and section_dict.section == context.selected_section %} show {% endif %}" id="{{field_dict.field_name}}_{{section_dict.section}}">
                                                                                         <ul class="btn-toggle-nav">
                                                                                             <!-- Рейс-->
                                                                                             {% for run_dict in section_dict.runs %}
-                                                                                            <li><a href="?run_id={{run_dict.id}}" class="run">{{run_dict.run_number}}</a></li>
+                                                                                            <li><a href="?run_id={{run_dict.id}}" class="run" {% if run_dict.run_number == context.selected_run and well_dict.well_name == context.selected_well %} style="background-color: #fdb30d;" {% endif %}>{{run_dict.run_number}}
+
+
+
+                                                                                            </a></li>
                                                                                             {% endfor %}
                                                                                             <!-- Конец Рейс-->
                                                                                         </ul>

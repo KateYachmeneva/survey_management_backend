@@ -83,7 +83,7 @@ def write_data_in_Excel(all_data: dict, filename: str, type: int, Run: object) -
     """
     Well = Run.section.wellbore.well_name
     # построение графика
-    other_data = get_graphics(all_data, Well)
+    other_data, waste_word = get_graphics(all_data, Well)
 
     file_folder = file_dir + '\\Шаблон\\' + filename
     excel_file = openpyxl.load_workbook(file_folder)
@@ -99,6 +99,7 @@ def write_data_in_Excel(all_data: dict, filename: str, type: int, Run: object) -
     waste['hor'] = hor
     waste['ver'] = ver
     waste['common'] = common
+    waste['word'] = waste_word
 
     if type == 1:
         nnb_dynamic(excel_file, all_data['Динамические замеры ННБ'])

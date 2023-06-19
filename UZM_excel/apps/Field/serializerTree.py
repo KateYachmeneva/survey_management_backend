@@ -49,7 +49,7 @@ class PadNameSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Pad
-        fields = ['pad_name', 'wells', ]
+        fields = ['id', 'pad_name', 'wells', ]
 
 
 class FieldNameSerializer(serializers.ModelSerializer):

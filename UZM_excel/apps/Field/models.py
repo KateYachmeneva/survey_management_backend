@@ -183,9 +183,9 @@ class Well(models.Model):
     T3_start = models.DateField('Окончание сопровождения до Т1', null=True, blank=True)
     T3_end = models.DateField('Окончание сопровождения до Т3', null=True, blank=True)
     critical_azimuth = models.BooleanField('Критический азимут', null=True, blank=True)
-    comment = models.TextField('Комментарий', max_length=300, null=True, blank=True)
-    mail_To = models.TextField('Список рассылки почта "Кому"', max_length=300, null=True, blank=True)
-    mail_Cc = models.TextField('Список рассылки почта "Копия"', max_length=300, null=True, blank=True)
+    comment = models.TextField('Комментарий', max_length=3000, null=True, blank=True)
+    mail_To = models.TextField('Список рассылки почта "Кому"', max_length=3000, null=True, blank=True)
+    mail_Cc = models.TextField('Список рассылки почта "Копия"', max_length=3000, null=True, blank=True)
 
     def get_client(self):
         """Получения ДО"""

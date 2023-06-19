@@ -35,12 +35,12 @@ class Letter:
     def get_body(self):
         """Из записанных параметров скважины формируем string"""
         # %0D%0A - enter
-        self.body = f"Контроль качетсва инклинометрии во время бурения:%0D%0A %0D%0A" \
+        self.body = f"Контроль качества инклинометрии во время бурения:%0D%0A %0D%0A" \
                     f"Месторождение: {self.data_body.field}%0D%0A" \
                     f"Куст: {self.data_body.pad}%0D%0A" \
                     f"Скважина: {self.data_body.well}%0D%0A %0D%0A" \
                     f"Общий отход на точку замера {self.data_body.depth} м от траектории подрядчика ННБ составляет "
         self.comm_waste = f" {self.data_body.departure} м;%0D%0A %0D%0A"
-        self.hor_waste = f"По горизонтали - {self.data_body.horiz}"
-        self.ver_waste = f"; %0D%0A %0D%0AПо вертикали - {self.data_body.vert}"
-        self.endbody = f"."
+        self.hor_waste = f"По горизонтали : {self.data_body.horiz}"
+        self.ver_waste = f"; %0D%0A %0D%0AПо вертикали : {self.data_body.vert}"
+        self.endbody = f".%0D%0A"

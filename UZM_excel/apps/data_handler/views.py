@@ -28,6 +28,7 @@ def traj(request):
                "tree": get_tree(),
                "server_ip": server_ip,
                }
+    # print(context['tree'])
     if request.method == "GET":
         if request.GET.get('run_id') is not None:  # если в get запросе не run_id выводим пустую страницу
             run_id = request.GET.get('run_id')

@@ -16,7 +16,7 @@ def getGorizontalAxes(Inc1, Inc2, Az1, Az2, deltaMD):
     Получаем шаг по X,Y,Z для горизонтальной проекции
     """
     dInc = math.radians(Inc2 - Inc1)
-    dAzim = math.radians(Az2-Az1)
+    dAzim = math.radians(Az2 - Az1)
     I1 = math.radians(Inc1)
     I2 = math.radians(Inc2)
     A1 = math.radians(Az1)
@@ -96,7 +96,6 @@ def get_graph_data(I: list, A: list, Depth: list, RKB: int, VSaz: int = 1) -> li
                                                        deltaMD=(all_measurement[i + 1][0] - meas[0]))
         # print(f'Vsect {Vsect} | TVD {TVD} | TVDSS {TVDSS}')
 
-
         # print(f"delta: {deltaNS, deltaEW, deltaTVD}")
 
         NS += deltaNS
@@ -135,7 +134,7 @@ data_name = {'igirgi_file': 'Статические замеры ИГИРГИ',
 def get_graphics(all_data: dict, well: object) -> dict:
     """
     Строит график, сохраняет его в /Report_out/1.png
-    На выходе словарь с данными для записи в эксель
+    На выходе словарь с данными для записи в эксель и наименование при отходах
     Ключи в словаре:
             -nnb_delta_y
             -nnb_delta_x
@@ -145,8 +144,13 @@ def get_graphics(all_data: dict, well: object) -> dict:
             -igirgi_delta_x
             -igirgi_TVD
     """
+    # для траектории
     RKB = (84 if well.RKB is None else well.RKB)
     VSaz = (1 if well.VSaz is None else well.VSaz)
+
+    # для отходов
+    Ex = (well.EX if well.EX is not None else 0)
+    Ny = (well.NY if well.NY is not None else 0)
 
     data_dict = dict()  # словарь с данными, которые необходимо записать в эксель
 
@@ -182,7 +186,11 @@ def get_graphics(all_data: dict, well: object) -> dict:
     ax1.plot(x1, y1, 'b', label='Подрядчик по ННБ')
     ax2.plot(x2, y2, 'b', label='Подрядчик по ННБ')
 
+    EW_nnb = x1[-1]  # EW для отходов
+    NS_nnb = y1[-1]  # NS для отходов
+
     data_dict['nnb_TVD'] = copy.deepcopy(z)
+    data_dict['nnb_TVDSS'] = copy.deepcopy(y2)
     data_dict['nnb_delta_y'] = copy.deepcopy(y1)
     data_dict['nnb_delta_x'] = copy.deepcopy(x1)
 
@@ -195,6 +203,9 @@ def get_graphics(all_data: dict, well: object) -> dict:
 
     ax1.plot(x1, y1, color='orange', label='IGIRGI')
     ax2.plot(x2, y2, color='orange', label='IGIRGI')
+
+    EW_igirgi = x1[-1]  # EW для отходов
+    NS_igirgi = y1[-1]  # NS для отходов
 
     # for item in zip(x1, y1, x2, y2, z, data['Глубина']):
     #     print(f"NS: {item[0]} | EW: {item[1]} | Vsect: {item[2]} | TVDSS: {item[3]} | TVD: {item[4]} | DEPTH: {item[5]}")
@@ -227,21 +238,13 @@ def get_graphics(all_data: dict, well: object) -> dict:
     delta_x = (ext_dict['max_x'] - ext_dict['min_x'])
     delta_y = (ext_dict['max_y'] - ext_dict['min_y'])
 
-    # # Создаем экземпляр класса, который будет отвечать за расположение рисок
-    # # Риски будут следовать с шагом delta
-    # locator = matplotlib.ticker.MultipleLocator(delta_y if delta_x > delta_y else delta_x)
-    #
-    # # Установим локатор для главных рисок
-    # ax1.xaxis.set_major_locator(locator)
-    # ax1.yaxis.set_major_locator(locator)
-
     if delta_x > delta_y:
-        ext_dict['max_y'] += (delta_x - delta_y)/2
-        ext_dict['min_y'] -= (delta_x - delta_y)/2
+        ext_dict['max_y'] += (delta_x - delta_y) / 2
+        ext_dict['min_y'] -= (delta_x - delta_y) / 2
         additional_delta = delta_x / (step * 2)
     else:
-        ext_dict['max_x'] += (delta_y - delta_x)/2
-        ext_dict['min_x'] -= (delta_y - delta_x)/2
+        ext_dict['max_x'] += (delta_y - delta_x) / 2
+        ext_dict['min_x'] -= (delta_y - delta_x) / 2
         additional_delta = delta_y / (step * 2)
 
     # создаем квадратную сетке
@@ -251,14 +254,73 @@ def get_graphics(all_data: dict, well: object) -> dict:
     ax1.set_xlabel('Запад/Восток')
     ax1.set_ylabel('Юг/Север')
     ax1.set_title('Горизонтальная проекция')
-    ax1.legend(title='Вертикальная проекция', loc=(0, -0.4), mode='expand', ncols=1)
+    # ax1.legend(title='Горизонтальная проекция', loc=(0, -0.4), mode='expand', ncols=1)
     ax1.grid()
     ax2.set_xlabel('Вертикальная секция')
     ax2.set_ylabel('Абсолютная отметка')
     ax2.set_title('Вертикальная проекция')
-    ax2.legend(title='Вертикальная проекция', bbox_to_anchor=(0.85, -0.15))
+    # ax2.legend(title='Вертикальная проекция', bbox_to_anchor=(0.85, -0.15))
     ax2.grid()
 
+    ax2.legend(bbox_to_anchor=(-0.015, -0.15), fontsize=10)  # общая подпись
+
+    waste_word = dict()
+    AZ = all_data['Статические замеры ННБ']['Азимут'][-1]  # по горизонтали
+    if 45 <= AZ <= 135:
+        if NS_igirgi == NS_nnb:
+            waste_word['hor'] = ''
+        else:
+            waste_word['hor'] = ('правее' if NS_igirgi < NS_nnb else 'левее')
+    elif 225 <= AZ <= 315:
+        if NS_igirgi == NS_nnb:
+            waste_word['hor'] = ''
+        else:
+            waste_word['hor'] = ('правее' if NS_igirgi > NS_nnb else 'левее')
+    elif 135 <= AZ <= 225:
+        if EW_igirgi == EW_nnb:
+            waste_word['hor'] = ''
+        else:
+            waste_word['hor'] = ('правее' if EW_igirgi < EW_nnb else 'левее')
+    elif AZ >= 315 or AZ <= 45:
+        if EW_igirgi == EW_nnb:
+            waste_word['hor'] = ''
+        else:
+            waste_word['hor'] = ('правее' if EW_igirgi > EW_nnb else 'левее')
+    text_data = get_text_data(data_dict, all_data, Ex, Ny)  # числовые значения отходов
+    if text_data["Отход по вертикали"] == 0:  # по вертикали
+        waste_word['ver'] = ''
+    else:
+        waste_word['ver'] = ('выше' if text_data["Отход по вертикали"] > 0 else 'ниже')
+
+    ax1.text((ext_dict['min_x'] - additional_delta),
+             2 * (ext_dict['min_y'] - additional_delta),
+             f'Точка замера: {format(text_data["Точка замера"], ".2f")} м\n'
+             f'Отход по горизонтали: {format(text_data["Отход по горизонтали"], ".2f")} м {waste_word["hor"]}\n'
+             f'Отход по вертикали: {format(text_data["Отход по вертикали"], ".2f")} м {waste_word["ver"]}\n'
+             f'Общий отход: {format(text_data["Общий отход"], ".2f")} м\n'
+             f'Абсолютная отметка: {format(text_data["Абсолютная отметка"], ".2f")} м\n',
+             fontsize=12)
     plt.savefig(file_dir + f'/Report_out/{well}.png')
 
-    return data_dict
+    waste_word["hor"] = '(' + waste_word["hor"] + ')'  # для отображения в письме добавляем ()
+    waste_word["ver"] = '(' + waste_word["ver"] + ')'
+    return data_dict, waste_word
+
+
+def get_text_data(data_dict: dict, all_data: dict, Ex, Ny) -> dict():
+    """Формируем данные для текста на графике"""
+    text_data = dict()
+    text_data['Точка замера'] = all_data['Статические замеры ИГИРГИ']['Глубина'][-1]
+    X_nnb = Ex + data_dict['nnb_delta_x'][-1]
+    Y_nnb = Ny + data_dict['nnb_delta_y'][-1]
+    X_igirgi = Ex + data_dict['igirgi_delta_x'][-1]
+    Y_igigri = Ny + data_dict['igirgi_delta_y'][-1]
+
+    text_data['Отход по горизонтали'] = round(math.sqrt((X_nnb - X_igirgi) ** 2 + (Y_nnb - Y_igigri) ** 2), 2)
+    text_data['Отход по вертикали'] = round(data_dict['nnb_TVD'][-1] - data_dict['igirgi_TVD'][-1], 2)
+    text_data['Общий отход'] = round(
+        math.sqrt((X_nnb - X_igirgi) ** 2 + (Y_nnb - Y_igigri) ** 2 + (
+                data_dict['nnb_TVD'][-1] - data_dict['igirgi_TVD'][-1]) ** 2), 2)
+
+    text_data['Абсолютная отметка'] = round(data_dict['nnb_TVDSS'][-1], 2)
+    return text_data
