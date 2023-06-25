@@ -64,7 +64,7 @@ def parcing_manually(path, manually_depth, manually_gx, manually_gy, manually_gz
     elif "txt" in re.findall(r".(txt)", path):
         """Для обработки txt"""
         name_List = [manually_bz, manually_by, manually_bx, manually_gz, manually_gy, manually_gx, manually_depth]
-        start_index = (manually_import if manually_import is not None else 31)
+        start_index = (manually_import if manually_import is not None else 30)
         with open(path, encoding="utf-8") as f:
             for i in range(int(start_index)):
                 f.readline()
@@ -78,7 +78,7 @@ def parcing_manually(path, manually_depth, manually_gx, manually_gy, manually_gz
                     continue
                 for d_index, n_index in enumerate(name_List):
                     data[d_index].append(float(raw_list[int(n_index)]))
-        print(data)
+        # print(data)
     else:
         """Для обработки excel"""
         try:

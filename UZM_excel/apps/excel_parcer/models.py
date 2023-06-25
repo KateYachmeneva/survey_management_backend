@@ -46,13 +46,15 @@ class Device(models.Model):
 class Data(models.Model):
     """один из замеров под рейс"""
     run = models.ForeignKey(Run, on_delete=models.CASCADE)
-    depth = models.FloatField('Глубина', max_length=50)
-    CX = models.FloatField('GX', max_length=50, null=True)
-    CY = models.FloatField('GY', max_length=50, null=True)
-    CZ = models.FloatField('GZ', max_length=50, null=True)
-    BX = models.FloatField('BX', max_length=50, null=True)
-    BY = models.FloatField('BY', max_length=50, null=True)
-    BZ = models.FloatField('BZ', max_length=50, null=True)
+    depth = models.FloatField('Глубина', max_length=10)
+    CX = models.FloatField('GX', max_length=10, null=True)
+    CY = models.FloatField('GY', max_length=10, null=True)
+    CZ = models.FloatField('GZ', max_length=10, null=True)
+    BX = models.FloatField('BX', max_length=10, null=True)
+    BY = models.FloatField('BY', max_length=10, null=True)
+    BZ = models.FloatField('BZ', max_length=10, null=True)
+    Btotal_corr = models.FloatField('Btotal_corr', default=0)
+    DIP_corr = models.FloatField('DIP_corr', default=0)
     in_statistics = models.BooleanField('Учитывать в статистике', null=True)
 
     def __str__(self):

@@ -25,7 +25,7 @@
             <a>Выберите скважину</a>
                 <p></p>
                  <div class="input-group mb-3">
-                   <select name="well" class="form-select" id="inputGroupSelect04">
+                   <select name="well" class="form-select" id="well-select">
                        {% for w in context.well %}
                        {% if w.id == context.selected.id%}
                        <option value="{{w.id}}" selected>{{w}}</option>
@@ -36,7 +36,8 @@
                    </select>
                  </div>
         </div>
-        <button type="submit" style="border:1">Показать данные</button>
+        <button type="submit" id='show-graph' style="border:1">Показать данные</button>
+        <button type="button" id="data-redirect" style="border:1">Данные осей</button>
     </form>
     <!--      /end Временное решение      -->
 </div>
@@ -1496,6 +1497,32 @@ new Chart(grafica6,
       },
     },
   });
+
+<!--Записываем выбранную кважину-->
+document.getElementById('well-select').addEventListener('change', function () {
+    localStorage.setItem("well_id", document.getElementById('well-select').value);
+});
+
+
+<!-- При загрузке открываем выбранную ранее скважину -->
+window.addEventListener('load', () => {
+    let well_id = localStorage.getItem("well_id");
+    if (well_id != null) {
+      Array.from(document.getElementById('well-select').options).forEach(function(element){
+      if (element.value == well_id) {element.selected = true;}
+      });
+      {% if context.selected.well == 'None' %}
+       document.getElementById('show-graph').click();
+      {% endif %}
+
+    }
+});
+
+
+<!-- Перенаправление на стринцу с данными рейса (осями) для их изменения/добавления-->
+document.getElementById('data-redirect').addEventListener('click', function () {
+  window.location.href = {% url 'data' %};
+});
 </script>
 
 </center>

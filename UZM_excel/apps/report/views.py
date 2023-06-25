@@ -45,15 +45,11 @@ def run_index(request):
 # report/api/file_name
 def report(request):
     """Делаем отчёт по имеющимся данным и отправляем его имя"""
+    # по рейсу ищем все остальные рейсы скважины
     run = Run.objects.get(id=request.POST['run_id'])
-    all_data = get_data(run)
+    runs = Run.objects.filter(section__wellbore__well_name=run.section.wellbore.well_name)
+    all_data = get_data(runs)
     file_name, waste = write_data_in_Excel(all_data, f'Единая_форма_отчета0.xlsx', 0, run)  # имя файла и отходы
-
-    # надписи правее/левее и ниже/выше
-    # last_depth = all_data['Статические замеры ИГИРГИ']['Глубина'][-1]
-    # if 315 < last_depth < 45 or 315 < last_depth < 45:
-    #     last_azimut = all_data['Статические замеры ИГИРГИ']['Азимут'][-1]
-
     return JsonResponse({'file_name': file_name, 'waste': waste})
 
 
@@ -64,4 +60,3 @@ def get_file(request):
     file_name = request.POST['name']
     file_dir = os.getcwd() + "\\files"
     return FileResponse(open(file_dir + "\\Report_out\\" + file_name, 'rb'))
-

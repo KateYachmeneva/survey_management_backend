@@ -1,21 +1,32 @@
 from math import sqrt
+from typing import Union, Iterable
 
 from ..models import *
 from django.db.models import Max
 from .graffic import *
 
 
-def get_data(run: object) -> dict:
+def get_data(runs: Union[object, Iterable[object]]) -> dict:
     """
     Функция для перезаписи даты в работу, опираясь на данные из бд.
     (Если у нас  в БД лежит план траектории то необязательно он должен быть в форме со страницы)
     """
-    data = {'Статические замеры ИГИРГИ': IgirgiStatic.objects.filter(run=run),
-            'Динамические замеры ННБ': DynamicNNBData.objects.filter(run=run),
-            'Статические замеры ННБ': StaticNNBData.objects.filter(run=run),
-            'Плановая траектория': Plan.objects.filter(run=run),
-            'Динамические замеры ИГИРГИ': IgirgiDynamic.objects.filter(run=run),
-            }
+
+    if len(runs) == 0:
+        run = runs
+        data = {'Статические замеры ИГИРГИ': IgirgiStatic.objects.filter(run=run),
+                'Динамические замеры ННБ': DynamicNNBData.objects.filter(run=run),
+                'Статические замеры ННБ': StaticNNBData.objects.filter(run=run),
+                'Плановая траектория': Plan.objects.filter(run=run),
+                'Динамические замеры ИГИРГИ': IgirgiDynamic.objects.filter(run=run),
+                }
+    else:
+        data = {'Статические замеры ИГИРГИ': IgirgiStatic.objects.filter(run__in=runs),
+                'Динамические замеры ННБ': DynamicNNBData.objects.filter(run__in=runs),
+                'Статические замеры ННБ': StaticNNBData.objects.filter(run__in=runs),
+                'Плановая траектория': Plan.objects.filter(run__in=runs),
+                'Динамические замеры ИГИРГИ': IgirgiDynamic.objects.filter(run__in=runs),
+                }
 
     del_key = list()
     # преобразуем queryset в словарь с листами (3 отдельных массива - Глубина,Угол,Азимут)

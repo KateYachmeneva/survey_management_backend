@@ -1,241 +1,279 @@
-{% extends 'base.html' %}
+﻿{% extends 'base.html' %}
 {% load static %}
 
 {%  block header %}
-<!-- Стиль для вспылвающих подсказок-->
-<style>
-   [data-tooltip] {
-    position: relative; /* Относительное позиционирование */
-   }
-   [data-tooltip]::after {
-    content: attr(data-tooltip); /* Выводим текст */
-    position: absolute; /* Абсолютное позиционирование */
-    width: 15em; /* Ширина подсказки */
-    right: -7em; bottom: 1.5em; /* Положение подсказки */
-    background: #3989c9; /* Синий цвет фона */
-    color: #fff; /* Цвет текста */
-    padding: 0.5em; /* Поля вокруг текста */
-    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3); /* Параметры тени */
-    pointer-events: none; /* Подсказка */
-    opacity: 0; /* Подсказка невидима */
-    transition: 1s; /* Время появления подсказки */
-   }
-   [data-tooltip]:hover::after {
-    opacity: 1; /* Показываем подсказку */
-    /*bottom: 0em;  Положение подсказки */
-   }
- </style>
+    <link type="text/css" href="{% static 'css/table.css' %}" rel="stylesheet" />
 {% endblock %}
 
 {% block content %}
 <center>
-<div>
-        <form action="{% url 'add_data' %}" method="post" enctype="multipart/form-data" style="margin-top:1%" name="axe_form" onsubmit="return validForm()">
+        <form action="" method="post" enctype="multipart/form-data" style="margin-top:0%">
             {% csrf_token %}
-
-            <div style="max-width:500px; margin-top:1%">
-                <div style="max-width:500px">
-                    <a>Выберите рейс</a>
-                    <p></p>
-                    <div class="input-group mb-3">
-                        <select type="text" name="run" class="form-select" id="run">
-                            <option value="Выберите рейс">Выберите рейс</option>
-                             {% for r in context.run %}
-                                <option value="{{r.id}}" >{{r}}</option>
-                             {% endfor %}
-                        </select>
-                    </div>
-                </div>
-            </div>
-
             <div style="max-width:500px">
-                <a>Выберите телесистему</a>
-                <p></p>
-                <div class="input-group mb-3">
-                  <select type="text" name="device" class="form-select" id="inputGroupSelect01">
-                      {% for element in context.telesystem %}
-                        {% if element == context.last_form.device %}
-                          <option selected>{{element}}</option>
-                        {% else %}
-                          <option>{{element}}</option>
-                        {% endif %}
-                      {% endfor %}
-                  </select>
-                </div>
+                <a>Выберите рейс</a>
+                    <p></p>
+                     <div class="input-group mb-3">
+                       <select type="text" name="run" class="form-select" id="run-select">
+                           {% for r in context.run %}
+                           {% if r == context.selected_run%}
+                           <option value="{{r.id}}" selected>{{r}}</option>
+                           {% else %}
+                           <option value="{{r.id}}">{{r}}</option>
+                           {% endif %}
+                           {% endfor %}
+                       </select>
+                     </div>
             </div>
-
-
-            <hr style="color:#FFC501;margin-top:1%;border-width: 3px">
-
-            <div class="container" style="max-width:90%">
-                  <div class="row justify-content-between" style="margin-left:0px;
-                                                                  margin-right:0px;">
-                      <div class="col col-6 align-self-center">
-                          <h4 style="margin-top:2%">Загрузите файл с осями</h4>
-                          {% csrf_token %}
-                          <input  type="file" accept=".xls,.xlsx,.las,.txt,.sur,.csv" name="file" style="margin-top:1%">
-                          <a data-tooltip=".xls .xlsx .csv .las .txt .sur">
-                              <img class="circle" src="{% static 'img/report/question.png'%}"
-                                                  alt="question"
-                                                  style="height: 16px;width: 16px;">
-                          </a>
-                      </div>
-
-                      <div class="col col-6 align-self-center">
-                        <h4 style="margin-top:2%">Имя(буква) столбца</h4>
-                        <div class="input-group mb-3">
-                            <span class="input-group-text">Глубина</span>
-                            <input type="text" class="form-control" name="manually_depth" id="inp_depth">
-                            <span class="input-group-text">Gx</span>
-                            <input type="text" class="form-control" name="manually_gx" id="inp_gx">
-                            <span class="input-group-text">Gy</span>
-                            <input type="text" class="form-control" name="manually_gy" id="inp_gy">
-                            <span class="input-group-text">Gz</span>
-                            <input type="text" class="form-control" name="manually_gz" id="inp_gz">
-                            <span class="input-group-text">Bx</span>
-                            <input type="text" class="form-control" name="manually_bx" id="inp_bx">
-                            <span class="input-group-text">By</span>
-                            <input type="text" class="form-control" name="manually_by" id="inp_by">
-                            <span class="input-group-text">Bz</span>
-                            <input type="text" class="form-control" name="manually_bz" id="inp_bz">
-                        </div>
-                        <div class="input-group mb-3">
-                            <span class="input-group-text">Строка единиц измерений</span>
-                            <input type="text" class="form-control"  name="manually_measurement" id="inp_unit">
-                            <span class="input-group-text" >Импорт со строки</span>
-                            <input type="text" class="form-control" name="manually_import" id="inp_string">
-                        </div>
-                      </div>
-                  </div>
-            </div>
-
-            <hr style="color:#FFC501;margin-top:1%;border-width: 3px">
-
-            <button type="submit" style="border:1">Загрузить данные</button>
+            <button type="submit" id='show-data' style="border:1">Показать данные</button>
+            <button type="button" class="" placeholder="" data-toggle="modal" data-target="#data_Modal1">
+                Добавить оси
+            </button>
+            <button type="button" class="" placeholder="" data-toggle="modal" data-target="#data_Modal2">
+                Добавить скорректированные значения
+            </button>
+            <button type="button" id="data-redirect" style="border:1">Графики контроля</button>
         </form>
+
+
     <hr style="color:#FFC501;margin-top:1%;border-width: 3px">
-    <div class="container" style="max-width:5000px">
-          <div class="row">
+
+    <div class="container" style="max-width:500em">
+        <div class="row">
             <div class="col-sm">
-              <h3 style="margin-top:1%">Распаршенные данные</h3>
-                <table  class="table table-light  table-bordered ">
+                <table  class="table table-light  table-bordered table-hover"
+                        name="table_axes"
+                        style="margin-top:2%">
                     <thead class="thead-dark">
-                        <tr clas="table-warning">
-                            <th scope="col">Глубина</th>
-                            <th scope="col">GX</th>
-                            <th scope="col">GY</th>
-                            <th scope="col">GZ</th>
-                            <th scope="col">BX</th>
-                            <th scope="col">BY</th>
-                            <th scope="col">BZ</th>
-                        </tr>
+                    <tr clas="table-warning">
+                        <th scope="col">Глубина</th>
+                        <th scope="col">GX</th>
+                        <th scope="col">GY</th>
+                        <th scope="col">GZ</th>
+                        <th scope="col">BX</th>
+                        <th scope="col">BY</th>
+                        <th scope="col">BZ</th>
+                    </tr>
                     </thead>
 
                     <tbody>
-
-                    {% for row in context.result %}
-                        <tr>
-                        {% for element in row  %}
-                            {% if element1  == "None" %}
-                            <td style="background-color:red">{{element}}</td>
-                            {% elif element1 == "Коротий замер" %}
-                            <td style="background-color:red">{{element}}</td>
-                            {% elif element1 == "Влияние ОК." %}
-                            <td style="background-color:red">{{element}}</td>
-                            {% else%}
-                            <td>{{ element }}</td>
-                            {% endif%}
-                        {% endfor %}
-                        </tr>
-                 {% endfor %}
+                    {% for obj in context.data %}
+                    <tr>
+                        <td scope="col">{{obj.depth_dot}}</td>
+                        <td scope="col">{{obj.CX_dot}}</td>
+                        <td scope="col">{{obj.CY_dot}}</td>
+                        <td scope="col">{{obj.CZ_dot}}</td>
+                        <td scope="col">{{obj.BX_dot}}</td>
+                        <td scope="col">{{obj.BY_dot}}</td>
+                        <td scope="col">{{obj.BZ_dot}}</td>
+                    </tr>
+                    {% endfor %}
                     </tbody>
                 </table>
-
             </div>
-              <div class="col-sm">
-                <h3 style="margin-top:1%">Приведенные данные</h3>
-                <table  class="table table-light  table-bordered ">
+
+            <div class="col-sm">
+                <table  class="table table-light  table-bordered table-hover"
+                        name="table_calculation"
+                        style="margin-top:2%">
                     <thead class="thead-dark">
-                        <tr clas="table-warning">
-                            <th scope="col">Глубина</th>
-                            <th scope="col">GX</th>
-                            <th scope="col">GY</th>
-                            <th scope="col">GZ</th>
-                            <th scope="col">BX</th>
-                            <th scope="col">BY</th>
-                            <th scope="col">BZ</th>
-                        </tr>
+                    <tr clas="table-warning">
+                        <th scope="col">Gtotal</th>
+                        <th scope="col">Btotal_raw</th>
+                        <th scope="col">Btotal_corr</th>
+                        <th scope="col">DIP_raw</th>
+                        <th scope="col">DIP_corr</th>
+                        <th scope="col" style="width: 16%">Зенитный угол</th>
+                        <th scope="col">Азимут</th>
+                        <th scope="col" style="width: 30%">Комментарий</th>
+                    </tr>
                     </thead>
+
                     <tbody>
-                        {% for row in context.result2 %}
-                        <tr>
-                            {% for element in row  %}
-                            {% if element  == "None" %}
-                            <td style="background-color:red">{{element}}</td>
-                            {% elif element == "Коротий замер" %}
-                            <td style="background-color:red">{{element}}</td>
-                            {% elif element == "Влияние ОК." %}
-                            <td style="background-color:red">{{element}}</td>
-                            {% else %}
-                            <td>{{ element }}</td>
-                            {% endif %}
-                            {% endfor %}
-                        </tr>
-                        {% endfor %}
+                    {% for obj in context.data %}
+                    <tr>
+                        {% if obj.Gtotal < context.well.min_gtotal or obj.Gtotal > context.well.max_gtotal %}
+                        <td style="background-color:red" scope="col"> {{obj.Gtotal}} </td>
+                        {% else %}
+                        <td scope="col"> {{obj.Gtotal}} </td>
+                        {% endif %}
+
+                        {% if obj.Btotal < context.well.min_btotal or obj.Btotal > context.well.max_btotal %}
+                        <td style="background-color:red" scope="col"> {{obj.Btotal}} </td>
+                        {% else %}
+                        <td scope="col"> {{obj.Btotal}} </td>
+                        {% endif %}
+
+                        <td scope="col"> {{obj.Btotal_corr}}  </td>
+
+                        {% if obj.Dip < context.well.min_dip or obj.Dip > context.well.max_dip %}
+                        <td style="background-color:red" scope="col"> {{obj.Dip}} </td>
+                        {% else %}
+                        <td scope="col"> {{obj.Dip}} </td>
+                        {% endif %}
+
+                        <td scope="col"> {{obj.DIP_corr}} </td>
+
+                        <td scope="col">{{obj.Zenit}}</td>
+                        <td scope="col">{{obj.Azimut}}</td>
+                        <td style="padding: 0em;">
+                            <textarea style='width: 100%; height: 2em; Border: none; outline: none;' disabled>
+                            </textarea>
+                        </td>
+                    </tr>
+                    {% endfor %}
                     </tbody>
                 </table>
-              </div>
-          </div>
-
+            </div>
+        </div>
     </div>
-</div>
 </center>
 
+
+
+
+<!-- модальное окно для доабвления осей-->
+<div class="modal fade" id="data_Modal1" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Добавление осей</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form action=""  method="post" name="data_form" >
+            <div class="modal-body">
+                    <div class="form-group">
+                        <label for="modal-run1" class="col-form-label">Рейс:</label>
+                        <select type="text" class="form-control" id="modal-run1" name="run"> </select>
+                    </div>
+                    <div class="form-group col-md">
+                        <a class="tooltip-test" title="Значения глубины и осей">
+                        <label for="depth-text">Данные:</label></a>
+                        <textarea class="form-control" id="depth-text" rows="20" name="data"></textarea>
+                    </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Закрыть</button>
+                <button type="submit" class="btn btn-primary">Добавить</button>
+            </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- модальное окно для доабвления скорректированных значений-->
+<div class="modal fade" id="data_Modal2" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Добавление скорректированных значений</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form action=""  method="post" name="data_form" >
+            <div class="modal-body">
+                    <div class="form-group">
+                        <label for="modal-run2" class="col-form-label">Рейс:</label>
+                        <select type="text" class="form-control" id="modal-run2" name="run"> </select>
+                    </div>
+                    <div class="form-group row">
+                        <div class="form-group col-md-4">
+                            <a class="tooltip-test" title="Вставте значения глубины">
+                            <label for="depth-text">Глубина:</label></a>
+                            <textarea class="form-control"  rows="15" name="depth"></textarea>
+                        </div>
+                        <div class="form-group col-md-4">
+                            <a class="tooltip-test" title="Вставте значения Btotal_corr">
+                            <label>Btotal_corr:</label></a>
+                            <textarea class="form-control"  rows="15" name="Btotal_corr"></textarea>
+                        </div>
+                        <div class="form-group col-md-4">
+                            <a class="tooltip-test" title="Вставте значения DIP_corr">
+                            <label>DIP_corr:</label></a>
+                            <textarea class="form-control" rows="15" name="DIP_corr"></textarea>
+                        </div>
+                    </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Закрыть</button>
+                <button type="submit" class="btn btn-primary">Добавить</button>
+            </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+
 <script>
-    document.getElementsByName("run")[0].addEventListener("change",function(e){
-        console.log("Selected" + e.target.value);
-         document.getElementById("inp_depth").value = "";
-         document.getElementById("inp_gx").value = "";
-         document.getElementById("inp_gy").value = "";
-         document.getElementById("inp_gz").value = "";
-         document.getElementById("inp_bx").value = "";
-         document.getElementById("inp_by").value = "";
-         document.getElementById("inp_bz").value = "";
-         document.getElementById("inp_unit").value = "";
-         document.getElementById("inp_string").value = "";
-        var params = new FormData();
-        params.set('run_title', e.target.value);
 
-        fetch('http://{{ context.server_ip }}/axes/run_index', {
-        method: 'POST',
-        body: params }).then(response=>response.json())
-        .then(data=>{console.log(data);
-                    document.getElementById("inputGroupSelect01").value=data.device;
-                    document.getElementById("inp_depth").value = data.depth;
-                    document.getElementById("inp_gx").value = data.GX;
-                    document.getElementById("inp_gy").value = data.GY;
-                    document.getElementById("inp_gz").value = data.GZ;
-                    document.getElementById("inp_bx").value = data.BX;
-                    document.getElementById("inp_by").value = data.BY;
-                    document.getElementById("inp_bz").value = data.BZ;
-                    document.getElementById("inp_unit").value = data.unit;
-                    document.getElementById("inp_string").value = data.string;
-                    })
-    });
+<!--Функция для модального окна 1-->
+$('#data_Modal1').on('show.bs.modal', function (event) {
+  var button = $(event.relatedTarget) // Кнопка которая запускает модальное окно
+  var recipient = button.data('whatever') // Извлечь информацию из data-* атрибутов
+  var data = button.data('run')
 
-    $('#sortTable3').DataTable();
+  <!-- Копируем элементы из селектора на основной странице -->
+  parent_select= document.getElementById('run-select');
+  Array.from(parent_select.options).forEach(function(element){
+  opt = document.createElement("option");
+  opt.value = element.value;
+  opt.text = element.text;
+  document.getElementById('modal-run1').add(opt);
+  });
+  document.getElementById('modal-run1').options[parent_select.selectedIndex].selected = true;
+
+})
+
+<!--Функция для модального окна 2-->
+$('#data_Modal2').on('show.bs.modal', function (event) {
+  var button = $(event.relatedTarget) // Кнопка которая запускает модальное окно
+  var recipient = button.data('whatever') // Извлечь информацию из data-* атрибутов
+  var data = button.data('run')
+
+  <!-- Копируем элементы из селектора на основной странице -->
+  parent_select= document.getElementById('run-select');
+  Array.from(parent_select.options).forEach(function(element){
+  opt = document.createElement("option");
+  opt.value = element.value;
+  opt.text = element.text;
+  document.getElementById('modal-run2').add(opt);
+  });
+  document.getElementById('modal-run2').options[parent_select.selectedIndex].selected = true;
+
+})
 
 
-
-    <!-- Отслеживаем чтобы пользователь ввел данные -->
-    function validForm(){
-    var f = document.forms['axe_form']['run'].value;
-
-    if (f=='Выберите рейс'){
-        alert("Необходимо выбрать рейс");
-        return false;
-        }
+<!-- При загрузке открываем выбранную ранее скважину -->
+window.addEventListener('load', () => {
+    let run_id = localStorage.getItem("run_id");
+    if (run_id != null) {
+      Array.from(document.getElementById('run-select').options).forEach(function(element){
+      if (element.value == run_id) {element.selected = true;}
+      });
+      {% if context.selected_run == 'None' %}
+      document.getElementById('show-data').click();
+      {% endif %}
     }
+});
+
+<!--Записываем выбранный рейс и его скважину-->
+document.getElementById('run-select').addEventListener('change', function () {
+    let well_list = {{context.wells_id}};
+    let num_select = document.getElementById('run-select').selectedIndex;
+
+    localStorage.setItem("well_id", well_list[num_select]);
+    localStorage.setItem("run_id", document.getElementById('run-select').options[num_select].value);
+});
+
+
+<!-- Перенаправление на стринцу с графиками контроля -->
+document.getElementById('data-redirect').addEventListener('click', function () {
+    window.location.href = '{% url 'graph' %}';
+});
+
 </script>
+
 
 {% endblock %}

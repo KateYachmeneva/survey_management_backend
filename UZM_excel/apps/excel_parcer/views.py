@@ -17,15 +17,59 @@ def index(request):
     """
     context = {"title": 'Оси',
                "run": get_all_run(),
-               'selected_run': 'Выберите рейс'
+               "wells_id": list(),  # повторяет run только с индексами скважин
+               'selected_run': 'None'
                }
+    for run in context['run']:
+        context['wells_id'].append(run.section.wellbore.well_name.id)
 
     if request.method == 'POST':
         current_run = Run.objects.get(id=request.POST['run'])
         context['well'] = current_run.section.wellbore.well_name
-        context['data'] = Data.objects.filter(run=request.POST['run']).order_by('depth')
+        context['data'] = Data.objects.filter(run=request.POST['run'], in_statistics=1).order_by('depth')
         context['selected_run'] = current_run
-    return render(request, 'excel_parcer/parcer.html', {'context': context, })
+        if 'data' in request.POST:  # ловим данные с модальной формы
+            axes_data = request.POST['data'].replace(',', '.').replace(' ', '').replace('\r', '').replace('\n', '\t') \
+                .split('\t')
+            counter = 0
+            for data in axes_data:
+                if data == '':
+                    continue
+                if counter == 0:
+                    obj = Data.objects.get_or_create(run=current_run, depth=data)[0]
+                elif counter == 1:
+                    obj.CX = data
+                elif counter == 2:
+                    obj.CY = data
+                elif counter == 3:
+                    obj.CZ = data
+                elif counter == 4:
+                    obj.BX = data
+                elif counter == 5:
+                    obj.BY = data
+                else:
+                    obj.BZ = data
+                    obj.in_statistics = 1
+                    obj.save()
+                counter = (0 if counter == 6 else counter + 1)
+        if 'depth' in request.POST:  # ловим данные с модальной формы
+            depth_data = request.POST['depth'].replace(',', '.').replace(' ', '').replace('\r', '').replace('\n', '\t') \
+                .split('\t')
+            Btotal_data = request.POST['Btotal_corr'].replace(',', '.').replace(' ', '').replace('\r', '').replace('\n',
+                                                                                                                   '\t') \
+                .split('\t')
+            DIP_data = request.POST['DIP_corr'].replace(',', '.').replace(' ', '').replace('\r', '').replace('\n', '\t') \
+                .split('\t')
+            for meas in zip(depth_data, Btotal_data, DIP_data):
+                try:
+                    obj = Data.objects.get(run=current_run, depth=meas[0])
+                    obj.Btotal_corr = (meas[1] if meas[1] < 100 else meas[1] * 1000)
+                    obj.DIP_corr = meas[2]
+                    obj.save()
+                except:
+                    pass
+
+    return render(request, 'excel_parcer/data.html', {'context': context, })
 
 
 def file(request):
@@ -63,7 +107,7 @@ def file(request):
             context['result'] = result
             write_to_bd(result2, current_run)
 
-    return render(request, 'excel_parcer/data.html', {'context': context, })
+    return render(request, 'excel_parcer/add_data.html', {'context': context, })
 
 
 def get_run_index(request):
@@ -98,12 +142,3 @@ def get_run_index(request):
                 'depth': [],
                 'device': [],
             })
-
-
-# FIXME удаляем(функция выгрузки картинок)
-def AxeGraphImage(request, run_id):
-    with open(f'C:/Users/superuser/UZM_excel/files/Report_out/{run_id}.png', "rb") as f:
-        return HttpResponse(f.read(), content_type="image/jpeg")
-
-
-

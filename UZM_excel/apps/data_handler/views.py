@@ -131,6 +131,7 @@ def param(request):
 def graph(request):
     """Страница с графиком первичного контроля"""
     selected = dict()
+    selected["well"] = 'None'
     depthGoxy = []
     depthGz = []
     depthGtotal = []
@@ -174,7 +175,7 @@ def graph(request):
                 depthBref.append({'x': survey.depth, 'y': well.btotal})
                 depthBmax.append({'x': survey.depth, 'y': well.max_btotal()})
                 depthBmin.append({'x': survey.depth, 'y': well.min_btotal()})
-                depthBcorr.append({'x': survey.depth, 'y': survey.Btotal()})
+                depthBcorr.append({'x': survey.depth, 'y': survey.Btotal_corr})
                 # График HSTF
                 depthHSTF.append({'x': survey.depth, 'y': survey.get_hstf()})
                 # График Dip
@@ -182,8 +183,8 @@ def graph(request):
                 depthDipref.append({'x': survey.depth, 'y': well.dip})
                 depthDipmax.append({'x': survey.depth, 'y': well.max_dip()})
                 depthDipmin.append({'x': survey.depth, 'y': well.min_dip()})
-                depthDipcorr.append({'x': survey.depth, 'y': survey.Dip()})
-
+                depthDipcorr.append({'x': survey.depth, 'y': survey.DIP_corr})
+                
     try:
         firstDepth = depthHSTF[0]['x']
         lastDepth = depthHSTF[-1]['x']

@@ -302,8 +302,9 @@ def get_graphics(all_data: dict, well: object) -> dict:
              fontsize=12)
     plt.savefig(file_dir + f'/Report_out/{well}.png')
 
-    waste_word["hor"] = '(' + waste_word["hor"] + ')'  # для отображения в письме добавляем ()
-    waste_word["ver"] = '(' + waste_word["ver"] + ')'
+    # для отображения в письме добавляем ()
+    waste_word["hor"] = ('(' + waste_word["hor"] + ')' if waste_word["hor"] != '' else waste_word["hor"])
+    waste_word["ver"] = ('(' + waste_word["ver"] + ')' if waste_word["ver"] != '' else waste_word["ver"])
     return data_dict, waste_word
 
 
