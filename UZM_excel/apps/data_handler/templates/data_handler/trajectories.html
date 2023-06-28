@@ -315,10 +315,13 @@ function Send_mail() {
                 anchorElement.download = String(FileName);
                 anchorElement.click();
              })
+    <!-- Генерация письма в Outlook -->
     const a_mail = document.createElement('a');
     const url = 'mailto:{{context.letter.mailto}}&cc={{context.letter.cc}}&body={{context.letter.body}}'+
-    Waste['common'].toFixed(2)+'{{context.letter.comm_waste}}{{context.letter.hor_waste}}' + Waste['hor'].toFixed(2)+' м '+ Waste['word']['hor'] +'{{context.letter.ver_waste}}'+
-    Waste['ver'].toFixed(2)+' м '+Waste['word']['ver']+'{{context.letter.endbody}}&subject='+String(FileName).slice(0, -5);
+    Math.abs(Waste['common'].toFixed(2))+'{{context.letter.comm_waste}}{{context.letter.hor_waste}}' +
+    Math.abs(Waste['hor'].toFixed(2))+' м '+ Waste['word']['hor'] +'{{context.letter.ver_waste}}'+
+    Math.abs(Waste['ver'].toFixed(2))+' м '+Waste['word']['ver']+
+    '{{context.letter.endbody}}&subject='+String(FileName).slice(0, -5);
     a_mail.href = url;
     a_mail.click();
 

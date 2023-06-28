@@ -76,7 +76,7 @@ def parcing_manually(path, manually_depth, manually_gx, manually_gy, manually_gz
                 f.readline()
             for raw in f.readlines():
                 raw_list = raw.replace('\n', '').split()
-                print(raw_list)
+                # print(raw_list)
                 if len(raw_list) < 7:  # в строке отсутсвует разделитель
                     continue
                 for d_index, n_index in enumerate(index_List):

@@ -18,17 +18,20 @@ def index(request):
     context = {"title": 'Оси',
                "run": get_all_run(),
                "wells_id": list(),  # повторяет run только с индексами скважин
-               'selected_run': 'None'
+               'selected_run': 'None',
+               'error_depth': list(),  # глубины замеров при вставке которых нашли ошибку
                }
     for run in context['run']:
         context['wells_id'].append(run.section.wellbore.well_name.id)
 
     if request.method == 'POST':
+        # получение данных для отображения
         current_run = Run.objects.get(id=request.POST['run'])
         context['well'] = current_run.section.wellbore.well_name
         context['data'] = Data.objects.filter(run=request.POST['run'], in_statistics=1).order_by('depth')
         context['selected_run'] = current_run
-        if 'data' in request.POST:  # ловим данные с модальной формы
+
+        if 'data' in request.POST:  # Модальная форма с ОСЯМИ
             axes_data = request.POST['data'].replace(',', '.').replace(' ', '').replace('\r', '').replace('\n', '\t') \
                 .split('\t')
             counter = 0
@@ -52,22 +55,23 @@ def index(request):
                     obj.in_statistics = 1
                     obj.save()
                 counter = (0 if counter == 6 else counter + 1)
-        if 'depth' in request.POST:  # ловим данные с модальной формы
-            depth_data = request.POST['depth'].replace(',', '.').replace(' ', '').replace('\r', '').replace('\n', '\t') \
-                .split('\t')
-            Btotal_data = request.POST['Btotal_corr'].replace(',', '.').replace(' ', '').replace('\r', '').replace('\n',
-                                                                                                                   '\t') \
-                .split('\t')
-            DIP_data = request.POST['DIP_corr'].replace(',', '.').replace(' ', '').replace('\r', '').replace('\n', '\t') \
-                .split('\t')
+
+        if 'depth' in request.POST:  # Модальная форма с  Скорректированными значениями
+            depth_data = request.POST['depth'].replace(',', '.').replace(' ', '').replace('\r', '').\
+                replace('\n', '\t').split('\t')
+            Btotal_data = request.POST['Btotal_corr'].replace(',', '.').replace(' ', '').replace('\r', '').\
+                replace('\n', '\t').split('\t')
+            DIP_data = request.POST['DIP_corr'].replace(',', '.').replace(' ', '').replace('\r', '').\
+                replace('\n', '\t').split('\t')
             for meas in zip(depth_data, Btotal_data, DIP_data):
-                try:
-                    obj = Data.objects.get(run=current_run, depth=meas[0])
-                    obj.Btotal_corr = (meas[1] if meas[1] < 100 else meas[1] * 1000)
-                    obj.DIP_corr = meas[2]
-                    obj.save()
-                except:
-                    pass
+                if meas[0] != '' and meas[1] != '' and meas[2] != '':
+                    try:
+                        obj = Data.objects.get(run=current_run, depth=float(meas[0]))
+                        obj.Btotal_corr = (float(meas[1]) if float(meas[1]) > 100 else float(meas[1]) * 1000)
+                        obj.DIP_corr = float(meas[2])
+                        obj.save()
+                    except:
+                        context['error_depth'].append(float(meas[0]))
 
     return render(request, 'excel_parcer/data.html', {'context': context, })
 

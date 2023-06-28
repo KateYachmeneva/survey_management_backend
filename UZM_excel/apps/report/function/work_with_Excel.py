@@ -87,8 +87,8 @@ def write_data_in_Excel(all_data: dict, filename: str, type: int, Run: object) -
 
     file_folder = file_dir + '\\Шаблон\\' + filename
     excel_file = openpyxl.load_workbook(file_folder)
-    print(all_data['Статические замеры ННБ'])
-    print(all_data['Статические замеры ИГИРГИ'])
+    # print(all_data['Статические замеры ННБ'])
+    # print(all_data['Статические замеры ИГИРГИ'])
     hor, ver, common = write_data(excel_file,    # горизонтальные, вертикальные, общие отходы
                                   all_data['Статические замеры ННБ'],
                                   all_data['Статические замеры ИГИРГИ'],

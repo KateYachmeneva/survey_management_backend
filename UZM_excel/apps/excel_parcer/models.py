@@ -71,9 +71,14 @@ class Data(models.Model):
         return round(sqrt(self.BX ** 2 + self.BY ** 2 + self.BZ ** 2), 1)
 
     def Dip(self):
-        return abs(round(math.degrees(math.asin(
-            (self.CX * self.BX + self.CY * self.BY + self.CZ * self.BZ) /
-            (sqrt(self.CX ** 2 + self.CY ** 2 + self.CZ ** 2) * sqrt(self.BX ** 2 + self.BY ** 2 + self.BZ ** 2)))), 2))
+        try:
+            dip = abs(round(math.degrees(math.asin(
+                (self.CX * self.BX + self.CY * self.BY + self.CZ * self.BZ) /
+                (sqrt(self.CX ** 2 + self.CY ** 2 + self.CZ ** 2) * sqrt(self.BX ** 2 + self.BY ** 2 + self.BZ ** 2)))),
+                2))
+        except:
+            dip = None
+        return dip
 
     def Zenit(self):
         return round(math.degrees(math.acos(self.CZ / sqrt(self.CX ** 2 + self.CY ** 2 + self.CZ ** 2))), 2)
@@ -137,4 +142,3 @@ class TelesystemIndex(models.Model):
     class Meta:
         verbose_name = 'Индесы телесистемы'
         verbose_name_plural = 'Индесы телесистемы'
-

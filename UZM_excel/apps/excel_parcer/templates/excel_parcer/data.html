@@ -245,8 +245,9 @@ $('#data_Modal2').on('show.bs.modal', function (event) {
 })
 
 
-<!-- При загрузке открываем выбранную ранее скважину -->
+<!-- Загрузили страницу -->
 window.addEventListener('load', () => {
+    <!-- При загрузке открываем выбранную ранее скважину -->
     let run_id = localStorage.getItem("run_id");
     if (run_id != null) {
       Array.from(document.getElementById('run-select').options).forEach(function(element){
@@ -256,6 +257,10 @@ window.addEventListener('load', () => {
       document.getElementById('show-data').click();
       {% endif %}
     }
+
+    {% if context.error_depth|length != 0 %}
+      alert('Не удалось найти глубины: '+'{{context.error_depth}}');
+    {% endif %}
 });
 
 <!--Записываем выбранный рейс и его скважину-->
@@ -272,6 +277,7 @@ document.getElementById('run-select').addEventListener('change', function () {
 document.getElementById('data-redirect').addEventListener('click', function () {
     window.location.href = '{% url 'graph' %}';
 });
+
 
 </script>
 
