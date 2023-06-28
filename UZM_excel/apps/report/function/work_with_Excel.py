@@ -291,5 +291,8 @@ def get_excel_name(well: object, last_depth: float = 0, departure_horiz: float =
     """
     Получаем название файла по параметрам скважины
     """
+    # при 0 убираем знак в названии
+    departure_horiz = (departure_horiz if departure_horiz != 0.0 else abs(departure_horiz))
+    departure_ver = (departure_ver if departure_ver != 0.0 else abs(departure_ver))
     return f"{well.pad_name.field.field_name}_{well.pad_name.pad_name}_{well.well_name}_" \
            f"Скорректированные данные_{last_depth}м (MD) ({departure_horiz}; {departure_ver}).xlsx"

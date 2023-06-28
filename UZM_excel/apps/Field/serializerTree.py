@@ -58,7 +58,7 @@ class FieldNameSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Field
-        fields = ['field_name', 'pads', ]
+        fields = ['id', 'field_name', 'pads', ]
 
 
 class Tree(serializers.ModelSerializer):

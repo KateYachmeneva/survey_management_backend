@@ -110,7 +110,7 @@ class WellboreSerializer(serializers.ModelSerializer):
 
 
 class WellWithRunSerializer(serializers.ModelSerializer):
-    full_name = serializers.SerializerMethodField(read_only=True) # по умолчанию берем данные из метода get_
+    full_name = serializers.SerializerMethodField(read_only=True)  # по умолчанию берем данные из метода get_
     wellbores = WellboreSerializer(many=True, read_only=True)
 
     # sections = SectionSerializer(many=True, read_only=True)
