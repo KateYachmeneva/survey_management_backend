@@ -1,8 +1,10 @@
+from django.core.files.storage import FileSystemStorage
 from django.shortcuts import render, redirect
 from pytest import console_main
 from Field.models import Well, Run, get_all_well
 from excel_parcer.models import Data
-from report.models import StaticNNBData, IgirgiStatic
+from report.models import StaticNNBData, IgirgiStatic, Plan
+from report.function.work_with_data import work_with_plan
 from Field.views_api import get_tree
 from .function.context_editer import *
 from .function.mail import *
@@ -40,28 +42,34 @@ def traj(request):
 
             context["igirgi_data"] = IgirgiStatic.objects.filter(run=run_id)
             context["nnb_data"] = StaticNNBData.objects.filter(run=run_id)
-
+            runs = Run.objects.filter(section__wellbore__well_name=run.section.wellbore.well_name)
+            context["plan_ex"] = (True if len(Plan.objects.filter(run__in=runs)) != 0 else False)
             context['letter'] = Letter(run.section.wellbore.well_name)
 
     if request.method == 'POST':
         run = Run.objects.get(id=request.GET.get('run_id'))
-        depth_data = request.POST['depth'].replace(',', '.').replace(' ', '') \
-            .replace('\r', '').replace('\n', '\t').split('\t')
-        corner_data = request.POST['corner'].replace(',', '.').replace(' ', '') \
-            .replace('\r', '').replace('\n', '\t').split('\t')
-        azimut_data = request.POST['azimut'].replace(',', '.').replace(' ', '') \
-            .replace('\r', '').replace('\n', '\t').split('\t')
 
-        if request.POST.get("data-type") == 'ННБ':
-            obj = StaticNNBData.objects
-        else:
-            obj = IgirgiStatic.objects
-        for meas in zip(depth_data, corner_data, azimut_data):
-            if meas[0] != '' and meas[1] != '' and meas[2] != '':  # Если значения не нулевые
-                new_obj = obj.get_or_create(run=run, depth=meas[0])
-                new_obj[0].corner = meas[1]
-                new_obj[0].azimut = meas[2]
-                new_obj[0].save()
+        if 'plan_depth' in request.POST:  # данные с модальной формы 2 (плановая траектория)
+            work_with_plan(request, run)
+
+        if 'data-depth' in request.POST:  # данные с модальной формы 1 (добавление значенией)
+            depth_data = request.POST['data-depth'].replace(',', '.').replace(' ', '') \
+                .replace('\r', '').replace('\n', '\t').split('\t')
+            corner_data = request.POST['data-corner'].replace(',', '.').replace(' ', '') \
+                .replace('\r', '').replace('\n', '\t').split('\t')
+            azimut_data = request.POST['data-azimut'].replace(',', '.').replace(' ', '') \
+                .replace('\r', '').replace('\n', '\t').split('\t')
+
+            if request.POST.get("data-type") == 'ННБ':
+                obj = StaticNNBData.objects
+            else:
+                obj = IgirgiStatic.objects
+            for meas in zip(depth_data, corner_data, azimut_data):
+                if meas[0] != '' and meas[1] != '' and meas[2] != '':  # Если значения не нулевые
+                    new_obj = obj.get_or_create(run=run, depth=meas[0])
+                    new_obj[0].corner = meas[1]
+                    new_obj[0].azimut = meas[2]
+                    new_obj[0].save()
 
         return redirect(request.META.get('HTTP_REFERER'))  # вернуть на ту же страницу где и были
     return render(request, 'data_handler/trajectories.html', {'context': context, })
@@ -107,7 +115,7 @@ def edit_traj(request):
         context['selected_id'] = run_id
         context["igirgi_data"] = IgirgiStatic.objects.filter(run=run_id)
         context["nnb_data"] = StaticNNBData.objects.filter(run=run_id)
-
+        return redirect('traj')
     return render(request, 'data_handler/edit_trajectories.html', {'context': context, })
 
 
@@ -184,7 +192,7 @@ def graph(request):
                 depthDipmax.append({'x': survey.depth, 'y': well.max_dip()})
                 depthDipmin.append({'x': survey.depth, 'y': well.min_dip()})
                 depthDipcorr.append({'x': survey.depth, 'y': survey.DIP_corr})
-                
+
     try:
         firstDepth = depthHSTF[0]['x']
         lastDepth = depthHSTF[-1]['x']

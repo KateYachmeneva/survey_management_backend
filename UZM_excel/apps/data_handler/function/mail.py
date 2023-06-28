@@ -21,9 +21,9 @@ class Letter:
     def __init__(self, Well: object):
         """ Передаем экземпляр скважины по которой отправляем отчёт """
         self.data_body = BodyData(Well)
-        self.subject = 'test'  # тема письма Будет заполянться в js функции при выдаче файла
-        self.mailto = Well.mail_To  # кому отправить
-        self.cc = Well.mail_Cc  # копия
+        self.subject = 'test'  # тема письма Будет заполянться в js функции при выдаче файла (нужны отходы с отчета)
+        self.mailto = (Well.mail_To if Well.mail_To != '' else 'None')  # кому отправить
+        self.cc = (Well.mail_Cc if Well.mail_Cc != '' else 'None')  # копия
         # тело письма
         self.body = 'Это тело письма'  # get_body() - перезаписывает все переменные ниже
         self.comm_waste = "Это строка с общими отходами"

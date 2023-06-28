@@ -35,6 +35,7 @@ def index(request):
     return render(request, 'report/index.html', {'context': context, })
 
 
+# report/api/run_index
 def run_index(request):
     """Функция для fetch запроса"""
     if request.method == 'POST':

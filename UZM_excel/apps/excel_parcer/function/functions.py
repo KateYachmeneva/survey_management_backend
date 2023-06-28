@@ -39,46 +39,48 @@ def parcing_manually(path, manually_depth, manually_gx, manually_gy, manually_gz
                 data[i] = np.asarray(las_file[name])
         data = np.asarray(data)
         data = data[:, ~np.isnan(data).any(axis=0)]
-    # FIXME поправить вывод
+    # FIXME вынести все условия в функции
     elif "csv" in re.findall(r".(csv)", path):
         """Для обработки csv"""
         with open(path, 'r', newline='') as csvfile:
             i: int = 0
-            name_List = [manually_bz, manually_by, manually_bx, manually_gz, manually_gy, manually_gx, manually_depth]
+            index_List = [manually_bz, manually_by, manually_bx, manually_gz, manually_gy, manually_gx, manually_depth]
             datareader = csv.reader(csvfile, delimiter=';', quotechar='|')
             for raw in datareader:
-                if i == 0:
-                    for number, word in enumerate(raw):
-                        for index, name in enumerate(name_List):
-                            if word == name:
-                                name_List[index] = number
                 i += 1
                 if len(raw) == 0:
                     continue
-                for d_index, n_index in enumerate(name_List):
+                for d_index, n_index in enumerate(index_List):
                     try:
-                        data[d_index].append(float(raw[int(n_index)]))
-                    except:
+                        data[d_index].append(float(raw[int(n_index) - 1]))
+                    except Exception as e:
                         pass
-
     elif "txt" in re.findall(r".(txt)", path):
         """Для обработки txt"""
-        name_List = [manually_bz, manually_by, manually_bx, manually_gz, manually_gy, manually_gx, manually_depth]
-        start_index = (manually_import if manually_import is not None else 30)
+        index_List = [manually_bz, manually_by, manually_bx, manually_gz, manually_gy, manually_gx, manually_depth]
+        start_index = (manually_import if manually_import is not None else 31)
+        with open(path, encoding="utf-8") as f:
+            for i in range(int(start_index)):
+                f.readline()  # считываем ненужные строки
+            for raw in f.readlines():
+                raw_list = raw.split(sep=',')
+                if len(raw_list) == 0:  # в строке отсутсвует разделитель
+                    continue
+                for d_index, n_index in enumerate(index_List):
+                    data[d_index].append(float(raw_list[int(n_index) - 1]))
+    elif 'sur' in re.findall(r".(sur)", path):
+        index_List = [manually_bz, manually_by, manually_bx, manually_gz, manually_gy, manually_gx, manually_depth]
+        start_index = (manually_import if manually_import is not None else 2)
         with open(path, encoding="utf-8") as f:
             for i in range(int(start_index)):
                 f.readline()
-            for number, word in enumerate(f.readline().split(sep=',')):
-                for index, name in enumerate(name_List):
-                    if word == name:
-                        name_List[index] = number
             for raw in f.readlines():
-                raw_list = raw.split(sep=',')
-                if len(raw_list) == 0:
+                raw_list = raw.replace('\n', '').split()
+                print(raw_list)
+                if len(raw_list) < 7:  # в строке отсутсвует разделитель
                     continue
-                for d_index, n_index in enumerate(name_List):
-                    data[d_index].append(float(raw_list[int(n_index)]))
-        # print(data)
+                for d_index, n_index in enumerate(index_List):
+                    data[d_index].append(float(raw_list[int(n_index) - 1]))
     else:
         """Для обработки excel"""
         try:
@@ -92,7 +94,7 @@ def parcing_manually(path, manually_depth, manually_gx, manually_gy, manually_gz
         for i, name in enumerate(
                 [manually_bz, manually_by, manually_bx, manually_gz, manually_gy, manually_gx, manually_depth]):
             colum_id = column_index_from_string(name)
-            for row_id in range(int(manually_import), sheet.max_row+1):
+            for row_id in range(int(manually_import), sheet.max_row + 1):
                 cell = sheet.cell(row_id, colum_id)
                 if cell.value is not None:
                     data[i].append(cell.value)
@@ -287,4 +289,5 @@ def write_to_bd(data: list[list], run: object) -> NoReturn:
         bd_data[0].BY = rows[5]
         bd_data[0].BZ = rows[6]
         bd_data[0].in_statistics = True
+
     Data.objects.bulk_update(update_obj, ["CX", "CY", "CZ", "BX", "BY", "BZ", "in_statistics"])

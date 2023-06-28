@@ -137,7 +137,7 @@ def processing_data(start_data: dict, run_id: int, index_id: int) -> FileRespons
     for key, value in start_data.items():
         print(f'Работа с type: {key} - file: {value}')
         if key == 'response_type':
-            pass  # нужно для выдачи нужного шаблона
+            pass  # для выдачи нужного шаблона
         elif key == "igirgi_data":
             all_data['Статические замеры ИГИРГИ'] = list_to_dict(value)
         else:
@@ -404,7 +404,6 @@ def bd_Write_data(all_data: dict, run_id: int) -> NoReturn:
             model = Raw
         elif key == 'plan_file':
             model = Plan
-            print("Пишем план")
         elif key == 'igirgi_dynamic':
             model = IgirgiDynamic
         else:
@@ -433,3 +432,34 @@ def bd_Write_data(all_data: dict, run_id: int) -> NoReturn:
                 db_meas[0].corner = meas[1]
             model.objects.bulk_update(updat_obj, ['corner'])
         updat_obj = []
+
+
+def work_with_plan(request: dict, run: object) -> bool:
+    """Чтение и сохранение палновой траектории"""
+    fs = FileSystemStorage(location=file_dir + '/Report_input')
+
+    plan_file = request.FILES['plan_file']  # сохранение файла плана
+    path = fs.save('plan_' + plan_file.name, plan_file)
+
+    plan_index(run, request.POST)  # перезапись индексов
+
+    data = reader('plan_file', path, ReportIndex.objects.get(run=run).id)  # берём данные с плана
+    all_data = {'Плановая траектория': data}
+
+    # удаляем старый план
+    runs = Run.objects.filter(section__wellbore__well_name=run.section.wellbore.well_name)
+    Plan.objects.filter(run__in=runs).delete()
+
+    bd_Write_data(all_data, run.id)  # сохраняем в бд
+    return True
+
+
+def plan_index(run, new_index):
+    """ Перезапись индексов палновой траектории """
+    index_model = ReportIndex.objects.get_or_create(run=run)[0]
+    index_model.plan_depth = new_index["plan_depth"]
+    index_model.plan_corner = new_index["plan_corner"]
+    index_model.plan_azimut = new_index["plan_azimut"]
+    index_model.plan_list_name = new_index["plan_list_name"]
+    index_model.plan_str = new_index["plan_str"]
+    index_model.save()

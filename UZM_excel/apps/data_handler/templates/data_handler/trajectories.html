@@ -34,13 +34,30 @@
         {% block top_button%}
         <br>
         {% if context.selected_id is not None %}
+        <!--    Кнопка отвечает за плановую траекторию    -->
+        {% if context.plan_ex == True %}
+        <button type="button" data-toggle="modal" data-target="#data_Modal2" data-run="{{context.selected_obj}}">
+            <a style="text-decoration: none;color: #000;">Заменить план</a>
+        </button>
+        <!--    Кнопка отвечает за отправку отчёта    -->
         <button id='btn_send' type="button" class="" onclick="Send_mail()" aria-controls="dtDynamicVerticalScrollExample">
             <i id='fa_send' class="fa fa-spinner fa-spin" hidden></i>Отправить отчет
         </button>
+        {% else %}
+        <button type="button" data-toggle="modal" data-target="#data_Modal2" data-run="{{context.selected_obj}}">
+            <a style="text-decoration: none;color: #000;">Добавить план</a>
+        </button>
+        <!--    Кнопка отвечает за отправку отчёта    -->
+        <button  type="button" disabled>
+            Отправить отчет
+        </button>
+        {% endif %}
 
+        <!--    Кнопка отвечает за редактирование значений траектории    -->
         <button type="button" class="" placeholder="" aria-controls="dtDynamicVerticalScrollExample">
             <a href="{% url 'edit_traj' %}?run_id={{context.selected_id}} " style="text-decoration: none;color: #000;">Редактировать значения</a>
         </button>
+
         {% else %}
         Выберите рейс в меню слева
         {% endif %}
@@ -134,14 +151,14 @@
 {% if context.selected_id is not None %} <!-- Не отображать кнопки добавления без выбранного рейса-->
 <div class="row" style="margin-top:0.5em;margin-right:0.1em;">
     <div class="col-5" style="text-align: right">
-       <button type="button" class="" placeholder="" data-toggle="modal" data-target="#data_Modal" style="width:100%"
+       <button type="button" class="" placeholder="" data-toggle="modal" data-target="#data_Modal1" style="width:100%"
                data-whatever="ИГиРГИ" data-run="{{context.selected_obj}}">
             Добавить значения
         </button>
     </div>
     <div class="col-1"> </div>
     <div class="col-5" style="text-align: right;">
-        <button type="button" class="" placeholder="" data-toggle="modal" data-target="#data_Modal" style="width:100%"
+        <button type="button" class="" placeholder="" data-toggle="modal" data-target="#data_Modal1" style="width:100%"
                 data-whatever="ННБ" data-run="{{context.selected_obj}}">
             Добавить значения
         </button>
@@ -150,8 +167,8 @@
 </div>
 {% endif %}
 
-
-<div class="modal fade" id="data_Modal" tabindex="-1" role="dialog">
+<!-- Модальное окно для добавления новых замеров -->
+<div class="modal fade" id="data_Modal1" tabindex="-1" role="dialog">
     <div class="modal-dialog modal-lg" role="document">
         <div class="modal-content">
             <div class="modal-header">
@@ -174,17 +191,17 @@
                         <div class="form-group col-md-4">
                             <a class="tooltip-test" title="Вставте значения глубины">
                             <label for="depth-text">Глубина:</label></a>
-                            <textarea class="form-control" id="depth-text" rows="15" name="depth"></textarea>
+                            <textarea class="form-control" id="depth-text" rows="15"  name="data-depth"></textarea>
                         </div>
                         <div class="form-group col-md-4">
                             <a class="tooltip-test" title="Вставте значения угла">
                             <label for="corner-text">Угол:</label></a>
-                            <textarea class="form-control" id="corner-text" rows="15" name="corner"></textarea>
+                            <textarea class="form-control" id="corner-text" rows="15" name="data-corner"></textarea>
                         </div>
                         <div class="form-group col-md-4">
                             <a class="tooltip-test" title="Вставте значения азимута">
                             <label for="azimut-text">Азимут:</label></a>
-                            <textarea class="form-control" id="azimut-text" rows="15" name="azimut"></textarea>
+                            <textarea class="form-control" id="azimut-text" rows="15" name="data-azimut"></textarea>
                         </div>
                     </div>
 
@@ -199,6 +216,70 @@
     </div>
 </div>
 
+
+<!-- Модальное окно для загрузки плановой траектории -->
+<div class="modal fade" id="data_Modal2" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Загрузка плановой траектории</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form action=""  method="post" name="data_form" enctype="multipart/form-data">
+            <div class="modal-body">
+                    <div class="form-group">
+                        <label for="run-name" class="col-form-label">Рейс:</label>
+                        <input type="text" class="form-control" name="run" id="run_name">
+                    </div>
+                    <div class="form-group row">
+                        <div class="form-group col-md-6">
+                            <div style="vertical-align: baseline;">
+                                <a class="tooltip-test" title="Добавьте файл с замерами">
+                                    <label class="col-form-label">Файл:</label></a>
+                                <input class="form-control" type="file" accept=".xls,.xlsx" name="plan_file">
+                            </div>
+                        </div>
+                        <div class="form-group col-md-6">
+                            <div class="form-group">
+                                <a class="tooltip-test" title="Буквенный индекс колонки с глубинами. Пример: 'A'">
+                                <label for="run-name" class="col-form-label">Глубина:</label></a>
+                                <input type="text" class="form-control" name="plan_depth">
+                            </div>
+                            <div class="form-group">
+                                <a class="tooltip-test" title="Буквенный индекс колонки с зенитным углом. Пример: 'A'">
+                                <label for="run-name" class="col-form-label">Угол:</label></a>
+                                <input type="text" class="form-control" name="plan_corner">
+                            </div>
+                            <div class="form-group">
+                                <a class="tooltip-test" title="Буквенный индекс колонки с азимутальным углом. Пример: 'A'">
+                                <label for="run-name" class="col-form-label">Азимут:</label></a>
+                                <input type="text" class="form-control" name="plan_azimut">
+                            </div>
+                            <div class="form-group">
+                                <a class="tooltip-test" title="Числовой индекс строки, с которой начинается считывание. Пример: '32'">
+                                <label for="run-name" class="col-form-label">Строка:</label></a>
+                                <input type="text" class="form-control" name="plan_str">
+                            </div>
+                            <div class="form-group">
+                                <a class="tooltip-test" title="Текстовое наименование страницы с данными. Пример: 'Planned WGR'">
+                                <label for="run-name" class="col-form-label">Лист:</label></a>
+                                <input type="text" class="form-control" name="plan_list_name">
+                            </div>
+                        </div>
+                    </div>
+
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Закрыть</button>
+                <button type="submit" class="btn btn-primary">Загрузить</button>
+            </div>
+            </form>
+        </div>
+    </div>
+</div>
 
 
 {% endblock%}
@@ -284,13 +365,11 @@ function SearchFilter() {
   }
 }
 
-<!--Функция для модального окна-->
-$('#data_Modal').on('show.bs.modal', function (event) {
+<!--Функция для модального окна под добавление замеров-->
+$('#data_Modal1').on('show.bs.modal', function (event) {
   var button = $(event.relatedTarget) // Button that triggered the modal
   var recipient = button.data('whatever') // Extract info from data-* attributes
   var data = button.data('run')
-  // If necessary, you could initiate an AJAX request here (and then do the updating in a callback).
-  // Update the modal's content. We'll use jQuery here, but you could use a data binding library or other methods instead.
   var modal = $(this)
   document.getElementById('run-name').value = data;
   document.getElementById('data-name').value = recipient;
@@ -298,5 +377,30 @@ $('#data_Modal').on('show.bs.modal', function (event) {
   modal.find('.modal-title').text('Новые данные для ' + recipient)
 
 })
+
+<!--Функция для модального окна под загрузку плана-->
+$('#data_Modal2').on('show.bs.modal', function (event) {
+  var button = $(event.relatedTarget)
+  var recipient = button.data('whatever')
+
+  var params = new FormData();
+  params.set('run_id', {{context.selected_id}});
+  fetch('http://{{ context.server_ip }}/report/api/run_index', { method: 'POST', body: params })
+         .then(response=>response.json()).
+         then(data=>{
+         console.log(data);
+         console.log(data.plan_depth);
+         document.getElementsByName('plan_depth')[0].value=data.plan_depth;
+         document.getElementsByName('plan_corner')[0].value=data.plan_corner;
+         document.getElementsByName('plan_azimut')[0].value=data.plan_azimut;
+         document.getElementsByName('plan_str')[0].value=data.plan_str;
+         document.getElementsByName('plan_list_name')[0].value=data.plan_list_name;
+         });
+
+  var run_name = button.data('run')
+  var modal = $(this)
+  document.getElementById('run_name').value = run_name;
+})
+
 </script>
 {% endblock %}
