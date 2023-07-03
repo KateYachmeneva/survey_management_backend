@@ -15,7 +15,7 @@ def add_contractor_nnb(request):
             form.save()
         return redirect(add_contractor_drill)
 
-    context = {"title": 'Подрятчик',
+    context = {"title": 'Подрядчик',
                "form": form,
                "method": "add_contractor_nnb",
                "data": models.ContractorNNB.objects.all().values()}
@@ -29,7 +29,7 @@ def add_contractor_drill(request):
             form.save()
         return redirect(add_field)
 
-    context = {"title": 'Подрятчик',
+    context = {"title": 'Подрядчик',
                "form": form,
                "method": "add_contractor_drill",
                "data": models.ContractorDrill.objects.all().values()}

@@ -30,7 +30,7 @@
 {% block content %}
 <center>
 <div>
-        <form action="{% url 'add_data' %}" method="post" enctype="multipart/form-data" style="margin-top:1%" name="axe_form" onsubmit="return validForm()">
+        <form action="{% url 'add_axes' %}" method="post" enctype="multipart/form-data" style="margin-top:1%" name="axe_form" onsubmit="return validForm()">
             {% csrf_token %}
 
             <div style="max-width:500px; margin-top:1%">

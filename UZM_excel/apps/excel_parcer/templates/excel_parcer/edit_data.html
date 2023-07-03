@@ -1,0 +1,176 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{%  block header %}
+<link type="text/css" href="{% static 'css/table.css' %}" rel="stylesheet" />
+<style>
+.table>:not(caption)>*>* {
+	padding:0em;
+}
+td {
+    width:1rem;
+    height:1rem;
+}
+
+th  {
+    width:1rem;
+    height:1rem;
+}
+
+</style>
+{% endblock %}
+
+{% block content %}
+<br>
+<center>
+    <form action="" method="post" enctype="multipart/form-data" style="margin-top:0%">
+
+        <button type="submit" style="border:1"> Сохранить </button>
+        <a  href="{% url 'axes' %}" style="text-decoration: none;color: #000;">
+            <button type="button" style="border:1"> Назад </button></a>
+
+
+        <hr style="color:#FFC501;margin-top:1%;border-width: 3p2x">
+
+        <div class="container" style="max-width:500em">
+            <div class="row">
+                <div class="col-sm">
+                    <table  class="table table-light table-sm table-bordered table-hover"
+                            name="table_axes"
+                            style="margin-top:2%">
+                        <thead class="thead-dark">
+                        <tr class="table">
+                            <th scope="col">Глубина</th>
+                            <th scope="col">GX</th>
+                            <th scope="col">GY</th>
+                            <th scope="col">GZ</th>
+                            <th scope="col">BX</th>
+                            <th scope="col">BY</th>
+                            <th scope="col">BZ</th>
+                        </tr>
+                        </thead>
+
+                        <tbody>
+                        {% for obj in context.data %}
+                        <tr>
+                            <td scope="col"><input type="number" id="{{obj.id}}depth" value="{{obj.depth_dot}}" onchange="getName({{obj.id}},'depth')" step="0.01" style="text-align: center;Border: none; outline: none;width:100%;height:100%;"></td>
+                            <td scope="col"><input type="number" id="{{obj.id}}gx" value="{{obj.CX_dot}}"  onchange="getName({{obj.id}},'gx')" step="0.00001" style="text-align: center;Border: none; outline: none;width:100%;height:100%;"></td>
+                            <td scope="col"><input type="number" id="{{obj.id}}gy" value="{{obj.CY_dot}}"  onchange="getName({{obj.id}},'gy')" step="0.00001" style="text-align: center;Border: none; outline: none;width:100%;height:100%;"></td>
+                            <td scope="col"><input type="number" id="{{obj.id}}gz" value="{{obj.CZ_dot}}"  onchange="getName({{obj.id}},'gz')" step="0.00001" style="text-align: center;Border: none; outline: none;width:100%;height:100%;"></td>
+                            <td scope="col"><input type="number" id="{{obj.id}}bx" value="{{obj.BX_dot}}"  onchange="getName({{obj.id}},'bx')" step="0.00001" style="text-align: center;Border: none; outline: none;width:100%;height:100%;"></td>
+                            <td scope="col"><input type="number" id="{{obj.id}}by" value="{{obj.BY_dot}}"  onchange="getName({{obj.id}},'by')" step="0.00001" style="text-align: center;Border: none; outline: none;width:100%;height:100%;"></td>
+                            <td scope="col"><input type="number" id="{{obj.id}}bz" value="{{obj.BZ_dot}}"  onchange="getName({{obj.id}},'bz')" step="0.00001" style="text-align: center;Border: none; outline: none;width:100%;height:100%;"></td>
+                        </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="col-sm">
+                    <table  class="table table-light table-sm table-bordered table-hover"
+                            name="table_calculation"
+                            style="margin-top:2%">
+                        <thead class="thead-dark">
+                        <tr class="table">
+                            <th scope="col">Gtotal</th>
+                            <th scope="col">Btotal_raw</th>
+                            <th scope="col">Btotal_corr</th>
+                            <th scope="col">DIP_raw</th>
+                            <th scope="col">DIP_corr</th>
+                            <th scope="col" style="width: 16%">Зенитный угол</th>
+                            <th scope="col">Азимут</th>
+                            <th scope="col" style="width: 30%">Комментарий</th>
+                        </tr>
+                        </thead>
+
+                        <tbody>
+                        {% for obj in context.data %}
+                        <tr>
+                            {% if obj.Gtotal < context.well.min_gtotal or obj.Gtotal > context.well.max_gtotal %}
+                            <td style="background-color:red" scope="col"> {{obj.Gtotal}} </td>
+                            {% else %}
+                            <td scope="col"> {{obj.Gtotal}} </td>
+                            {% endif %}
+
+                            {% if obj.Btotal < context.well.min_btotal or obj.Btotal > context.well.max_btotal %}
+                            <td style="background-color:red" scope="col"> {{obj.Btotal}} </td>
+                            {% else %}
+                            <td scope="col"> {{obj.Btotal}} </td>
+                            {% endif %}
+
+                            <td scope="col"> <input type="number" value="{{obj.Btotal_corr_dot}}" id="{{obj.id}}btotal" onchange="getName({{obj.id}},'btotal')" step="0.01" style="text-align:center; Border: none; outline: none; width:100%; height:100%;">   </td>
+
+                            {% if obj.Dip < context.well.min_dip or obj.Dip > context.well.max_dip %}
+                            <td style="background-color:red" scope="col"> {{obj.Dip}} </td>
+                            {% else %}
+                            <td scope="col"> {{obj.Dip}} </td>
+                            {% endif %}
+
+                            <td scope="col"> <input type="number" value="{{obj.DIP_corr_dot}}" id="{{obj.id}}dip" onchange="getName({{obj.id}},'dip')" step="0.01" style="text-align:center; Border: none; outline: none; width:100%; height:100%;"> </td>
+
+                            <td scope="col">{{obj.Zenit}}</td>
+                            <td scope="col">{{obj.Azimut}}</td>
+                            <td style="padding: 0em;">
+                                <textarea style='width: 100%; height: 1em; Border: none; outline: none;'>
+                                </textarea>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </form>
+
+
+<script>
+<!-- Загрузили страницу -->
+window.addEventListener('load', () => {
+    <!-- При загрузке открываем выбранную ранее скважину -->
+    let run_id = localStorage.getItem("run_id");
+    if (run_id != null) {
+    {% if context.selected_run == 'None' %}
+    window.location = window.location.href +'?run_id='+ run_id
+    {% endif %}
+    }
+
+});
+
+function getName(depth, name) {
+  console.log(arguments[0], arguments[1]);
+
+  let dep = document.getElementById(arguments[0]+'depth');
+  let gx = document.getElementById(arguments[0]+'gx');
+  let gy = document.getElementById(arguments[0]+'gy');
+  let gz = document.getElementById(arguments[0]+'gz');
+  let bx = document.getElementById(arguments[0]+'bx');
+  let by = document.getElementById(arguments[0]+'by');
+  let bz = document.getElementById(arguments[0]+'bz');
+  let btotal = document.getElementById(arguments[0]+'btotal');
+  let dip = document.getElementById(arguments[0]+'dip');
+
+  dep.style.color ='DarkOrange';
+  gx.style.color ='DarkOrange';
+  gy.style.color ='DarkOrange';
+  gz.style.color ='DarkOrange';
+  bx.style.color ='DarkOrange';
+  by.style.color ='DarkOrange';
+  bz.style.color ='DarkOrange';
+  btotal.style.color ='DarkOrange';
+  dip.style.color ='DarkOrange';
+
+  if (arguments[1] == 'depth') {dep.name=arguments[0]+' '+'depth'}
+  if (arguments[1] == 'gx') {gx.name=arguments[0]+' '+'gx'}
+  if (arguments[1] == 'gy') {gy.name=arguments[0]+' '+'gy'}
+  if (arguments[1] == 'gz') {gz.name=arguments[0]+' '+'gz'}
+  if (arguments[1] == 'bx') {bx.name=arguments[0]+' '+'bx'}
+  if (arguments[1] == 'by') {by.name=arguments[0]+' '+'by'}
+  if (arguments[1] == 'bz') {bz.name=arguments[0]+' '+'bz'}
+  if (arguments[1] == 'btotal') {btotal.name=arguments[0]+' '+'btotal'}
+  if (arguments[1] == 'dip') {dip.name=arguments[0]+' '+'dip'}
+}
+</script>
+
+
+{% endblock %}

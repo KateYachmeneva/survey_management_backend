@@ -2,6 +2,7 @@ import copy
 import math
 import os
 from math import sin, cos
+from PIL import Image, ImageDraw, ImageFont
 from random import random, randint
 
 import matplotlib
@@ -114,13 +115,6 @@ def get_graph_data(I: list, A: list, Depth: list, RKB: int, VSaz: int = 1) -> li
         TVDSS_list.append(TVDSS)
     return EW_list, NS_list, Vsect_list, TVDSS_list, TVD_list
 
-
-# def add_plot(x, y, name):
-#     # Подаем в функцию x y для каждой из линий с соответсвующими надписями
-#     getHorizontalPlot(NS_list, EW_list, 'План')
-#     plt.close()
-#     getVerticalPlot(TVDSS_list, Vsect_list, 'План')
-#     plt.close()
 
 data_name = {'igirgi_file': 'Статические замеры ИГИРГИ',
              'nnb_dynamic': 'Динамические замеры ННБ',
@@ -292,15 +286,21 @@ def get_graphics(all_data: dict, well: object) -> dict:
     else:
         waste_word['ver'] = ('выше' if text_data["Отход по вертикали"] > 0 else 'ниже')
 
-    ax1.text((ext_dict['min_x'] - additional_delta),
-             2 * (ext_dict['min_y'] - additional_delta),
-             f'Точка замера: {format(text_data["Точка замера"], ".2f")} м\n'
-             f'Отход по горизонтали: {format(text_data["Отход по горизонтали"], ".2f")} м {waste_word["hor"]}\n'
-             f'Отход по вертикали: {format(text_data["Отход по вертикали"], ".2f")} м {waste_word["ver"]}\n'
-             f'Общий отход: {format(text_data["Общий отход"], ".2f")} м\n'
-             f'Абсолютная отметка: {format(text_data["Абсолютная отметка"], ".2f")} м\n',
-             fontsize=12)
+    # сохраняем изображение
     plt.savefig(file_dir + f'/Report_out/{well}.png')
+
+    # вставка текста на изображение
+    image = Image.open(file_dir + f'/Report_out/{well}.png')
+    font = ImageFont.truetype("arial.ttf", 25)
+    drawer = ImageDraw.Draw(image)
+    drawer.text((180, 820),
+                f'Точка замера: {format(text_data["Точка замера"], ".2f")} м\n'
+                f'Отход по горизонтали: {format(text_data["Отход по горизонтали"], ".2f")} м {waste_word["hor"]}\n'
+                f'Отход по вертикали: {format(text_data["Отход по вертикали"], ".2f")} м {waste_word["ver"]}\n'
+                f'Общий отход: {format(text_data["Общий отход"], ".2f")} м\n'
+                f'Абсолютная отметка: {format(text_data["Абсолютная отметка"], ".2f")} м\n',
+                font=font, fill='black')
+    image.save(file_dir + f'/Report_out/{well}.png')
 
     # для отображения в письме добавляем ()
     waste_word["hor"] = ('(' + waste_word["hor"] + ')' if waste_word["hor"] != '' else waste_word["hor"])
@@ -319,6 +319,11 @@ def get_text_data(data_dict: dict, all_data: dict, Ex, Ny) -> dict():
 
     text_data['Отход по горизонтали'] = round(math.sqrt((X_nnb - X_igirgi) ** 2 + (Y_nnb - Y_igigri) ** 2), 2)
     text_data['Отход по вертикали'] = round(data_dict['nnb_TVD'][-1] - data_dict['igirgi_TVD'][-1], 2)
+    # при 0 убираем знак в названии
+    text_data['Отход по горизонтали'] = (text_data['Отход по горизонтали'] if text_data['Отход по горизонтали'] != 0.0
+                                         else abs(text_data['Отход по горизонтали']))
+    text_data['Отход по вертикали'] = (text_data['Отход по вертикали'] if text_data['Отход по вертикали'] != 0.0
+                                       else abs(text_data['Отход по вертикали']))
     text_data['Общий отход'] = round(
         math.sqrt((X_nnb - X_igirgi) ** 2 + (Y_nnb - Y_igigri) ** 2 + (
                 data_dict['nnb_TVD'][-1] - data_dict['igirgi_TVD'][-1]) ** 2), 2)

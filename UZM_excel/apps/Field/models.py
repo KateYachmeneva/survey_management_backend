@@ -221,23 +221,35 @@ class Well(models.Model):
 
     """Функции для шаблона с осями"""
 
+    def btotal_graph(self):
+        """Для графиков контроля (None значения не принимает)"""
+        return self.btotal if self.btotal is not None else 'Null'
+
+    def gtotal_graph(self):
+        """Для графиков контроля (None значения не принимает)"""
+        return self.gtotal if self.gtotal is not None else 'Null'
+
+    def dip_graph(self):
+        """Для графиков контроля (None значения не принимает)"""
+        return self.dip if self.dip is not None else 'Null'
+
     def min_gtotal(self):
-        return self.gtotal - 0.003
+        return self.gtotal - 0.003 if self.gtotal is not None else 'Null'
 
     def max_gtotal(self):
-        return self.gtotal + 0.003
+        return self.gtotal + 0.003 if self.gtotal is not None else 'Null'
 
     def min_btotal(self):
-        return self.btotal - 300
+        return self.btotal - 300 if self.btotal is not None else 'Null'
 
     def max_btotal(self):
-        return self.btotal + 300
+        return self.btotal + 300 if self.btotal is not None else 'Null'
 
     def min_dip(self):
-        return self.dip - 0.3
+        return self.dip - 0.3 if self.dip is not None else 'Null'
 
     def max_dip(self):
-        return self.dip + 0.3
+        return self.dip + 0.3 if self.dip is not None else 'Null'
 
 
 class Wellbore(models.Model):

@@ -60,7 +60,7 @@ def parcing_manually(path, manually_depth, manually_gx, manually_gy, manually_gz
         index_List = [manually_bz, manually_by, manually_bx, manually_gz, manually_gy, manually_gx, manually_depth]
         start_index = (manually_import if manually_import is not None else 31)
         with open(path, encoding="utf-8") as f:
-            for i in range(int(start_index)):
+            for i in range(int(start_index-1)):
                 f.readline()  # считываем ненужные строки
             for raw in f.readlines():
                 raw_list = raw.split(sep=',')

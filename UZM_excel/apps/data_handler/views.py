@@ -172,7 +172,7 @@ def graph(request):
                 depthGz.append({'x': survey.depth, 'y': survey.CZ})
                 # График Gtotal
                 depthGtotal.append({'x': survey.depth, 'y': survey.Gtotal()})
-                depthGref.append({'x': survey.depth, 'y': well.gtotal})
+                depthGref.append({'x': survey.depth, 'y': well.gtotal_graph()})
                 depthGmax.append({'x': survey.depth, 'y': well.max_gtotal()})
                 depthGmin.append({'x': survey.depth, 'y': well.min_gtotal()})
                 # График Boxy-Bz
@@ -180,7 +180,7 @@ def graph(request):
                 depthBz.append({'x': survey.depth, 'y': survey.BZ})
                 # График Btotal
                 depthBtotal.append({'x': survey.depth, 'y': survey.Btotal()})
-                depthBref.append({'x': survey.depth, 'y': well.btotal})
+                depthBref.append({'x': survey.depth, 'y': well.btotal_graph()})
                 depthBmax.append({'x': survey.depth, 'y': well.max_btotal()})
                 depthBmin.append({'x': survey.depth, 'y': well.min_btotal()})
                 depthBcorr.append({'x': survey.depth, 'y': (survey.Btotal_corr if survey.Btotal_corr is not None else
@@ -189,7 +189,7 @@ def graph(request):
                 depthHSTF.append({'x': survey.depth, 'y': survey.get_hstf()})
                 # График Dip
                 depthDipraw.append({'x': survey.depth, 'y': survey.Dip()})
-                depthDipref.append({'x': survey.depth, 'y': well.dip})
+                depthDipref.append({'x': survey.depth, 'y': well.dip_graph()})
                 depthDipmax.append({'x': survey.depth, 'y': well.max_dip()})
                 depthDipmin.append({'x': survey.depth, 'y': well.min_dip()})
                 depthDipcorr.append({'x': survey.depth, 'y': (survey.DIP_corr if survey.DIP_corr is not None else

@@ -31,7 +31,12 @@
             <button type="button" class="" placeholder="" data-toggle="modal" data-target="#data_Modal2">
                 Добавить скорректированные значения
             </button>
-            <button type="button" id="data-redirect" style="border:1">Графики контроля</button>
+
+            <a  id="edit-redirect" href="{% url 'edit_axes' %}" style="text-decoration: none;color: #000;">
+                <button type="button" style="border:1">Редактировать</button></a>
+
+            <a  id="graph-redirect"  href="{% url 'graph' %}" style="text-decoration: none;color: #000;">
+                <button type="button" style="border:1">Графики контроля</button></a>
         </form>
 
 
@@ -40,11 +45,11 @@
     <div class="container" style="max-width:500em">
         <div class="row">
             <div class="col-sm">
-                <table  class="table table-light  table-bordered table-hover"
+                <table  class="table table-light table-sm table-bordered table-hover"
                         name="table_axes"
                         style="margin-top:2%">
                     <thead class="thead-dark">
-                    <tr clas="table-warning">
+                    <tr class="table">
                         <th scope="col">Глубина</th>
                         <th scope="col">GX</th>
                         <th scope="col">GY</th>
@@ -72,11 +77,11 @@
             </div>
 
             <div class="col-sm">
-                <table  class="table table-light  table-bordered table-hover"
+                <table  class="table table-light table-sm table-bordered table-hover"
                         name="table_calculation"
                         style="margin-top:2%">
                     <thead class="thead-dark">
-                    <tr clas="table-warning">
+                    <tr class="table">
                         <th scope="col">Gtotal</th>
                         <th scope="col">Btotal_raw</th>
                         <th scope="col">Btotal_corr</th>
@@ -103,7 +108,7 @@
                         <td scope="col"> {{obj.Btotal}} </td>
                         {% endif %}
 
-                        <td scope="col"> {{obj.Btotal_corr}}  </td>
+                        <td scope="col"> {{obj.Btotal_corrFix}}  </td>
 
                         {% if obj.Dip < context.well.min_dip or obj.Dip > context.well.max_dip %}
                         <td style="background-color:red" scope="col"> {{obj.Dip}} </td>
@@ -111,12 +116,12 @@
                         <td scope="col"> {{obj.Dip}} </td>
                         {% endif %}
 
-                        <td scope="col"> {{obj.DIP_corr}} </td>
+                        <td scope="col"> {{obj.DIP_corrFix}} </td>
 
                         <td scope="col">{{obj.Zenit}}</td>
                         <td scope="col">{{obj.Azimut}}</td>
                         <td style="padding: 0em;">
-                            <textarea style='width: 100%; height: 2em; Border: none; outline: none;' disabled>
+                            <textarea style='width: 100%; height: 1em; Border: none; outline: none;' disabled>
                             </textarea>
                         </td>
                     </tr>
@@ -143,15 +148,24 @@
             </div>
             <form action=""  method="post" name="data_form" >
             <div class="modal-body">
-                    <div class="form-group">
-                        <label for="modal-run1" class="col-form-label">Рейс:</label>
-                        <select type="text" class="form-control" id="modal-run1" name="run"> </select>
-                    </div>
-                    <div class="form-group col-md">
-                        <a class="tooltip-test" title="Значения глубины и осей">
+                <div class="form-group">
+                    <label for="modal-run1" class="col-form-label">Рейс:</label>
+                    <select type="text" class="form-control" id="modal-run1" name="run"> </select>
+                </div>
+                <div class="form-group">
+                    <label>Выберите телесистему</label>
+                    <select type="text" name="device" class="form-select">
+                        {% for element in context.telesystem %}
+                        <option>{{element}}</option>
+                        {% endfor %}
+                        <option selected> ----- </option>
+                    </select>
+                </div>
+                <div class="form-group col-md">
+                    <a class="tooltip-test" title="Значения глубины и осей">
                         <label for="depth-text">Данные:</label></a>
-                        <textarea class="form-control" id="depth-text" rows="20" name="data"></textarea>
-                    </div>
+                    <textarea class="form-control" id="depth-text" rows="20" name="data-axes"></textarea>
+                </div>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Закрыть</button>
@@ -178,6 +192,7 @@
                         <label for="modal-run2" class="col-form-label">Рейс:</label>
                         <select type="text" class="form-control" id="modal-run2" name="run"> </select>
                     </div>
+
                     <div class="form-group row">
                         <div class="form-group col-md-4">
                             <a class="tooltip-test" title="Вставте значения глубины">
@@ -214,7 +229,7 @@ $('#data_Modal1').on('show.bs.modal', function (event) {
   var recipient = button.data('whatever') // Извлечь информацию из data-* атрибутов
   var data = button.data('run')
 
-  <!-- Копируем элементы из селектора на основной странице -->
+  <!-- Копируем элементы из селектора на основной странице (рейс)-->
   parent_select= document.getElementById('run-select');
   Array.from(parent_select.options).forEach(function(element){
   opt = document.createElement("option");
@@ -232,7 +247,7 @@ $('#data_Modal2').on('show.bs.modal', function (event) {
   var recipient = button.data('whatever') // Извлечь информацию из data-* атрибутов
   var data = button.data('run')
 
-  <!-- Копируем элементы из селектора на основной странице -->
+  <!-- Копируем элементы из селектора на основной странице (рейс) -->
   parent_select= document.getElementById('run-select');
   Array.from(parent_select.options).forEach(function(element){
   opt = document.createElement("option");
@@ -270,12 +285,6 @@ document.getElementById('run-select').addEventListener('change', function () {
 
     localStorage.setItem("well_id", well_list[num_select]);
     localStorage.setItem("run_id", document.getElementById('run-select').options[num_select].value);
-});
-
-
-<!-- Перенаправление на стринцу с графиками контроля -->
-document.getElementById('data-redirect').addEventListener('click', function () {
-    window.location.href = '{% url 'graph' %}';
 });
 
 

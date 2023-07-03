@@ -83,13 +83,13 @@ def write_data_in_Excel(all_data: dict, filename: str, type: int, Run: object) -
     """
     Well = Run.section.wellbore.well_name
     # построение графика
-    other_data, waste_word = get_graphics(all_data, Well)
+    other_data, waste_word = get_graphics(all_data, Well)  # other_data - тут лежат TVD, угол, азимут
 
     file_folder = file_dir + '\\Шаблон\\' + filename
     excel_file = openpyxl.load_workbook(file_folder)
     # print(all_data['Статические замеры ННБ'])
     # print(all_data['Статические замеры ИГИРГИ'])
-    hor, ver, common = write_data(excel_file,    # горизонтальные, вертикальные, общие отходы
+    hor, ver, common = write_data(excel_file,  # горизонтальные, вертикальные, общие отходы
                                   all_data['Статические замеры ННБ'],
                                   all_data['Статические замеры ИГИРГИ'],
                                   other_data,
@@ -183,15 +183,19 @@ def write_data(excel: openpyxl.workbook.workbook.Workbook,
     Well = Run.section.wellbore.well_name
 
     excel_sheet = excel['Данные']
-    write_hat(excel['Данные'], Well)
+    write_hat(excel['Данные'], Well)  # шапка для страницы
     row = 18
 
-    table_hat(excel['Данные'], Well)
+    table_hat(excel['Данные'], Well)  # шапка для таблицы
 
+    count = 0  # первую стрчоку не выводим
     # запись в ячейки
     for meas in zip(igirgi['Глубина'], igirgi['Угол'], igirgi['Азимут'], nnb['Угол'], nnb['Азимут'],
                     other['igirgi_TVDSS'], other['igirgi_delta_x'], other['igirgi_delta_y'], other['igirgi_TVD'],
                     other['nnb_delta_x'], other['nnb_delta_y'], other['nnb_TVD'], ):
+        if count == 0:
+            count += 1
+            continue
         # excel_sheet.cell(row=row, column=1).value = Run.run_number  # Номер рейса
         excel_sheet.cell(row=row, column=1).value = round(meas[0], 2)  # Глубина
         excel_sheet.cell(row=row, column=2).value = round(meas[1], 2)  # Зенитный угол
@@ -199,7 +203,8 @@ def write_data(excel: openpyxl.workbook.workbook.Workbook,
         if Well.dec is None:
             excel_sheet.cell(row=row, column=4).value = '-'  # Азимут магнитный
         else:
-            excel_sheet.cell(row=row, column=4).value = round(meas[2] - Well.total_correction, 2)  # Азимут магнитный
+            excel_sheet.cell(row=row, column=4).value = '%.2f' % round(meas[2] - Well.total_correction,
+                                                                       2)  # Азимут магнитный
 
         excel_sheet.cell(row=row, column=5).value = round(meas[5], 2)  # Абсолютная отметка TVDSS
         excel_sheet.cell(row=row, column=6).value = round(meas[3], 2)  # ННБ зенитный угол
@@ -222,10 +227,9 @@ def write_data(excel: openpyxl.workbook.workbook.Workbook,
             sqrt((X_nnb - X_igirgi) ** 2 + (Y_nnb - Y_igigri) ** 2 +
                  (meas[11] - meas[8]) ** 2), 2)
 
-        if row == (17 + len(igirgi['Глубина'])):  # забираем последнии значения отходов
+        if row == (17 + len(igirgi['Глубина'])-1):  # забираем последнии значения отходов
             return round(sqrt((X_nnb - X_igirgi) ** 2 + (Y_nnb - Y_igigri) ** 2), 2), round(meas[11] - meas[8], 2), \
                    round(sqrt((X_nnb - X_igirgi) ** 2 + (Y_nnb - Y_igigri) ** 2 + (meas[11] - meas[8]) ** 2), 2)
-
         row += 1
 
 

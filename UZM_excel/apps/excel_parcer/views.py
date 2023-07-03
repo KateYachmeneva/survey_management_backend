@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.core.files.storage import FileSystemStorage
 
 from UZM_excel.conf import server_ip
@@ -20,6 +20,7 @@ def index(request):
                "wells_id": list(),  # повторяет run только с индексами скважин
                'selected_run': 'None',
                'error_depth': list(),  # глубины замеров при вставке которых нашли ошибку
+               "telesystem": Device.objects.all(),
                }
     for run in context['run']:
         context['wells_id'].append(run.section.wellbore.well_name.id)
@@ -31,37 +32,51 @@ def index(request):
         context['data'] = Data.objects.filter(run=request.POST['run'], in_statistics=1).order_by('depth')
         context['selected_run'] = current_run
 
-        if 'data' in request.POST:  # Модальная форма с ОСЯМИ
-            axes_data = request.POST['data'].replace(',', '.').replace(' ', '').replace('\r', '').replace('\n', '\t') \
+        if 'data-axes' in request.POST:  # Модальная форма с ОСЯМИ
+            axes_data = request.POST['data-axes'].replace(',', '.').replace(' ', '').replace('\r', '').replace('\n',
+                                                                                                               '\t') \
                 .split('\t')
+            print(axes_data)
             counter = 0
+            manually_bz = list()
+            manually_by = list()
+            manually_bx = list()
+            manually_gz = list()
+            manually_gy = list()
+            manually_gx = list()
+            manually_depth = list()
             for data in axes_data:
                 if data == '':
                     continue
                 if counter == 0:
-                    obj = Data.objects.get_or_create(run=current_run, depth=data)[0]
+                    manually_depth.append(data)
                 elif counter == 1:
-                    obj.CX = data
+                    manually_gx.append(data)
                 elif counter == 2:
-                    obj.CY = data
+                    manually_gy.append(data)
                 elif counter == 3:
-                    obj.CZ = data
+                    manually_gz.append(data)
                 elif counter == 4:
-                    obj.BX = data
+                    manually_bx.append(data)
                 elif counter == 5:
-                    obj.BY = data
+                    manually_by.append(data)
                 else:
-                    obj.BZ = data
-                    obj.in_statistics = 1
-                    obj.save()
+                    manually_bz.append(data)
                 counter = (0 if counter == 6 else counter + 1)
-
+            # result - считанные данные
+            result = zip(manually_depth, manually_gx, manually_gy, manually_gz, manually_bx, manually_by, manually_bz)
+            if request.POST.get('device') != '-----':
+                result2 = new_measurements(list(result), request.POST.get('device'))  # перобразованные данные
+                write_to_bd(result2, current_run)
+            else:
+                write_to_bd(result, current_run)
+            print(current_run)
         if 'depth' in request.POST:  # Модальная форма с  Скорректированными значениями
-            depth_data = request.POST['depth'].replace(',', '.').replace(' ', '').replace('\r', '').\
+            depth_data = request.POST['depth'].replace(',', '.').replace(' ', '').replace('\r', ''). \
                 replace('\n', '\t').split('\t')
-            Btotal_data = request.POST['Btotal_corr'].replace(',', '.').replace(' ', '').replace('\r', '').\
+            Btotal_data = request.POST['Btotal_corr'].replace(',', '.').replace(' ', '').replace('\r', ''). \
                 replace('\n', '\t').split('\t')
-            DIP_data = request.POST['DIP_corr'].replace(',', '.').replace(' ', '').replace('\r', '').\
+            DIP_data = request.POST['DIP_corr'].replace(',', '.').replace(' ', '').replace('\r', ''). \
                 replace('\n', '\t').split('\t')
             for meas in zip(depth_data, Btotal_data, DIP_data):
                 if meas[0] != '' and meas[1] != '' and meas[2] != '':
@@ -72,8 +87,59 @@ def index(request):
                         obj.save()
                     except:
                         context['error_depth'].append(float(meas[0]))
-
     return render(request, 'excel_parcer/data.html', {'context': context, })
+
+
+def edit_index(request):
+    """Редактировать таблицу с осями и скорректирвоанными значениями"""
+    context = {"title": 'Оси',
+               'selected_run': 'None',
+               }
+
+    if request.method == 'GET':
+        if request.GET.get('run_id'):
+            current_run = Run.objects.get(id=request.GET.get('run_id'))
+            context['well'] = current_run.section.wellbore.well_name
+            context['data'] = Data.objects.filter(run=current_run, in_statistics=1).order_by('depth')
+            context['selected_run'] = request.GET.get('run_id')
+
+    # FIXME
+    if request.method == 'POST':
+        for items in request.POST.lists():
+            print(items)
+            key = str(items[0]).split(' ')
+            obj = Data.objects.get(id=key[0])
+            if items[1][0] == '':
+                if key[1] == 'btotal':
+                    obj.Btotal_corr = None
+                    obj.save()
+                elif key[1] == 'dip':
+                    obj.DIP_corr = None
+                    obj.save()
+                else:
+                    obj.delete()
+            else:
+                if key[1] == 'depth':
+                    obj.depth = items[1][0]
+                elif key[1] == 'gx':
+                    obj.CX = items[1][0]
+                elif key[1] == 'gy':
+                    obj.CY = items[1][0]
+                elif key[1] == 'gz':
+                    obj.CZ = items[1][0]
+                elif key[1] == 'bx':
+                    obj.BX = items[1][0]
+                elif key[1] == 'by':
+                    obj.BY = items[1][0]
+                elif key[1] == 'bz':
+                    obj.BZ = items[1][0]
+                elif key[1] == 'btotal':
+                    obj.Btotal_corr = items[1][0]
+                elif key[1] == 'dip':
+                    obj.DIP_corr = items[1][0]
+                obj.save()
+        return redirect('axes')
+    return render(request, 'excel_parcer/edit_data.html', {'context': context, })
 
 
 def file(request):

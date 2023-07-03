@@ -64,6 +64,14 @@ class Data(models.Model):
         verbose_name = 'Данные'
         verbose_name_plural = 'Данные'
 
+    def Btotal_corrFix(self):
+        """Округленное значение"""
+        return round(self.Btotal_corr, 4) if self.Btotal_corr is not None else '-'
+
+    def DIP_corrFix(self):
+        """Округленное значение"""
+        return round(self.Btotal_corr, 2) if self.Btotal_corr is not None else '-'
+
     def Gtotal(self):
         return round(sqrt(self.CX ** 2 + self.CY ** 2 + self.CZ ** 2), 5)
 
@@ -93,6 +101,7 @@ class Data(models.Model):
                      , 2)
         return azim if azim > 0 else round(azim + 360, 2)
 
+    # Отображение на страницу в input type="number" не поддерживает .
     def depth_dot(self) -> str:
         return str(self.depth).replace(",", ".")
 
@@ -113,6 +122,12 @@ class Data(models.Model):
 
     def BZ_dot(self) -> str:
         return str(self.BZ).replace(",", ".")
+
+    def Btotal_corr_dot(self) -> float:
+        return str(self.Btotal_corr).replace(",", ".")
+
+    def DIP_corr_dot(self) -> float:
+        return str(self.DIP_corr).replace(",", ".")
 
     def get_goxy(self) -> float:
         return sqrt(self.CX ** 2 + self.CY ** 2)
