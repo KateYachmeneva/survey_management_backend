@@ -218,33 +218,33 @@ let undBtnDip = document.getElementById('undoDip');
 
 // Goxy-Gz
 
-const depthGoxy = {{ context.depthGoxy | safe }};
-const depthGz = {{ context.depthGz | safe }};
+const depthGoxy = {{ context.depthGoxy | safe }}.sort(field_sort);
+const depthGz = {{ context.depthGz | safe }}.sort(field_sort);
 
 // Gtotal
-const depthGref = {{ context.depthGref | safe }};
-const depthGtotal = {{ context.depthGtotal | safe }};
+const depthGref = {{ context.depthGref | safe }}.sort(field_sort);
+const depthGtotal = {{ context.depthGtotal | safe }}.sort(field_sort);
 
 
 
 // Boxy-Bz
-const depthBoxy = {{ context.depthBoxy | safe }};
-const depthBz = {{ context.depthBz | safe }};
+const depthBoxy = {{ context.depthBoxy | safe }}.sort(field_sort);
+const depthBz = {{ context.depthBz | safe }}.sort(field_sort);
 
 
 // Btotal
-const depthBref = {{ context.depthBref | safe }};
-const depthBraw = {{ context.depthBtotal | safe }};
-const depthBcorr = {{ context.depthBcorr | safe }};
+const depthBref = {{ context.depthBref | safe }}.sort(field_sort);
+const depthBraw = {{ context.depthBtotal | safe }}.sort(field_sort);
+const depthBcorr = {{ context.depthBcorr | safe }}.sort(field_sort);
 
 
 // HSTF
-const depthHSTF = {{ context.depthHSTF | safe }};
+const depthHSTF = {{ context.depthHSTF | safe }}.sort(field_sort);
 
 //DIP
-const depthDipref = {{ context.depthDipref | safe }};
-const depthDipraw = {{ context.depthDipraw | safe }};
-const depthDipcorr = {{ context.depthDipcorr | safe }};
+const depthDipref = {{ context.depthDipref | safe }}.sort(field_sort);
+const depthDipraw = {{ context.depthDipraw | safe }}.sort(field_sort);
+const depthDipcorr = {{ context.depthDipcorr | safe }}.sort(field_sort);
 
 
 //обработка отправки формы
@@ -1497,6 +1497,19 @@ new Chart(grafica6,
       },
     },
   });
+
+<!-- Обработчик для сортировки-->
+function field_sort(a,b){
+if (a.x > b.x) {
+    return 1;
+  }
+  if (a.x < b.x) {
+    return -1;
+  }
+  // a должно быть равным b
+  return 0;
+};
+
 
 <!--Записываем выбранную кважину-->
 document.getElementById('well-select').addEventListener('change', function () {

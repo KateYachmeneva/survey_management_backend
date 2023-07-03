@@ -70,7 +70,6 @@ def index(request):
                 write_to_bd(result2, current_run)
             else:
                 write_to_bd(result, current_run)
-            print(current_run)
         if 'depth' in request.POST:  # Модальная форма с  Скорректированными значениями
             depth_data = request.POST['depth'].replace(',', '.').replace(' ', '').replace('\r', ''). \
                 replace('\n', '\t').split('\t')

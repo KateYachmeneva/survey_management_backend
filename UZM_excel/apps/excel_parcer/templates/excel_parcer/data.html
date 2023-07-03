@@ -154,7 +154,7 @@
                 </div>
                 <div class="form-group">
                     <label>Выберите телесистему</label>
-                    <select type="text" name="device" class="form-select">
+                    <select type="text" name="device" class="form-select" id="device-select">
                         {% for element in context.telesystem %}
                         <option>{{element}}</option>
                         {% endfor %}
@@ -195,17 +195,17 @@
 
                     <div class="form-group row">
                         <div class="form-group col-md-4">
-                            <a class="tooltip-test" title="Вставте значения глубины">
+                            <a class="tooltip-test" title="Вставьте значения глубины">
                             <label for="depth-text">Глубина:</label></a>
                             <textarea class="form-control"  rows="15" name="depth"></textarea>
                         </div>
                         <div class="form-group col-md-4">
-                            <a class="tooltip-test" title="Вставте значения Btotal_corr">
+                            <a class="tooltip-test" title="Вставьте значения Btotal_corr">
                             <label>Btotal_corr:</label></a>
                             <textarea class="form-control"  rows="15" name="Btotal_corr"></textarea>
                         </div>
                         <div class="form-group col-md-4">
-                            <a class="tooltip-test" title="Вставте значения DIP_corr">
+                            <a class="tooltip-test" title="Вставьте значения DIP_corr">
                             <label>DIP_corr:</label></a>
                             <textarea class="form-control" rows="15" name="DIP_corr"></textarea>
                         </div>
@@ -223,7 +223,7 @@
 
 <script>
 
-<!--Функция для модального окна 1-->
+<!--Функция для модального окна 1 (Добавление осей)-->
 $('#data_Modal1').on('show.bs.modal', function (event) {
   var button = $(event.relatedTarget) // Кнопка которая запускает модальное окно
   var recipient = button.data('whatever') // Извлечь информацию из data-* атрибутов
@@ -239,9 +239,21 @@ $('#data_Modal1').on('show.bs.modal', function (event) {
   });
   document.getElementById('modal-run1').options[parent_select.selectedIndex].selected = true;
 
+  <!-- Индекс телесистемы  -->
+  var params = new FormData();
+  params.set('run_title', localStorage.getItem("run_id"));
+
+  console.log('http://'+window.location.hostname+':'+window.location.port+'/axes/run_index')
+  fetch('http://'+window.location.hostname+':'+window.location.port+'/axes/run_index', {
+       method: 'POST',
+       body: params }).then(response=>response.json())
+       .then(data=>{console.log(data);
+                    document.getElementById("device-select").value=data.device;
+                   })
+
 })
 
-<!--Функция для модального окна 2-->
+<!--Функция для модального окна 2 (Добавление скорректированных значений)-->
 $('#data_Modal2').on('show.bs.modal', function (event) {
   var button = $(event.relatedTarget) // Кнопка которая запускает модальное окно
   var recipient = button.data('whatever') // Извлечь информацию из data-* атрибутов

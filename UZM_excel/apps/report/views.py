@@ -57,7 +57,7 @@ def report(request):
 # report/api/get_file
 def get_file(request):
     """Пролучаем файл по имени """
-    print('Взять файл')
+    print('Беру отчёт с сервера!')
     file_name = request.POST['name']
     file_dir = os.getcwd() + "\\files"
     return FileResponse(open(file_dir + "\\Report_out\\" + file_name, 'rb'))

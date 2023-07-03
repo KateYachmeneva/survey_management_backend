@@ -70,7 +70,7 @@ class Data(models.Model):
 
     def DIP_corrFix(self):
         """Округленное значение"""
-        return round(self.Btotal_corr, 2) if self.Btotal_corr is not None else '-'
+        return round(self.DIP_corr, 2) if self.DIP_corr is not None else '-'
 
     def Gtotal(self):
         return round(sqrt(self.CX ** 2 + self.CY ** 2 + self.CZ ** 2), 5)
