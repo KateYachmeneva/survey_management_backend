@@ -1,7 +1,5 @@
 from django.shortcuts import render, redirect
 from django.core.files.storage import FileSystemStorage
-
-from UZM_excel.conf import server_ip
 from .function.functions import *
 
 from django.http import JsonResponse, HttpResponse
@@ -27,7 +25,10 @@ def index(request):
 
     if request.method == 'POST':
         # получение данных для отображения
-        current_run = Run.objects.get(id=request.POST['run'])
+        try:
+            current_run = Run.objects.get(id=request.POST['run'])
+        except:
+            return render(request, 'excel_parcer/data.html', {'context': context, })
         context['well'] = current_run.section.wellbore.well_name
         context['data'] = Data.objects.filter(run=request.POST['run'], in_statistics=1).order_by('depth')
         context['selected_run'] = current_run
@@ -146,7 +147,6 @@ def file(request):
     context = {"telesystem": Device.objects.all(),
                "run": get_all_run(),
                "title": 'Загрузка осей',
-               'server_ip': server_ip,  # для прокидывания fetch запросов js
                }
 
     if request.method == 'POST':

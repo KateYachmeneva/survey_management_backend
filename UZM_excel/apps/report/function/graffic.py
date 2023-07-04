@@ -56,7 +56,7 @@ def getVerticalAxes(NS2: int, EW2: int, VSaz: int) -> int:
     return Vsect2, ClsDisp2
 
 
-def get_graph_data(I: list, A: list, Depth: list, RKB: int, VSaz: int = 1) -> list:
+def get_graph_data(I: list, A: list, Depth: list, RKB: int = 84, VSaz: int = 1) -> list:
     """
     I - угол
     А - азимут

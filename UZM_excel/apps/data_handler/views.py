@@ -8,8 +8,7 @@ from report.function.work_with_data import work_with_plan
 from Field.views_api import get_tree
 from .function.context_editer import *
 from .function.mail import *
-from report.function.work_with_Excel import write_data_in_Excel
-from UZM_excel.conf import server_ip
+from report.function.model_service import waste
 
 
 def index(request):
@@ -25,16 +24,17 @@ def index(request):
 
 def traj(request):
     """Страница с траекторией ННБ и ИГиРГИ"""
-    context = {"title": 'Траектория',
-               "active": 'traj',
-               "tree": get_tree(),
-               "server_ip": server_ip,
-               }
-    # print(context['tree'])
+    context = {"title": 'Траектория', "active": 'traj',
+               "tree": get_tree(),}
+
     if request.method == "GET":
         if request.GET.get('run_id') is not None:  # если в get запросе не run_id выводим пустую страницу
             run_id = request.GET.get('run_id')
-            run = Run.objects.get(id=run_id)
+            try:
+                run = Run.objects.get(id=run_id)
+            except:  # если не нашли рейс возвращаем пустую страницу
+                return render(request, 'data_handler/trajectories.html', {'context': context, })
+
             context['selected_obj'] = str(run)  # для отображения текущей модели на странице
             context['selected_id'] = run_id  # для перенаправления по id на редактирование
 
@@ -42,6 +42,11 @@ def traj(request):
 
             context["igirgi_data"] = IgirgiStatic.objects.filter(run=run_id)
             context["nnb_data"] = StaticNNBData.objects.filter(run=run_id)
+            context["waste_index"] = list()
+            for ind, data in enumerate(IgirgiStatic.objects.filter(run__section__wellbore__well_name=run.section.wellbore.well_name).order_by('depth')):
+                if data in context['igirgi_data']:
+                    context["waste_index"].append(ind)
+            context["waste_hor"], context["waste_vert"], context["waste_common"] = waste(run.section.wellbore.well_name, 1)
             runs = Run.objects.filter(section__wellbore__well_name=run.section.wellbore.well_name)
             context["plan_ex"] = (True if len(Plan.objects.filter(run__in=runs)) != 0 else False)
             context['letter'] = Letter(run.section.wellbore.well_name)

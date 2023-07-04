@@ -4,7 +4,6 @@ from django.http import JsonResponse, FileResponse
 from django.shortcuts import render, redirect
 
 # Create your views here.
-from UZM_excel.conf import server_ip
 from .function.api_func import get_index
 from .function.model_service import get_data
 from .function.work_with_Excel import write_data_in_Excel
@@ -16,8 +15,7 @@ def index(request):
     """Главная страница для генератора отчетов"""
 
     context = {"title": 'Отчет',
-               "run": get_all_run(),
-               'server_ip': server_ip}
+               "run": get_all_run(),}
 
     if request.method == 'POST':
         index_id = rewrite_ReportIndex(request.POST.dict())  # перезапись индексов, получаем id текущего рейса

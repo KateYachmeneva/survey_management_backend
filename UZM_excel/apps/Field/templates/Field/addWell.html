@@ -62,7 +62,7 @@
          var params = new FormData();
          params.set('field_id', e.target.value);
 
-         fetch('http://{{ context.server_ip }}/main_data/api/get_pad',
+         fetch('http://'+window.location.hostname+':'+window.location.port+'/main_data/api/get_pad',
          { method: 'POST', body: params })
          .then(response=>response.json()).
          then(data=>{
@@ -86,7 +86,7 @@
          var params = new FormData();
          params.set('do_id', e.target.value);
 
-         fetch('http://{{ context.server_ip }}/main_data/api/get_field',
+         fetch('http://'+window.location.hostname+':'+window.location.port+'/main_data/api/get_field',
          { method: 'POST', body: params })
          .then(response=>response.json()).
          then(data=>{
@@ -100,7 +100,7 @@
                         if (Object.keys(data).length == 1) {
                             var params = new FormData();
                             params.set('field_id', Object.keys(data)[0]);
-                            fetch('http://{{ context.server_ip }}/main_data/api/get_pad',
+                            fetch('http://'+window.location.hostname+':'+window.location.port+'/main_data/api/get_pad',
                             { method: 'POST', body: params })
                             .then(response=>response.json()).
                             then(data=>{

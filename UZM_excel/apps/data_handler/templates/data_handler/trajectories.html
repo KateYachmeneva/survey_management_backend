@@ -1,5 +1,6 @@
 {% extends 'data_handler/index.html' %}
-{% load static%}
+{% load static %}
+{% load index %}
 
 {%  block header %}
 <!--для скрола таблицы-->
@@ -30,7 +31,7 @@
         </label>
 
     </div>
-    <div class="col-4" style="text-align: right;">
+    <div class="col-5" style="text-align: right;">
         {% block top_button%}
         <br>
         {% if context.selected_id is not None %}
@@ -71,12 +72,12 @@
     {% endblock %}
 
 <!-- ТАБЛИЦА -->
-<div class="scroll-table" >
+<div class="scroll-table" style="margin-top: 0.5%;">
     <div class="scroll-table-head">
-        <div class="row align-items-start ">
+        <div class="row align-items-start">
 
-            <div class="col-5">
-                <table class="table table-light  table-bordered table-hover" style="margin-top:2%;">
+            <div class="col-3">
+                <table class="table table-light table-sm table-bordered table-hover" style="">
                     <thead class="thead-dark">
                     <tr>
                         <th scope="col" colspan="3">Данные ННБ</th>
@@ -89,11 +90,8 @@
                     </thead>
                 </table>
             </div>
-
-            <div class="col-1"> </div>
-
-            <div class="col-5">
-                <table class="table table-light  table-bordered table-hover" style="margin-top:2%;">
+            <div class="col-3">
+                <table class="table table-light table-sm table-bordered table-hover" style="">
                     <thead class="thead-dark">
                     <tr>
                         <th scope="col" colspan="3">Данные ИГиРГИ</th>
@@ -106,42 +104,75 @@
                     </thead>
                 </table>
             </div>
-        <div class="col-1"> </div>
-    </div>
-    </div>
-    <div class="scroll-table-body">
-        <div class="row align-items-start ">
-            <div class="col-5">
-                <table name="table-data" class="table table-light  table-bordered table-hover" style="margin-top:2%;">
-                    <tbody>
-                    {% for meas in context.igirgi_data%}
-                    {% block data_tr1%}
+            <div class="col-6">
+                <table class="table table-light table-sm table-bordered table-hover" style="">
+                    <thead class="thead-dark">
                     <tr>
-                        <td scope="col">{{meas.depth}}</td>
-                        <td scope="col">{{meas.corner}}</td>
-                        <td scope="col">{{meas.azimut}}</td>
+                        <th scope="col" colspan="2">Разница</th>
+                        <th scope="col" colspan="3">Отходы</th>
                     </tr>
-                    {% endblock %}
-                    {% endfor %}
-                    </tbody>
+                    <tr >
+                        <th scope="col">∆Угол</th>
+                        <th scope="col">∆Азимут</th>
+                        <th scope="col">По горизонтали</th>
+                        <th scope="col">По вертикали</th>
+                        <th scope="col">Общий</th>
+                    </tr>
+                    </thead>
                 </table>
             </div>
-            <div class="col-1"> </div>
-            <div class="col-5">
-                <table name="table-data" class="table table-light  table-bordered table-hover" style="margin-top:2%;">
+    </div>
+    </div>
+    <div class="scroll-table-body" style="margin-top:0.1%;">
+        <div class="row align-items-start ">
+            <div class="col-3">
+                <table name="table-data" class="table table-light table-sm table-bordered table-hover">
                     <tbody>
                     {% for meas in context.nnb_data%}
                     {% block data_tr2%}
                     <tr>
-                        <td scope="col">{{meas.depth}}</td>
-                        <td scope="col">{{meas.corner}}</td>
-                        <td scope="col">{{meas.azimut}}</td>
+                        <td id="nnb_depth{{ forloop.counter0 }}" scope="col">{{meas.depth}}</td>
+                        <td id="nnb_cor{{ forloop.counter0 }}" scope="col">{{meas.corner}}</td>
+                        <td id="nnb_azimut{{ forloop.counter0 }}" scope="col">{{meas.azimut}}</td>
                     </tr>
                     {% endblock %}
                     {% endfor %}
                     </tbody>
                 </table>
             </div>
+            <div class="col-3">
+                <table name="table-data" class="table table-light table-sm table-bordered table-hover">
+                    <tbody>
+                    {% for meas in context.igirgi_data%}
+                    {% block data_tr1%}
+                    <tr>
+                        <td id="igirgi_depth{{ forloop.counter0 }}" scope="col">{{meas.depth}}</td>
+                        <td id="igirgi_cor{{ forloop.counter0 }}" scope="col">{{meas.corner}}</td>
+                        <td id="igirgi_azimut{{ forloop.counter0 }}" scope="col">{{meas.azimut}}</td>
+                    </tr>
+                    {% endblock %}
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            <div class="col-6">
+                <table name="table-data" class="table table-light table-sm table-bordered table-hover">
+                    <tbody>
+                    {% for ind in context.waste_index %}
+                    <tr>
+                        <td id="delta_cor{{ forloop.counter0 }}" name="delta1" scope="col"></td>
+                        <td id="delta_azimut{{ forloop.counter0 }}" name="delta2" scope="col"></td>
+                        <td name="waste1" scope="col">{{ context.waste_hor|index:ind }}</td>
+                        <td name="waste2" scope="col">{{ context.waste_vert|index:ind }}</td>
+                        <td name="waste3" scope="col">{{ context.waste_common|index:ind }}</td>
+                    </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+
+
         </div>
     </div>
 </div>
@@ -153,15 +184,14 @@
 
 {% if context.selected_id is not None %} <!-- Не отображать кнопки добавления без выбранного рейса-->
 <div class="row" style="margin-top:0.5em;margin-right:0.1em;">
-    <div class="col-5" style="text-align: right">
+    <div class="col-3" style="text-align: right">
        <button type="button" class="" placeholder="" data-toggle="modal" data-target="#data_Modal1" style="width:100%"
                 data-whatever="ННБ" data-run="{{context.selected_obj}}">
             Добавить значения
         </button>
 
     </div>
-    <div class="col-1"> </div>
-    <div class="col-5" style="text-align: right;">
+    <div class="col-3" style="text-align: right;">
         <button type="button" class="" placeholder="" data-toggle="modal" data-target="#data_Modal1" style="width:100%"
                data-whatever="ИГиРГИ" data-run="{{context.selected_obj}}">
             Добавить значения
@@ -297,7 +327,7 @@ function Send_mail() {
     params.set('run_id', {{context.selected_id}});
 
 
-    fetch('http://{{ context.server_ip }}/report/api/file_name',
+    fetch('http://'+window.location.hostname+':'+window.location.port+'/report/api/file_name',
     { method: 'POST', body: params })
     .then(response=>response.json()).
     then(data=>{
@@ -308,7 +338,7 @@ function Send_mail() {
             params = new FormData();
             params.set('name', FileName);
             <!--  Скачиваем файл  -->
-            fetch('http://{{ context.server_ip }}/report/api/get_file',
+            fetch('http://'+window.location.hostname+':'+window.location.port+'/report/api/get_file',
             { method: 'POST', body: params })
             .then(response=>response.blob()).
             then(data=>{
@@ -391,7 +421,7 @@ $('#data_Modal2').on('show.bs.modal', function (event) {
 
   var params = new FormData();
   params.set('run_id', {{context.selected_id}});
-  fetch('http://{{ context.server_ip }}/report/api/run_index', { method: 'POST', body: params })
+  fetch('http://'+window.location.hostname+':'+window.location.port+'/report/api/run_index', { method: 'POST', body: params })
          .then(response=>response.json()).
          then(data=>{
          console.log(data);
@@ -407,6 +437,23 @@ $('#data_Modal2').on('show.bs.modal', function (event) {
   var modal = $(this)
   document.getElementById('run_name').value = run_name;
 })
+
+<!-- Загрзка страницы-->
+window.addEventListener('load', () => {
+    <!--  Разность углов  -->
+    document.getElementsByName('delta1').forEach(function(element, ind){
+        element.innerHTML = (parseFloat(document.getElementById('igirgi_cor'+ind).innerHTML.replace(",", "."))-
+        parseFloat(document.getElementById('nnb_cor'+ind).innerHTML.replace(",", "."))).toFixed(2);
+        })
+
+    <!--  Разность азимутов  -->
+    document.getElementsByName('delta2').forEach(function(element, ind){
+        element.innerHTML = (parseFloat(document.getElementById('igirgi_azimut'+ind).innerHTML.replace(",", "."))-
+        parseFloat(document.getElementById('nnb_azimut'+ind).innerHTML.replace(",", "."))).toFixed(2);
+        })
+
+
+});
 
 </script>
 {% endblock %}

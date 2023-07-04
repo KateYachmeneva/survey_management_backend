@@ -206,7 +206,7 @@
         var params = new FormData();
         params.set('run_title', e.target.value);
 
-        fetch('http://{{ context.server_ip }}/axes/run_index', {
+        fetch('http://'+window.location.hostname+':'+window.location.port+'/axes/run_index', {
         method: 'POST',
         body: params }).then(response=>response.json())
         .then(data=>{console.log(data);
