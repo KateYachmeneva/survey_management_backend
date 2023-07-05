@@ -4,12 +4,12 @@ from report.function.model_service import last_depth, waste
 class BodyData:
     """ Даннные под тело письма get_body - формирует текст письма"""
 
-    def __init__(self, Well: object):
+    def __init__(self, Wellbore: object):
         """Создание тела письма"""
-        self.field = Well.pad_name.field.field_name
-        self.pad = Well.pad_name.pad_name
-        self.well = Well.well_name
-        self.depth = last_depth(Well)
+        self.field = Wellbore.well_name.pad_name.field.field_name
+        self.pad = Wellbore.well_name.pad_name.pad_name
+        self.well = Wellbore.well_name.well_name
+        self.depth = last_depth(Wellbore)
         self.departure = ''  # Берём отходы в fetch запросе с сервера функция report из report/views
         self.horiz = ''  # Горизантальные отходы
         self.vert = ''  # вертикальные отходы
@@ -18,12 +18,12 @@ class BodyData:
 class Letter:
     """ Здесь хранятся данные для пиьсма """
 
-    def __init__(self, Well: object):
+    def __init__(self, Wellbore: object):
         """ Передаем экземпляр скважины по которой отправляем отчёт """
-        self.data_body = BodyData(Well)
+        self.data_body = BodyData(Wellbore)
         self.subject = 'test'  # тема письма Будет заполянться в js функции при выдаче файла (нужны отходы с отчета)
-        self.mailto = (Well.mail_To if Well.mail_To != '' else 'None')  # кому отправить
-        self.cc = (Well.mail_Cc if Well.mail_Cc != '' else 'None')  # копия
+        self.mailto = (Wellbore.well_name.mail_To if Wellbore.well_name.mail_To != '' else 'None')  # кому отправить
+        self.cc = (Wellbore.well_name.mail_Cc if Wellbore.well_name.mail_Cc != '' else 'None')  # копия
         # тело письма
         self.body = 'Это тело письма'  # get_body() - перезаписывает все переменные ниже
         self.comm_waste = "Это строка с общими отходами"

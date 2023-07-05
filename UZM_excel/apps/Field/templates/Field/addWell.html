@@ -1,9 +1,14 @@
 {% extends 'Field/addModal.html' %}
 {% load static%}
 
+{%  block header %}
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link type="text/css" href="{% static 'css/run/styles.css' %}" rel="stylesheet" />
+    {% load crispy_forms_tags %}
+{% endblock %}
 
 {% block data_field %}
-
 <div class="container__item">
     <label class="container__label" >
         ДО:
@@ -39,11 +44,7 @@
     <div class="container__item">
         {% if f.label == 'Куст' %}  <!-- пропускаем поле Куст (добавили его выше с фильтром) -->
         {% else %}
-        <label class="container__label">
-            {{f.label}}:
-        </label>
-        {{f}}
-        {% if f.help_text != '' %}<li>{{f.help_text}}</li>{% endif %}
+        {{f|as_crispy_field}}
         {% endif %}
     </div>
 

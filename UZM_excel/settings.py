@@ -46,7 +46,9 @@ INSTALLED_APPS = [
     'excel_parcer.apps.ExcelParcerConfig',
     'report.apps.ReportConfig',
     'Field.apps.FieldConfig',
-    'chartjs',
+    'chartjs',  # для графиков
+    'crispy_forms',  # для бутстраповских форм
+    'crispy_bootstrap4',
 ]
 
 MIDDLEWARE = [
@@ -146,3 +148,6 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 CORS_ALLOW_ALL_ORIGINS = True
 CORS_ALLOW_CREDENTIALS = True
+
+
+CRISPY_TEMPLATE_PACK = 'bootstrap4'

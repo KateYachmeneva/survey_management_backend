@@ -1,9 +1,10 @@
 from math import sqrt
-from typing import Union, Iterable
+from typing import Union, Iterable, NoReturn
 
 from ..models import *
 from django.db.models import Max
 from .graffic import *
+from Field.models import Run
 
 
 def get_data(runs: Union[object, Iterable[object]]) -> dict:
@@ -67,19 +68,19 @@ def get_data(runs: Union[object, Iterable[object]]) -> dict:
     return data
 
 
-def last_depth(Well: object):
+def last_depth(Wellbore: object):
     """ Получить последнюю точку замера cкважины"""
-    return IgirgiStatic.objects.filter(run__section__wellbore__well_name=Well).aggregate(Max('depth'))['depth__max']
+    return IgirgiStatic.objects.filter(run__section__wellbore=Wellbore).aggregate(Max('depth'))['depth__max']
 
 
-def waste(Well: object, full: int = 0):
+def waste(Wellbore: object, full: int = 0):
     """ Формируем отходы по последней точке
     Если full то выдает весь массив отходов"""
-    nnb = StaticNNBData.objects.filter(run__section__wellbore__well_name=Well).order_by('depth')
-    igirgi = IgirgiStatic.objects.filter(run__section__wellbore__well_name=Well).order_by('depth')
+    nnb = StaticNNBData.objects.filter(run__section__wellbore=Wellbore).order_by('depth')
+    igirgi = IgirgiStatic.objects.filter(run__section__wellbore=Wellbore).order_by('depth')
 
-    RKB = (84 if Well.RKB is None else Well.RKB)
-    VSaz = (1 if Well.VSaz is None else Well.VSaz)
+    RKB = (84 if Wellbore.well_name.RKB is None else Wellbore.well_name.RKB)
+    VSaz = (1 if Wellbore.well_name.VSaz is None else Wellbore.well_name.VSaz)
     data = {'Угол': list(), 'Азимут': list(), 'Глубина': list()}
 
     for meas in nnb:
@@ -105,8 +106,8 @@ def waste(Well: object, full: int = 0):
                                                                               VSaz=VSaz)
 
     # пошли отходы
-    Ex = (Well.EX if Well.EX is not None else 0)
-    Ny = (Well.NY if Well.NY is not None else 0)
+    Ex = (Wellbore.well_name.EX if Wellbore.well_name.EX is not None else 0)
+    Ny = (Wellbore.well_name.NY if Wellbore.well_name.NY is not None else 0)
 
     if full == 1:
         horiz = list()
@@ -122,7 +123,7 @@ def waste(Well: object, full: int = 0):
 
         if full == 1:
             horiz.append(round(sqrt((X_nnb - X_igirgi) ** 2 + (Y_nnb - Y_igigri) ** 2), 2))
-            vert.append(round(meas[5]-meas[2], 2))
+            vert.append(round(meas[5] - meas[2], 2))
             departure.append(
                 round(sqrt((X_nnb - X_igirgi) ** 2 + (Y_nnb - Y_igigri) ** 2 + (meas[2] - meas[5]) ** 2), 2))
             continue
@@ -132,3 +133,17 @@ def waste(Well: object, full: int = 0):
             sqrt((X_nnb - X_igirgi) ** 2 + (Y_nnb - Y_igigri) ** 2 + (meas[2] - meas[5]) ** 2),
             2)  # отход общий
     return horiz, vert, departure
+
+
+def clone_wellbore_data(old_wellbore: object, new_wellbore: object) -> str:
+    """Клонирование всех замеров старого ствола в новый ствол"""
+    for old_section in old_wellbore.sections.all():
+        for old_run in old_section.runs.all():
+            new_run = Run.objects.get(run_number=old_run.run_number, section__wellbore=new_wellbore)
+
+            for meas in IgirgiStatic.objects.filter(run=old_run):
+                IgirgiStatic.objects.create(run=new_run, depth=meas.depth, corner=meas.corner, azimut=meas.azimut)
+
+            for meas in StaticNNBData.objects.filter(run=old_run):
+                StaticNNBData.objects.create(run=new_run, depth=meas.depth, corner=meas.corner, azimut=meas.azimut)
+    return 'Ok'

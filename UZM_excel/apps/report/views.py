@@ -5,10 +5,10 @@ from django.shortcuts import render, redirect
 
 # Create your views here.
 from .function.api_func import get_index
-from .function.model_service import get_data
+from .function.model_service import get_data, clone_wellbore_data
 from .function.work_with_Excel import write_data_in_Excel
 from .function.work_with_data import rewrite_ReportIndex, work_with_file
-from Field.models import get_all_run, Run
+from Field.models import get_all_run, Run, Wellbore
 
 
 def index(request):
@@ -46,7 +46,7 @@ def report(request):
     """Делаем отчёт по имеющимся данным и отправляем его имя"""
     # по рейсу ищем все остальные рейсы скважины
     run = Run.objects.get(id=request.POST['run_id'])
-    runs = Run.objects.filter(section__wellbore__well_name=run.section.wellbore.well_name)
+    runs = Run.objects.filter(section__wellbore=run.section.wellbore)
     all_data = get_data(runs)
     file_name, waste = write_data_in_Excel(all_data, f'Единая_форма_отчета0.xlsx', 0, run)  # имя файла и отходы
     return JsonResponse({'file_name': file_name, 'waste': waste})
@@ -55,7 +55,16 @@ def report(request):
 # report/api/get_file
 def get_file(request):
     """Пролучаем файл по имени """
-    print('Беру отчёт с сервера!')
+    # print('Беру отчёт с сервера!')
     file_name = request.POST['name']
     file_dir = os.getcwd() + "\\files"
     return FileResponse(open(file_dir + "\\Report_out\\" + file_name, 'rb'))
+
+
+# report/api/wellbore_copy
+def wellbore_copy(request):
+    print('я тут', request.POST)
+    clone_wellbore_data(Wellbore.objects.get(id=request.POST['old_wellbore']), Wellbore.objects.get(id=request.POST['new_wellbore']))
+
+    return JsonResponse({'status': 'ok'})
+

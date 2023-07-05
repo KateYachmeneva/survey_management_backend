@@ -6,7 +6,7 @@
 }
 
 .scroll-body {  /*Скрол по аналогии с таблице для div*/
-	height: 55em;
+	height: 44em;
 	width: 100%;
 	overflow-y: auto;
 	overflow-x: hidden;

@@ -1,7 +1,7 @@
 from django.core.files.storage import FileSystemStorage
 from django.shortcuts import render, redirect
 from pytest import console_main
-from Field.models import Well, Run, get_all_well
+from Field.models import Well, Run, Wellbore, Section, get_all_well
 from excel_parcer.models import Data
 from report.models import StaticNNBData, IgirgiStatic, Plan
 from report.function.work_with_data import work_with_plan
@@ -10,22 +10,20 @@ from .function.context_editer import *
 from .function.mail import *
 from report.function.model_service import waste
 
+from Field.forms import AddWellForm
+
 
 def index(request):
     """Главная страница"""
     context = {"title": 'Работа с данными',
                }
-
-    if request.method == 'POST':
-        pass
-
     return render(request, 'data_handler/index.html', {'context': context, })
 
 
 def traj(request):
     """Страница с траекторией ННБ и ИГиРГИ"""
     context = {"title": 'Траектория', "active": 'traj',
-               "tree": get_tree(),}
+               "tree": get_tree(), }
 
     if request.method == "GET":
         if request.GET.get('run_id') is not None:  # если в get запросе не run_id выводим пустую страницу
@@ -43,13 +41,18 @@ def traj(request):
             context["igirgi_data"] = IgirgiStatic.objects.filter(run=run_id)
             context["nnb_data"] = StaticNNBData.objects.filter(run=run_id)
             context["waste_index"] = list()
-            for ind, data in enumerate(IgirgiStatic.objects.filter(run__section__wellbore__well_name=run.section.wellbore.well_name).order_by('depth')):
+            for ind, data in enumerate(IgirgiStatic.objects.filter(
+                    run__section__wellbore=run.section.wellbore).order_by('depth')):
                 if data in context['igirgi_data']:
                     context["waste_index"].append(ind)
-            context["waste_hor"], context["waste_vert"], context["waste_common"] = waste(run.section.wellbore.well_name, 1)
-            runs = Run.objects.filter(section__wellbore__well_name=run.section.wellbore.well_name)
+            context["waste_hor"], context["waste_vert"], context["waste_common"] = waste(run.section.wellbore, 1)
+            # индексов становиться больше если данных ННБ меньше ИГиРГИ
+            if len(context["igirgi_data"]) != len(context["nnb_data"]):
+                context["waste_index"] = context["waste_index"][:len(context["waste_hor"])]
+            # Ищем план, формируем контекст дял письма
+            runs = Run.objects.filter(section__wellbore=run.section.wellbore)
             context["plan_ex"] = (True if len(Plan.objects.filter(run__in=runs)) != 0 else False)
-            context['letter'] = Letter(run.section.wellbore.well_name)
+            context['letter'] = Letter(run.section.wellbore)
 
     if request.method == 'POST':
         run = Run.objects.get(id=request.GET.get('run_id'))
@@ -126,17 +129,35 @@ def edit_traj(request):
 
 def param(request):
     """Страница с параметрами"""
-    context = {"title": 'Параметры',
-               "active": 'param',
+    context = {"title": 'Параметры', "active": 'param',
                "tree": get_tree(),
+               'form': AddWellForm(request.POST),
+               'cards': list(),  # карточки стволов
                }
-    if request.method == "GET":
-        if request.GET.get('run_id') is not None:
-            run_id = request.GET.get('run_id')
+    if request.GET.get('run_id') is not None:
+        run_id = request.GET.get('run_id')
+        try:  # можем удалить из страницы с run_id самого себя, поэтому если не нашли рейс отображаем пустую страницу
             run = Run.objects.get(id=request.GET.get('run_id'))
-            context['selected_obj'] = str(run)
-            context['selected_id'] = run_id
-            selected_for_tree(context, run)  # для раскрытия списка
+        except:
+            return render(request, 'data_handler/param.html', {'context': context, })
+        # для работы с стволами
+        context["igirgi_data"] = IgirgiStatic.objects.filter(run=run_id)
+        context["wellbore_choices"] = run.section.wellbore.get_choices()
+        context['selected_obj'] = run.section.wellbore.well_name
+        # карточки с стволами
+        for wellbore in Wellbore.objects.filter(well_name=run.section.wellbore.well_name):
+            context['cards'].append(WellboreCard(wellbore))
+    else:
+        return render(request, 'data_handler/param.html', {'context': context, })
+
+    if request.method == "GET":
+        context['form'] = AddWellForm(instance=run.section.wellbore.well_name)
+
+    if request.method == 'POST':
+        if context['form'].is_valid():
+            context['form'].save()
+
+    selected_for_tree(context, run)  # для раскрытия списка
 
     return render(request, 'data_handler/param.html', {'context': context, })
 
@@ -235,3 +256,14 @@ def graph(request):
     }
 
     return render(request, 'data_handler/graph.html', {'context': context, })
+
+
+# вытащить в сервисы
+class WellboreCard:
+    def __init__(self, wellbore):
+        self.id = wellbore.id
+        self.title = wellbore.get_full_wellbore_name
+        runs = Run.objects.filter(section__wellbore=wellbore)
+        self.section_len = Section.objects.filter(wellbore=wellbore).count()
+        self.igirgi_len = IgirgiStatic.objects.filter(run__in=runs).count()
+        self.nnb_len = StaticNNBData.objects.filter(run__in=runs).count()

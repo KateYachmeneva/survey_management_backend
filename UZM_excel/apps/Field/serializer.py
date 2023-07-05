@@ -32,6 +32,7 @@ class ContractorDrillSerializer(serializers.ModelSerializer):
 class WellSerializer(serializers.ModelSerializer):
     client_name = serializers.CharField(source='get_client', read_only=True)
     contractorNNB = serializers.CharField(source='get_contractor', read_only=True)
+    field_name = serializers.CharField(source='get_field_name', read_only=True)
 
     class Meta:
         model = Well

@@ -4,7 +4,7 @@ from django.shortcuts import render, redirect
 # Create your views here.
 from . import serializer
 from .forms import *
-from .models import Client
+from .models import *
 
 
 def add_contractor_nnb(request):
@@ -17,7 +17,7 @@ def add_contractor_nnb(request):
     context = {"title": 'Подрядчик',
                "form": form,
                "method": "add_contractor_nnb",
-               "data": models.ContractorNNB.objects.all().values()}
+               "data": ContractorNNB.objects.all().values()}
     return render(request, 'Field/addModal.html', {'context': context, })
 
 
@@ -31,7 +31,7 @@ def add_contractor_drill(request):
     context = {"title": 'Подрядчик',
                "form": form,
                "method": "add_contractor_drill",
-               "data": models.ContractorDrill.objects.all().values()}
+               "data": ContractorDrill.objects.all().values()}
     return render(request, 'Field/addModal.html', {'context': context, })
 
 
@@ -136,3 +136,25 @@ def add_run(request):
                "form": form,
                "method": "add_run"}
     return render(request, 'Field/addModal.html', {'context': context, })
+
+
+def clone_wellbore(request):
+    # print(request.POST)
+    old_wellbore = Wellbore.objects.get(id=request.POST['wellbore_id'])
+    new_wellbore = Wellbore.objects.create(well_name=old_wellbore.well_name, wellbore=request.POST['wellbore_name'])
+    for old_section in Section.objects.filter(wellbore=old_wellbore):
+        new_section = Section.objects.create(section=old_section.section, wellbore=new_wellbore,
+                                             target_depth=old_section.target_depth)
+        for old_run in Run.objects.filter(section=old_section):
+            new_run = Run.objects.create(run_number=old_run.run_number, section=new_section,
+                                         start_date=old_run.start_date,
+                                         end_date=old_run.end_date,
+                                         start_depth=old_run.start_depth,
+                                         end_depth=old_run.end_depth,
+                                         in_statistics=old_run.in_statistics,
+                                         memory=old_run.memory,
+                                         bha=old_run.bha,
+                                         sag=old_run.sag,
+                                         dd_contractor_name=old_run.dd_contractor_name)
+
+    return JsonResponse({'old_wellbore': old_wellbore.id, 'new_wellbore': new_wellbore.id})

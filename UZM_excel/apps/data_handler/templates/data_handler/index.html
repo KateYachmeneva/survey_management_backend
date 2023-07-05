@@ -11,8 +11,9 @@
 .link {
   text-decoration: none;
 }
+body{
+    overflow: hidden;}
 </style>
-
 
 <nav class="navbar navbar-expand-lg navbar-light bg-light">
   <div class="container-fluid">
@@ -96,7 +97,7 @@
                                                                                         <ul class="btn-toggle-nav">
                                                                                             <!-- Рейс-->
                                                                                             {% for run_dict in section_dict.runs %}
-                                                                                            <li><a href="?run_id={{run_dict.id}}" class="run" {% if run_dict.run_number == context.selected_run and well_dict.well_name == context.selected_well %} style="background-color: #fdb30d;" {% endif %}>{{run_dict.run_number}}</a></li>
+                                                                                            <li><a href="?run_id={{run_dict.id}}" class="run" {% if run_dict.run_number == context.selected_run and well_dict.well_name == context.selected_well and wellbore_dict.wellbore == context.selected_wellbore %} style="background-color: #fdb30d;" {% endif %}>{{run_dict.run_number}}</a></li>
                                                                                             {% endfor %}
                                                                                             <!-- Конец Рейс-->
                                                                                         </ul>
@@ -140,9 +141,7 @@
     </div>
   </div>
 
-<script src="{% static 'js/nav_menu.js'%}"></script>
-<script>
 
-</script>
+<script src="{% static 'js/nav_menu.js'%}"></script>
 {% endblock %}
 

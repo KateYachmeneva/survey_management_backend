@@ -35,4 +35,5 @@ urlpatterns = [
     path('api/', include(router.urls)),
     path('api/get_field', get_field_by_do, name='get_field_by_do'),
     path('api/get_pad', get_pad_by_field, name='run_index'),
+    path('api/wellbore/clone', views.clone_wellbore),
 ]

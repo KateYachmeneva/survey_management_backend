@@ -178,11 +178,11 @@ class Well(models.Model):
     grid_convergence = models.FloatField('Сближение меридианов', null=True, blank=True)
     total_correction = models.FloatField('Общая поправка', null=True, blank=True)
     gtotal = models.FloatField('Напряженность гравитационного поля', null=True, blank=True)
+    critical_azimuth = models.BooleanField('Критический азимут', null=True, blank=True)
     T1_start = models.DateField('Начало сопровождения до Т1', null=True, blank=True)
     T1_end = models.DateField('Начало сопровождения до Т3', null=True, blank=True)
     T3_start = models.DateField('Окончание сопровождения до Т1', null=True, blank=True)
     T3_end = models.DateField('Окончание сопровождения до Т3', null=True, blank=True)
-    critical_azimuth = models.BooleanField('Критический азимут', null=True, blank=True)
     comment = models.TextField('Комментарий', max_length=3000, null=True, blank=True)
     mail_To = models.TextField('Список рассылки почта "Кому"', max_length=3000, null=True, blank=True)
     mail_Cc = models.TextField('Список рассылки почта "Копия"', max_length=3000, null=True, blank=True)
@@ -209,6 +209,9 @@ class Well(models.Model):
         for variant in choices.NORTH_DIRECTION_CHOICES:
             if self.north_direction in variant:
                 return variant[1]
+
+    def get_field_name(self):
+        return self.pad_name.field.field_name
 
     class Meta:
         verbose_name = 'Скважина'
@@ -267,6 +270,10 @@ class Wellbore(models.Model):
         max_length=4,
         choices=choices.WELLBORE_CHOICES,
     )
+
+    def get_choices(self):
+        """Для выпадающих меню"""
+        return choices.WELLBORE_CHOICES
 
     def get_full_wellbore_name(self):
         """Полное имя из выпадающего списка"""
