@@ -31,15 +31,12 @@
         <div class="mx-auto">
             <table  class="table table-light  table-bordered table-hover" name="table_calculation" style="margin-top:2%">
                 <thead class="thead-dark">
-
-                <tr clas="table-warning">
-                    {% for key in context.data.0.keys %}
-                    <th scope="col">{{key}}</th>
-                    {% endfor %}
-                </tr>
-
+                    <tr>
+                        {% for key in context.data.0.keys %}
+                        <th scope="col">{{key}}</th>
+                        {% endfor %}
+                    </tr>
                 </thead>
-
                 <tbody>
                     {% for dict in context.data %}
                     <tr>

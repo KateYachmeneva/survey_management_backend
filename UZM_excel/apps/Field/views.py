@@ -45,7 +45,7 @@ def add_field(request):
     context = {"title": 'Месторождение',
                "form": form,
                "method": "add_field",
-               "data": serializer.FieldnameSerializer(models.Field.objects.all(), many=True).data}
+               "data": serializer.FieldnameSerializer(Field.objects.all(), many=True).data}
     return render(request, 'Field/addModal.html', {'context': context, })
 
 
@@ -59,7 +59,7 @@ def add_pad(request):
     context = {"title": 'Куст',
                "form": form,
                "method": "add_pad",
-               "data": serializer.PadnameSerializer(models.Pad.objects.all(), many=True).data}
+               "data": serializer.PadnameSerializer(Pad.objects.all(), many=True).data}
     return render(request, 'Field/addModal.html', {'context': context, })
 
 

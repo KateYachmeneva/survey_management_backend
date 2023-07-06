@@ -52,7 +52,7 @@
                 <a>Выберите телесистему</a>
                 <p></p>
                 <div class="input-group mb-3">
-                  <select type="text" name="device" class="form-select" id="inputGroupSelect01">
+                  <select type="text" name="device" class="form-select" id="device">
                       {% for element in context.telesystem %}
                         {% if element == context.last_form.device %}
                           <option selected>{{element}}</option>
@@ -61,6 +61,34 @@
                         {% endif %}
                       {% endfor %}
                   </select>
+                </div>
+            </div>
+
+            <hr style="color:#FFC501;margin-top:1%;border-width: 3px">
+
+            <div class="col col-6 align-self-center">
+                <h4 style="margin-top:2%">Коэффициенты пересчёта
+                <a href="{% url 'add_device'%}">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pencil-square" viewBox="0 0 16 16">
+                          <path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z"/>
+                          <path fill-rule="evenodd" d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5v11z"/>
+                        </svg>
+                    </a>
+                </h4>
+
+                <div class="input-group mb-3">
+                    <span class="input-group-text">Gx</span>
+                    <input type="text" class="form-control" name="manually_gx" id="coef_gx" readonly>
+                    <span class="input-group-text">Gy</span>
+                    <input type="text" class="form-control" name="manually_gy" id="coef_gy" readonly>
+                    <span class="input-group-text">Gz</span>
+                    <input type="text" class="form-control" name="manually_gz" id="coef_gz" readonly>
+                    <span class="input-group-text">Bx</span>
+                    <input type="text" class="form-control" name="manually_bx" id="coef_bx" readonly>
+                    <span class="input-group-text">By</span>
+                    <input type="text" class="form-control" name="manually_by" id="coef_by" readonly>
+                    <span class="input-group-text">Bz</span>
+                    <input type="text" class="form-control" name="manually_bz" id="coef_bz" readonly>
                 </div>
             </div>
 
@@ -192,6 +220,7 @@
 </center>
 
 <script>
+    <!--  Смотрим на изменение рейса  -->
     document.getElementsByName("run")[0].addEventListener("change",function(e){
         console.log("Selected" + e.target.value);
          document.getElementById("inp_depth").value = "";
@@ -206,11 +235,12 @@
         var params = new FormData();
         params.set('run_title', e.target.value);
 
+        <!--    Заполнение индексов в полях    -->
         fetch('http://'+window.location.hostname+':'+window.location.port+'/axes/run_index', {
         method: 'POST',
         body: params }).then(response=>response.json())
         .then(data=>{console.log(data);
-                    document.getElementById("inputGroupSelect01").value=data.device;
+                    document.getElementById("device").value=data.device;
                     document.getElementById("inp_depth").value = data.depth;
                     document.getElementById("inp_gx").value = data.GX;
                     document.getElementById("inp_gy").value = data.GY;
@@ -221,10 +251,40 @@
                     document.getElementById("inp_unit").value = data.unit;
                     document.getElementById("inp_string").value = data.string;
                     })
+
+        var params = new FormData();
+        params.set('device_title', document.getElementById("device").value);
+        <!--    Заполнение коэффициентов пересчёта    -->
+        fetch('http://'+window.location.hostname+':'+window.location.port+'/axes/api/coef_device', {
+        method: 'POST',
+        body: params }).then(response=>response.json())
+        .then(data=>{console.log(data);
+                    document.getElementById("coef_gx").value = data.GX;
+                    document.getElementById("coef_gy").value = data.GY;
+                    document.getElementById("coef_gz").value = data.GZ;
+                    document.getElementById("coef_bx").value = data.BX;
+                    document.getElementById("coef_by").value = data.BY;
+                    document.getElementById("coef_bz").value = data.BZ;
+                    });
+
     });
 
-    $('#sortTable3').DataTable();
-
+    <!--  Смотрим на изменение телесистемы  -->
+    document.getElementById("device").addEventListener("change",function(e){
+        var params = new FormData();
+        params.set('device_title', document.getElementById("device").value);
+        <!--    Заполнение коэффициентов пересчёта    -->
+        fetch('http://'+window.location.hostname+':'+window.location.port+'/axes/api/coef_device', {
+        method: 'POST',
+        body: params }).then(response=>response.json())
+        .then(data=>{console.log(data);
+                    document.getElementById("coef_gx").value = data.GX;
+                    document.getElementById("coef_gy").value = data.GY;
+                    document.getElementById("coef_gz").value = data.GZ;
+                    document.getElementById("coef_bx").value = data.BX;
+                    document.getElementById("coef_by").value = data.BY;
+                    document.getElementById("coef_bz").value = data.BZ;
+                    })});
 
 
     <!-- Отслеживаем чтобы пользователь ввел данные -->

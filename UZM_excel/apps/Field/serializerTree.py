@@ -18,7 +18,7 @@ class SectionNameSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Section
-        fields = ['section', 'runs', ]
+        fields = ['id','section', 'runs', ]
 
 
 class WellboreNameSerializer(serializers.ModelSerializer):
@@ -28,7 +28,7 @@ class WellboreNameSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Wellbore
-        fields = ['wellbore', 'sections', ]
+        fields = ['id', 'wellbore', 'sections', ]
 
     def get_wellbore(self, obj):
         return obj.get_full_wellbore_name()
@@ -40,7 +40,7 @@ class WellNameSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Well
-        fields = ['well_name', 'wellbores', ]
+        fields = ['id','well_name', 'wellbores', ]
 
 
 class PadNameSerializer(serializers.ModelSerializer):
@@ -68,7 +68,7 @@ class Tree(serializers.ModelSerializer):
     class Meta:
         model = Client
         depth = 6
-        fields = ['client', 'fields', ]
+        fields = ['id','client', 'fields', ]
 
     def get_client(self, obj):
         return str(obj)

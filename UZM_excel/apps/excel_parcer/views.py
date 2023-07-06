@@ -1,5 +1,7 @@
 from django.shortcuts import render, redirect
 from django.core.files.storage import FileSystemStorage
+
+from .forms import AddDeviceForm
 from .function.functions import *
 
 from django.http import JsonResponse, HttpResponse
@@ -177,6 +179,42 @@ def file(request):
             write_to_bd(result2, current_run)
 
     return render(request, 'excel_parcer/add_data.html', {'context': context, })
+
+
+def add_Device(request):
+    """добавление телесистемы"""
+    context = {"telesystem": Device.objects.all(),
+               "title": 'Телесистема',
+               "form": AddDeviceForm(request.POST),
+               }
+
+    if request.method == 'POST':
+        if context['form'].is_valid():
+            context['form'].save()
+    return render(request, 'excel_parcer/device.html', {'context': context, })
+
+
+def del_Device(request):
+    """Удаление телистемы по id"""
+    dev = Device.objects.get(id=request.POST['device_id']).delete()
+    return JsonResponse({'status': 'ok'})
+
+
+def get_coef_device(request):
+    """api для fetch запроса
+    Получаем коэффициенты
+    """
+
+    device = Device.objects.get(device_title=request.POST.get('device_title'))
+
+    return JsonResponse({
+                        'GX': device.CX,
+                        'GY': device.CY,
+                        'GZ': device.CZ,
+                        'BX': device.BX,
+                        'BY': device.BY,
+                        'BZ': device.BZ,
+                        })
 
 
 def get_run_index(request):

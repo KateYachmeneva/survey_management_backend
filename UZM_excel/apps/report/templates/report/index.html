@@ -37,330 +37,303 @@
 
 
 {% block content %}
-    <form action="{% url 'report' %}" class="container" method="post" enctype="multipart/form-data"
-          onsubmit="return validForm()" name="file_form" >
-      <div class="container__line"></div>
-      <div class="container__item">
+<form action="{% url 'report' %}" class="container" method="post" enctype="multipart/form-data"
+      onsubmit="return validForm()" name="file_form" >
+    <div class="container__line"></div>
+    <div class="container__item">
         <label class="container__label" for="run" style="text-align: center;">Рейс</label>
         <select class="container__selector selector" name="run" id="run">
-          <option value="Выберите рейс">Выберите рейс</option>
-          {% for r in context.run %}
-          <option value="{{r.id}}">{{r}}</option>
-          {% endfor %}
+            <option value="Выберите рейс">Выберите рейс</option>
+            {% for r in context.run %}
+            <option value="{{r.id}}">{{r}}</option>
+            {% endfor %}
         </select>
-      </div>
+    </div>
 
-      <div class="container__line"></div>
+    <div class="container__line"></div>
 
-      <div class="container__item">
+    <div class="container__item">
         <div class="container__file">
-          <label class="container__label container__label_type_color" style="width:60%"> Сырые динамические замеры </label>
-          <a data-tooltip="Файлы формата .las или .excel">
-          <img class="circle" src="{% static 'img/report/question.png'%}"  alt="question">
-          </a>
-          <input class="container__input" type="file" accept=".xls,.xlsx,.las" name="raw_file" />
+            <label class="container__label container__label_type_color" style="width:60%"> Сырые динамические замеры </label>
+            <a data-tooltip="Файлы формата .las или .excel">
+                <img class="circle" src="{% static 'img/report/question.png'%}"  alt="question">
+            </a>
+            <input class="container__input" type="file" accept=".xls,.xlsx,.las" name="raw_file" />
         </div>
         <div class="container__inputs">
-          <select class="container__selector selector" id="raw_file_type">
-            <option value="las">las-файл</option>
-            <option value="excel">excel-файл</option>
-          </select>
-          <!--     разные формы для разных типов файла     -->
+            <select class="container__selector selector" id="raw_file_type">
+                <option value="las">las-файл</option>
+                <option value="excel">excel-файл</option>
+            </select>
+            <!--     разные формы для разных типов файла     -->
             <div id="igirgi_excel_form" class="container__inputs" style="display:none;">
-                  <div class="container__text">
+                <div class="container__text">
                     <label class="container__label container__label_type_pos">Глубина
-                    <a data-tooltip="Буквенный индекс колонки с глубиной в excel">
-                    <img class="circle" src="{% static 'img/report/question.png'%}"  alt="question">
-                    </a>
+                        <a data-tooltip="Буквенный индекс колонки с глубиной в excel">
+                            <img class="circle" src="{% static 'img/report/question.png'%}"  alt="question">
+                        </a>
                     </label>
                     <input type="text" name="raw_depth_excel" value="{{context.index.raw_dynamic_depth_excel}}"/>
-                  </div>
-                  <div class="container__text">
+                </div>
+                <div class="container__text">
                     <label class="container__label container__label_type_pos" >Угол
-                    <a data-tooltip="Буквенный индекс колонки с углом в excel">
-                    <img class="circle" src="{% static 'img/report/question.png'%}"  alt="question">
-                    </a>
+                        <a data-tooltip="Буквенный индекс колонки с углом в excel">
+                            <img class="circle" src="{% static 'img/report/question.png'%}"  alt="question">
+                        </a>
                     </label>
                     <input type="text" name="raw_corner_excel" value="{{context.index.raw_dynamic_corner_excel}}" />
-                  </div>
-                  <div class="container__text">
+                </div>
+                <div class="container__text">
                     <label class="container__label container__label_type_pos">Строка
-                    <a data-tooltip="Числовой индекс строки с которой начнется считывание данных">
-                    <img class="circle" src="{% static 'img/report/question.png'%}"  alt="question">
-                    </a>
+                        <a data-tooltip="Числовой индекс строки с которой начнется считывание данных">
+                            <img class="circle" src="{% static 'img/report/question.png'%}"  alt="question">
+                        </a>
                     </label>
                     <input type="number" name="raw_str" value="{{context.index.raw_str}}"/>
-                  </div>
-                  <div class="container__text">
+                </div>
+                <div class="container__text">
                     <label class="container__label container__label_type_pos" >Лист excel
-                    <a data-tooltip="Указываем имя листа excel, с которой считываются данные">
-                    <img class="circle" src="{% static 'img/report/question.png'%}"  alt="question">
-                    </a>
+                        <a data-tooltip="Указываем имя листа excel, с которой считываются данные">
+                            <img class="circle" src="{% static 'img/report/question.png'%}"  alt="question">
+                        </a>
                     </label>
                     <input type="text" name="raw_list_name" value="{{context.index.raw_dynamic_list_name }}"/>
-                  </div>
+                </div>
             </div>
-          <!--     разные формы для разных типов файла     -->
+            <!--     разные формы для разных типов файла     -->
             <div id="igirgi_las_form" class="container__inputs" style="display: contents;">
-                  <div class="container__text">
+                <div class="container__text">
                     <label class="container__label container__label_type_pos">Глубина
-                    <a data-tooltip="Имя столбца с глубиной">
-                    <img class="circle" src="{% static 'img/report/question.png'%}"  alt="question">
-                    </a>
+                        <a data-tooltip="Имя столбца с глубиной">
+                            <img class="circle" src="{% static 'img/report/question.png'%}"  alt="question">
+                        </a>
                     </label>
                     <input type="text" name="raw_depth" value="{{context.index.raw_dynamic_depth}}"/>
-                  </div>
-                  <div class="container__text">
+                </div>
+                <div class="container__text">
                     <label class="container__label container__label_type_pos" >Угол
-                    <a data-tooltip="Имя столбца с углом">
-                    <img class="circle" src="{% static 'img/report/question.png'%}"  alt="question">
-                    </a>
+                        <a data-tooltip="Имя столбца с углом">
+                            <img class="circle" src="{% static 'img/report/question.png'%}"  alt="question">
+                        </a>
                     </label>
                     <input type="text" name="raw_corner" value="{{context.index.raw_dynamic_corner}}" />
-                  </div>
+                </div>
             </div>
 
         </div>
-      </div>
+    </div>
 
-      <div class="container__line"></div>
+    <div class="container__line"></div>
 
-      <div class="container__item">
+    <div class="container__item">
         <div class="container__file">
-          <label class="container__label container__label_type_color" >Замеры ННБ</label>
-          <input class="container__input" type="file" accept=".xls,.xlsx" name="nnb_file" />
+            <label class="container__label container__label_type_color" >Замеры ННБ</label>
+            <input class="container__input" type="file" accept=".xls,.xlsx" name="nnb_file" />
         </div>
         <div class="container__inputs">
             <h5 style="text-align: center;">Статические замеры</h5>
-          <div class="container__text">
-            <label class="container__label container__label_type_pos" >Глубина
-            <a data-tooltip="Буквенный индекс колонки с искомым значением">
-                <img class="circle" src="{% static 'img/report/question.png'%}"  alt="question">
-            </a></label>
-            <input type="text" name="nnb_static_depth" value="{{context.index.nnb_static_depth}}" />
-          </div>
-          <div class="container__text">
-            <label class="container__label container__label_type_pos" >Угол
-            <a data-tooltip="Буквенный индекс колонки с искомым значением">
-             <img class="circle" src="{% static 'img/report/question.png'%}"  alt="question">
-             </a></label>
-            <input type="text" name="nnb_static_corner" value="{{context.index.nnb_static_corner}}"/>
-          </div>
-          <div class="container__text">
-            <label class="container__label container__label_type_pos" >Азимут
-            <a data-tooltip="Буквенный индекс колонки с искомым значением">
-             <img class="circle" src="{% static 'img/report/question.png'%}"  alt="question">
-             </a></label>
-            <input type="text" name="nnb_static_azimut" value="{{context.index.nnb_static_azimut}}"/>
-          </div>
-          <div class="container__text">
-            <label class="container__label container__label_type_pos">Строка
-            <a data-tooltip="Числовой индекс строки с которой начнется считывание данных">
-              <img class="circle" src="{% static 'img/report/question.png'%}"  alt="question">
-            </a>
-            </label>
-            <input type="number" name="nnb_static_read" value="{{ context.index.nnb_static_read }}"/>
-          </div>
-          <div class="container__text">
-            <label class="container__label container__label_type_pos">Лист excel</label>
-            <input type="text" name="nnb_static_list_name" value="{{context.index.nnb_static_list_name }}"/>
-          </div>
-
-
-        <div class="container__line"></div>
-          <h5 style="text-align: center;">Динамические замеры</h5>
-         <div class="container__text">
-            <label class="container__label container__label_type_pos" >Глубина
-            <a data-tooltip="Буквенный индекс колонки с искомым значением">
-             <img class="circle" src="{% static 'img/report/question.png'%}"  alt="question">
-             </a></label>
-            <input type="text" name="nnb_dynamic_depth" value="{{context.index.nnb_dynamic_depth}}" />
-          </div>
-          <div class="container__text">
-            <label class="container__label container__label_type_pos" >Угол
-            <a data-tooltip="Буквенный индекс колонки с искомым значением">
-             <img class="circle" src="{% static 'img/report/question.png'%}"  alt="question">
-             </a></label>
-            <input type="text" name="nnb_dynamic_corner" value="{{context.index.nnb_dynamic_corner}}" />
-          </div>
-          <div class="container__text">
-            <label class="container__label container__label_type_pos" >Азимут
-            <a data-tooltip="Буквенный индекс колонки с искомым значением">
-             <img class="circle" src="{% static 'img/report/question.png'%}"  alt="question">
-             </a></label>
-            <input type="text" name="nnb_dynamic_azimut" value="{{context.index.nnb_dynamic_azimut}}"  />
-          </div>
-          <div class="container__text">
-            <label class="container__label container__label_type_pos">Строка
-            <a data-tooltip="Числовой индекс строки с которой начнется считывание данных">
-              <img class="circle" src="{% static 'img/report/question.png'%}"  alt="question">
-            </a>
-            </label>
-            <input type="number" name="nnb_dynamic_read" value="{{ context.index.nnb_dynamic_read }}"/>
-          </div>
-          <div class="container__text">
-            <label class="container__label container__label_type_pos" >Лист excel</label>
-            <input type="text" name="nnb_dynamic_list_name" value="{{context.index.nnb_dynamic_list_name}}"/>
-          </div>
-        </div>
-      </div>
-      <div class="container__line"></div>
-      <div class="container__item">
-        <div class="container__file">
-          <label class="container__label container__label_type_color" style="width:60%">Статические замеры ИГиРГИ</label>
-          <a data-tooltip="Загружаем файл в .excel формате или вставляем данные вручную">
-          <img class="circle" src="{% static 'img/report/question.png'%}"  alt="question">
-          </a>
-          {% if context.igirgi_data == True %}
-          <!--     всё нормально ошибка из-за элементов  содинаковым id но на практике используется лишь один из них по условию шаблонизатора     -->
-          <input class="container__input" type="file" accept=".xls,.xlsx" id='igirgi_file' name="igirgi_file" disabled/>
-          <input type="button" id="modal_with_data" data-toggle="modal" data-target="#data_Modal" value="Ввести данные">
-          <input type="button" id="delete_igirgi_data" value="Очистить введенные данные">
-          {% else %}
-          <input class="container__input" type="file" accept=".xls,.xlsx" id='igirgi_file' name="igirgi_file"/>
-          <input type="button" id="modal_with_data" data-toggle="modal" data-target="#data_Modal" value="Ввести данные">
-          <input type="button" id="delete_igirgi_data" value="Очистить введенные данные" disabled>
-          {% endif %}
-          <br>
-
-
-        </div>
-        <div class="container__inputs">
-          <div class="container__text">
-            <label class="container__label container__label_type_pos" >Глубина
-            <a data-tooltip="Буквенный индекс колонки с искомым значением">
-             <img class="circle" src="{% static 'img/report/question.png'%}"  alt="question">
-             </a></label>
-            <input type="text" name="igirgi_static_depth" value="{{context.index.igirgi_static_depth}}" />
-          </div>
-          <div class="container__text">
-            <label class="container__label container__label_type_pos">Угол
-            <a data-tooltip="Буквенный индекс колонки с искомым значением">
-             <img class="circle" src="{% static 'img/report/question.png'%}"  alt="question">
-             </a></label>
-            <input type="text" name="igirgi_static_corner" value="{{context.index.igirgi_static_corner}}" />
-          </div>
-          <div class="container__text">
-            <label class="container__label container__label_type_pos" >Азимут
-            <a data-tooltip="Буквенный индекс колонки с искомым значением">
-             <img class="circle" src="{% static 'img/report/question.png'%}"  alt="question">
-             </a>
-            </label>
-            <input type="text" name="igirgi_static_azimut" value="{{context.index.igirgi_static_azimut}}" />
-          </div>
-          <div class="container__text">
-             <label class="container__label container__label_type_pos">Строка
-             <a data-tooltip="Числовой индекс строки с которой начнется считывание данных">
-             <img class="circle" src="{% static 'img/report/question.png'%}"  alt="question">
-             </a>
-             </label>
-             <input type="number" name="igirgi_str" value="{{context.index.igirgi_str}}"/>
-          </div>
-          <div class="container__text">
-            <label class="container__label container__label_type_pos" >Лист excel</label>
-            <input type="text" name="igirgi_static_list_name" value="{{context.index.igirgi_list_name}}"/>
-          </div>
-        </div>
-      </div>
-
-      <div class="container__line"></div>
-      <div class="container__item">
-        <div class="container__file">
-          <label class="container__label container__label_type_color" style="width:60%">Плановая траектория</label>
-          <input class="container__input" type="file" accept=".xls,.xlsx" name="plan_file" />
-        </div>
-        <div class="container__inputs">
-          <div class="container__text">
-            <label class="container__label container__label_type_pos">Глубина
-            <a data-tooltip="Буквенный индекс колонки с искомым значением">
-             <img class="circle" src="{% static 'img/report/question.png'%}"  alt="question">
-             </a>
-            </label>
-            <input type="text" name="plan_depth" value="{{context.index.plan_depth}}" />
-          </div>
-          <div class="container__text">
-            <label class="container__label container__label_type_pos">Угол
-            <a data-tooltip="Буквенный индекс колонки с искомым значением">
-             <img class="circle" src="{% static 'img/report/question.png'%}"  alt="question">
-             </a>
-            </label>
-            <input type="text" name="plan_corner" value="{{context.index.plan_corner}}" />
-          </div>
-          <div class="container__text">
-            <label class="container__label container__label_type_pos" >Азимут
-            <a data-tooltip="Буквенный индекс колонки с искомым значением">
-             <img class="circle" src="{% static 'img/report/question.png'%}"  alt="question">
-             </a>
-            </label>
-            <input type="text" name="plan_azimut" value="{{context.index.plan_azimut}}" />
-          </div>
-          <div class="container__text">
-             <label class="container__label container__label_type_pos">Строка
-             <a data-tooltip="Числовой индекс строки с которой начнется считывание данных">
-             <img class="circle" src="{% static 'img/report/question.png'%}"  alt="question">
-             </a>
-             </label>
-             <input type="number" name="plan_str" value="{{context.index.plan_str}}"/>
-          </div>
-          <div class="container__text">
-            <label class="container__label container__label_type_pos" >Лист excel</label>
-            <input type="text" name="plan_list_name" value="{{context.index.plan_list_name}}"/>
-          </div>
-        </div>
-      </div>
-      <br>
-      <button type="submit" class="container__button">Готово</button>
-      <br>
-      <br>
-
-
-
-
-
-<div class="modal fade" id="data_Modal" tabindex="-1" role="dialog">
-    <div class="modal-dialog modal-lg" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="exampleModalLabel">Статические замеры ИГиРГИ</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
+            <div class="container__text">
+                <label class="container__label container__label_type_pos" >Глубина
+                    <a data-tooltip="Буквенный индекс колонки с искомым значением">
+                        <img class="circle" src="{% static 'img/report/question.png'%}"  alt="question">
+                    </a></label>
+                <input type="text" name="nnb_static_depth" value="{{context.index.nnb_static_depth}}" />
             </div>
-            <div class="modal-body">
-                <div class="form-group col">
-                    <label class="container__label_type_color" >Вставьте замеры вручную:</label>
-                    <textarea class="form-control" id="modal_data" name="igirgi_data" rows="30" cols="160" ></textarea>
-                </div>
+            <div class="container__text">
+                <label class="container__label container__label_type_pos" >Угол
+                    <a data-tooltip="Буквенный индекс колонки с искомым значением">
+                        <img class="circle" src="{% static 'img/report/question.png'%}"  alt="question">
+                    </a></label>
+                <input type="text" name="nnb_static_corner" value="{{context.index.nnb_static_corner}}"/>
             </div>
-            <div class="modal-footer">
-                <button type="button"  class="btn btn-secondary" data-dismiss="modal">Закрыть</button>
-                <input type="button" id="modal_data_send" class="btn btn-primary" data-dismiss="modal" value="Подтвердить ввод">
+            <div class="container__text">
+                <label class="container__label container__label_type_pos" >Азимут
+                    <a data-tooltip="Буквенный индекс колонки с искомым значением">
+                        <img class="circle" src="{% static 'img/report/question.png'%}"  alt="question">
+                    </a></label>
+                <input type="text" name="nnb_static_azimut" value="{{context.index.nnb_static_azimut}}"/>
+            </div>
+            <div class="container__text">
+                <label class="container__label container__label_type_pos">Строка
+                    <a data-tooltip="Числовой индекс строки с которой начнется считывание данных">
+                        <img class="circle" src="{% static 'img/report/question.png'%}"  alt="question">
+                    </a>
+                </label>
+                <input type="number" name="nnb_static_read" value="{{ context.index.nnb_static_read }}"/>
+            </div>
+            <div class="container__text">
+                <label class="container__label container__label_type_pos">Лист excel</label>
+                <input type="text" name="nnb_static_list_name" value="{{context.index.nnb_static_list_name }}"/>
+            </div>
+
+            <div class="container__line"></div>
+            <h5 style="text-align: center;">Динамические замеры</h5>
+            <div class="container__text">
+                <label class="container__label container__label_type_pos" >Глубина
+                    <a data-tooltip="Буквенный индекс колонки с искомым значением">
+                        <img class="circle" src="{% static 'img/report/question.png'%}"  alt="question">
+                    </a></label>
+                <input type="text" name="nnb_dynamic_depth" value="{{context.index.nnb_dynamic_depth}}" />
+            </div>
+            <div class="container__text">
+                <label class="container__label container__label_type_pos" >Угол
+                    <a data-tooltip="Буквенный индекс колонки с искомым значением">
+                        <img class="circle" src="{% static 'img/report/question.png'%}"  alt="question">
+                    </a></label>
+                <input type="text" name="nnb_dynamic_corner" value="{{context.index.nnb_dynamic_corner}}" />
+            </div>
+            <div class="container__text">
+                <label class="container__label container__label_type_pos" >Азимут
+                    <a data-tooltip="Буквенный индекс колонки с искомым значением">
+                        <img class="circle" src="{% static 'img/report/question.png'%}"  alt="question">
+                    </a></label>
+                <input type="text" name="nnb_dynamic_azimut" value="{{context.index.nnb_dynamic_azimut}}"  />
+            </div>
+            <div class="container__text">
+                <label class="container__label container__label_type_pos">Строка
+                    <a data-tooltip="Числовой индекс строки с которой начнется считывание данных">
+                        <img class="circle" src="{% static 'img/report/question.png'%}"  alt="question">
+                    </a>
+                </label>
+                <input type="number" name="nnb_dynamic_read" value="{{ context.index.nnb_dynamic_read }}"/>
+            </div>
+            <div class="container__text">
+                <label class="container__label container__label_type_pos" >Лист excel</label>
+                <input type="text" name="nnb_dynamic_list_name" value="{{context.index.nnb_dynamic_list_name}}"/>
             </div>
         </div>
     </div>
-</div>
-<!--                &lt;!&ndash; The Modal &ndash;&gt;-->
-<!--        <div id="myModal" class="modal">-->
+    <div class="container__line"></div>
+    <div class="container__item">
+        <div class="container__file">
+            <label class="container__label container__label_type_color" style="width:60%">Статические замеры ИГиРГИ</label>
+            <a data-tooltip="Загружаем файл в .excel формате или вставляем данные вручную">
+                <img class="circle" src="{% static 'img/report/question.png'%}"  alt="question">
+            </a>
+            {% if context.igirgi_data == True %}
+            <!--     всё нормально ошибка из-за элементов  содинаковым id но на практике используется лишь один из них по условию шаблонизатора     -->
+            <input class="container__input" type="file" accept=".xls,.xlsx" id='igirgi_file' name="igirgi_file" disabled/>
+            <input type="button" id="modal_with_data" data-toggle="modal" data-target="#data_Modal" value="Ввести данные">
+            <input type="button" id="delete_igirgi_data" value="Очистить введенные данные">
+            {% else %}
+            <input class="container__input" type="file" accept=".xls,.xlsx" id='igirgi_file' name="igirgi_file"/>
+            <input type="button" id="modal_with_data" data-toggle="modal" data-target="#data_Modal" value="Ввести данные">
+            <input type="button" id="delete_igirgi_data" value="Очистить введенные данные" disabled>
+            {% endif %}
+            <br>
 
-<!--          &lt;!&ndash; Модальное содержание &ndash;&gt;-->
-<!--          <div class="modal-content">-->
-<!--            <div class="modal-header">-->
-<!--                <h2>Статические замеры ИГиРГИ</h2> <span class="close">&times;</span>-->
-<!--            </div>-->
-<!--            <div class="modal-body">-->
-<!--                   <div class="container" method="post" enctype="multipart/form-data">-->
-<!--                     <br>-->
-<!--                     <label class="container__label_type_color" >Вставьте замеры вручную:</label> <br>-->
-<!--                     <textarea rows="30" cols="160" id="modal_data" name="igirgi_data"></textarea>-->
-<!--                     <br>-->
-<!--                     <input type="button" id="modal_data_send" value="Подтвердить ввод">-->
-<!--                   </div>-->
-<!--            </div>-->
-<!--          </div>-->
+        </div>
+        <div class="container__inputs">
+            <div class="container__text">
+                <label class="container__label container__label_type_pos" >Глубина
+                    <a data-tooltip="Буквенный индекс колонки с искомым значением">
+                        <img class="circle" src="{% static 'img/report/question.png'%}"  alt="question">
+                    </a></label>
+                <input type="text" name="igirgi_static_depth" value="{{context.index.igirgi_static_depth}}" />
+            </div>
+            <div class="container__text">
+                <label class="container__label container__label_type_pos">Угол
+                    <a data-tooltip="Буквенный индекс колонки с искомым значением">
+                        <img class="circle" src="{% static 'img/report/question.png'%}"  alt="question">
+                    </a></label>
+                <input type="text" name="igirgi_static_corner" value="{{context.index.igirgi_static_corner}}" />
+            </div>
+            <div class="container__text">
+                <label class="container__label container__label_type_pos" >Азимут
+                    <a data-tooltip="Буквенный индекс колонки с искомым значением">
+                        <img class="circle" src="{% static 'img/report/question.png'%}"  alt="question">
+                    </a>
+                </label>
+                <input type="text" name="igirgi_static_azimut" value="{{context.index.igirgi_static_azimut}}" />
+            </div>
+            <div class="container__text">
+                <label class="container__label container__label_type_pos">Строка
+                    <a data-tooltip="Числовой индекс строки с которой начнется считывание данных">
+                        <img class="circle" src="{% static 'img/report/question.png'%}"  alt="question">
+                    </a>
+                </label>
+                <input type="number" name="igirgi_str" value="{{context.index.igirgi_str}}"/>
+            </div>
+            <div class="container__text">
+                <label class="container__label container__label_type_pos" >Лист excel</label>
+                <input type="text" name="igirgi_static_list_name" value="{{context.index.igirgi_list_name}}"/>
+            </div>
+        </div>
+    </div>
 
-<!--        </div>-->
+    <div class="container__line"></div>
+    <div class="container__item">
+        <div class="container__file">
+            <label class="container__label container__label_type_color" style="width:60%">Плановая траектория</label>
+            <input class="container__input" type="file" accept=".xls,.xlsx" name="plan_file" />
+        </div>
+        <div class="container__inputs">
+            <div class="container__text">
+                <label class="container__label container__label_type_pos">Глубина
+                    <a data-tooltip="Буквенный индекс колонки с искомым значением">
+                        <img class="circle" src="{% static 'img/report/question.png'%}"  alt="question">
+                    </a>
+                </label>
+                <input type="text" name="plan_depth" value="{{context.index.plan_depth}}" />
+            </div>
+            <div class="container__text">
+                <label class="container__label container__label_type_pos">Угол
+                    <a data-tooltip="Буквенный индекс колонки с искомым значением">
+                        <img class="circle" src="{% static 'img/report/question.png'%}"  alt="question">
+                    </a>
+                </label>
+                <input type="text" name="plan_corner" value="{{context.index.plan_corner}}" />
+            </div>
+            <div class="container__text">
+                <label class="container__label container__label_type_pos" >Азимут
+                    <a data-tooltip="Буквенный индекс колонки с искомым значением">
+                        <img class="circle" src="{% static 'img/report/question.png'%}"  alt="question">
+                    </a>
+                </label>
+                <input type="text" name="plan_azimut" value="{{context.index.plan_azimut}}" />
+            </div>
+            <div class="container__text">
+                <label class="container__label container__label_type_pos">Строка
+                    <a data-tooltip="Числовой индекс строки с которой начнется считывание данных">
+                        <img class="circle" src="{% static 'img/report/question.png'%}"  alt="question">
+                    </a>
+                </label>
+                <input type="number" name="plan_str" value="{{context.index.plan_str}}"/>
+            </div>
+            <div class="container__text">
+                <label class="container__label container__label_type_pos" >Лист excel</label>
+                <input type="text" name="plan_list_name" value="{{context.index.plan_list_name}}"/>
+            </div>
+        </div>
+    </div>
+    <br>
+    <button type="submit" class="container__button">Готово</button>
+    <br>
+    <br>
+    <div class="modal fade" id="data_Modal" tabindex="-1" role="dialog">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Статические замеры ИГиРГИ</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group col">
+                        <label class="container__label_type_color" >Вставьте замеры вручную:</label>
+                        <textarea class="form-control" id="modal_data" name="igirgi_data" rows="30" cols="160" ></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button"  class="btn btn-secondary" data-dismiss="modal">Закрыть</button>
+                    <input type="button" id="modal_data_send" class="btn btn-primary" data-dismiss="modal" value="Подтвердить ввод">
+                </div>
+            </div>
+        </div>
+    </div>
 
-    </form>
+</form>
 
 
 
