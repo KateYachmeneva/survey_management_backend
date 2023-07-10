@@ -137,13 +137,17 @@ def waste(Wellbore: object, full: int = 0):
 
 def clone_wellbore_data(old_wellbore: object, new_wellbore: object) -> str:
     """Клонирование всех замеров старого ствола в новый ствол"""
+    igirgi_list = list()
+    nnb_list = list()
     for old_section in old_wellbore.sections.all():
         for old_run in old_section.runs.all():
             new_run = Run.objects.get(run_number=old_run.run_number, section__wellbore=new_wellbore)
 
             for meas in IgirgiStatic.objects.filter(run=old_run):
-                IgirgiStatic.objects.create(run=new_run, depth=meas.depth, corner=meas.corner, azimut=meas.azimut)
+                igirgi_list.append(IgirgiStatic(run=new_run, depth=meas.depth, corner=meas.corner, azimut=meas.azimut))
 
             for meas in StaticNNBData.objects.filter(run=old_run):
-                StaticNNBData.objects.create(run=new_run, depth=meas.depth, corner=meas.corner, azimut=meas.azimut)
+                nnb_list.append(StaticNNBData(run=new_run, depth=meas.depth, corner=meas.corner, azimut=meas.azimut))
+    IgirgiStatic.objects.bulk_create(igirgi_list)
+    StaticNNBData.objects.bulk_create(nnb_list)
     return 'Ok'

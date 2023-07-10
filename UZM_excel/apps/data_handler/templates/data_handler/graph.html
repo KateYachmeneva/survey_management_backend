@@ -1517,13 +1517,13 @@ if (a.x > b.x) {
 
 <!--Записываем выбранную кважину-->
 document.getElementById('well-select').addEventListener('change', function () {
-    localStorage.setItem("well_id", document.getElementById('well-select').value);
+    sessionStorage.setItem("well_id", document.getElementById('well-select').value);
 });
 
 
 <!-- При загрузке открываем выбранную ранее скважину -->
 window.addEventListener('load', () => {
-    let well_id = localStorage.getItem("well_id");
+    let well_id = sessionStorage.getItem("well_id");
     if (well_id != null) {
       Array.from(document.getElementById('well-select').options).forEach(function(element){
       if (element.value == well_id) {element.selected = true;}
@@ -1533,6 +1533,8 @@ window.addEventListener('load', () => {
       {% endif %}
 
     }
+
+    console.log('В сессии номер', sessionStorage.getItem("url_status"))
 });
 
 

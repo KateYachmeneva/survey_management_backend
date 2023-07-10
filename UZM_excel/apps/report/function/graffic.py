@@ -328,5 +328,5 @@ def get_text_data(data_dict: dict, all_data: dict, Ex, Ny) -> dict():
         math.sqrt((X_nnb - X_igirgi) ** 2 + (Y_nnb - Y_igigri) ** 2 + (
                 data_dict['nnb_TVD'][-1] - data_dict['igirgi_TVD'][-1]) ** 2), 2)
 
-    text_data['Абсолютная отметка'] = round(data_dict['nnb_TVDSS'][-1], 2)
+    text_data['Абсолютная отметка'] = round(data_dict['igirgi_TVDSS'][-1], 2)
     return text_data

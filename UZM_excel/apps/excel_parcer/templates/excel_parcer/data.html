@@ -44,12 +44,11 @@
 
     <div class="container" style="max-width:500em">
         <div class="row">
-            <div class="col-sm">
+            <div class="col-sm-4">
                 <table  class="table table-light table-sm table-bordered table-hover"
-                        name="table_axes"
-                        style="margin-top:2%">
+                        name="table_axes">
                     <thead class="thead-dark">
-                    <tr class="table">
+                    <tr class="table" style="text-align: center;">
                         <th scope="col">Глубина</th>
                         <th scope="col">GX</th>
                         <th scope="col">GY</th>
@@ -62,7 +61,7 @@
 
                     <tbody>
                     {% for obj in context.data %}
-                    <tr>
+                    <tr style="text-align: center;">
                         <td scope="col">{{obj.depth_dot}}</td>
                         <td scope="col">{{obj.CX_dot}}</td>
                         <td scope="col">{{obj.CY_dot}}</td>
@@ -76,26 +75,25 @@
                 </table>
             </div>
 
-            <div class="col-sm">
+            <div class="col-sm-8">
                 <table  class="table table-light table-sm table-bordered table-hover"
-                        name="table_calculation"
-                        style="margin-top:2%">
+                        name="table_calculation">
                     <thead class="thead-dark">
-                    <tr class="table">
+                    <tr class="table" style="text-align: center;">
                         <th scope="col">Gtotal</th>
                         <th scope="col">Btotal_raw</th>
                         <th scope="col">Btotal_corr</th>
                         <th scope="col">DIP_raw</th>
                         <th scope="col">DIP_corr</th>
-                        <th scope="col" style="width: 16%">Зенитный угол</th>
-                        <th scope="col">Азимут</th>
+                        <th scope="col">Зенитный угол</th>
+                        <th scope="col">{{context.selected_run.section.wellbore.well_name.get_north_direction}} азимут</th>
                         <th scope="col" style="width: 30%">Комментарий</th>
                     </tr>
                     </thead>
 
                     <tbody>
                     {% for obj in context.data %}
-                    <tr>
+                    <tr style="text-align: center;">
                         {% if obj.Gtotal < context.well.min_gtotal or obj.Gtotal > context.well.max_gtotal %}
                         <td style="background-color:red" scope="col"> {{obj.Gtotal}} </td>
                         {% else %}
@@ -241,7 +239,7 @@ $('#data_Modal1').on('show.bs.modal', function (event) {
 
   <!-- Индекс телесистемы  -->
   var params = new FormData();
-  params.set('run_title', localStorage.getItem("run_id"));
+  params.set('run_title', sessionStorage.getItem("run_id"));
 
   console.log('http://'+window.location.hostname+':'+window.location.port+'/axes/run_index')
   fetch('http://'+window.location.hostname+':'+window.location.port+'/axes/run_index', {
@@ -275,7 +273,7 @@ $('#data_Modal2').on('show.bs.modal', function (event) {
 <!-- Загрузили страницу -->
 window.addEventListener('load', () => {
     <!-- При загрузке открываем выбранную ранее скважину -->
-    let run_id = localStorage.getItem("run_id");
+    let run_id = sessionStorage.getItem("run_id");
     if (run_id != null) {
       Array.from(document.getElementById('run-select').options).forEach(function(element){
       if (element.value == run_id) {element.selected = true;}
@@ -295,8 +293,8 @@ document.getElementById('run-select').addEventListener('change', function () {
     let well_list = {{context.wells_id}};
     let num_select = document.getElementById('run-select').selectedIndex;
 
-    localStorage.setItem("well_id", well_list[num_select]);
-    localStorage.setItem("run_id", document.getElementById('run-select').options[num_select].value);
+    sessionStorage.setItem("well_id", well_list[num_select]);
+    sessionStorage.setItem("run_id", document.getElementById('run-select').options[num_select].value);
 });
 
 

@@ -12,10 +12,13 @@
 
 {% block data %}
 <div style="margin-top:1em">
-    <form method="post">
+    <form action="" method="POST">
         <div class="scroll-body form-row">
             <hr style="color:#FFC501;margin-top:1%;border-width: 3px">
             <legend><b>Параметры скважины:</b> {{context.selected_obj}}</legend>
+            <div class="form-group col-md">
+                {{context.form.pad_name|as_crispy_field}}
+            </div>
             <div class="row">
                 <div class="form-group col-md-4">
                     {{context.form.well_name|as_crispy_field}}
@@ -269,7 +272,8 @@ function clone_wellbore(){
             params.set('new_wellbore', data['new_wellbore']);
             fetch('http://'+window.location.hostname+':'+window.location.port+'/report/api/wellbore_copy',
                      { method: 'POST', body: params })
-                     .then(response=>response.json()).then(location.reload());
+                     .then(response=>response.json()).then(
+                     location.reload());
    })};
 
 function delete_wellbore(){

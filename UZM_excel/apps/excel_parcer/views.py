@@ -22,6 +22,7 @@ def index(request):
                'error_depth': list(),  # глубины замеров при вставке которых нашли ошибку
                "telesystem": Device.objects.all(),
                }
+    # Для сохранения в SessionStorage на клиенте id выбранной скважине по рейсу
     for run in context['run']:
         context['wells_id'].append(run.section.wellbore.well_name.id)
 
@@ -39,7 +40,6 @@ def index(request):
             axes_data = request.POST['data-axes'].replace(',', '.').replace(' ', '').replace('\r', '').replace('\n',
                                                                                                                '\t') \
                 .split('\t')
-            print(axes_data)
             counter = 0
             manually_bz = list()
             manually_by = list()
@@ -103,7 +103,7 @@ def edit_index(request):
             current_run = Run.objects.get(id=request.GET.get('run_id'))
             context['well'] = current_run.section.wellbore.well_name
             context['data'] = Data.objects.filter(run=current_run, in_statistics=1).order_by('depth')
-            context['selected_run'] = request.GET.get('run_id')
+            context['selected_run'] = current_run
 
     # FIXME
     if request.method == 'POST':

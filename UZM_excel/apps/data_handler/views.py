@@ -32,24 +32,25 @@ def traj(request):
                 run = Run.objects.get(id=run_id)
             except:  # если не нашли рейс возвращаем пустую страницу
                 return render(request, 'data_handler/trajectories.html', {'context': context, })
-
-            context['selected_obj'] = str(run)  # для отображения текущей модели на странице
-            context['selected_id'] = run_id  # для перенаправления по id на редактирование
-
             selected_for_tree(context, run)  # для раскрытия списка
 
+            context['selected_obj'] = str(run)  # для отображения текущей модели на странице (текст)
+            context['selected_id'] = run_id  # для перенаправления по id на редактирование
+
+            # Замеры
             context["igirgi_data"] = IgirgiStatic.objects.filter(run=run_id)
             context["nnb_data"] = StaticNNBData.objects.filter(run=run_id)
+            # Отходы
+            context["waste_hor"], context["waste_vert"], context["waste_common"] = waste(run.section.wellbore, 1)
+            # Индексы отходов (Какие отходы выводить)
             context["waste_index"] = list()
             for ind, data in enumerate(IgirgiStatic.objects.filter(
                     run__section__wellbore=run.section.wellbore).order_by('depth')):
-                if data in context['igirgi_data']:
+                if data in context['igirgi_data'] and ind < len(StaticNNBData.objects.filter(
+                        run__section__wellbore=run.section.wellbore).order_by('depth')):
                     context["waste_index"].append(ind)
-            context["waste_hor"], context["waste_vert"], context["waste_common"] = waste(run.section.wellbore, 1)
-            # индексов становиться больше если данных ННБ меньше ИГиРГИ
-            if len(context["igirgi_data"]) != len(context["nnb_data"]):
-                context["waste_index"] = context["waste_index"][:len(context["waste_hor"])]
-            # Ищем план, формируем контекст дял письма
+
+            # Ищем план, формируем контекст для письма
             runs = Run.objects.filter(section__wellbore=run.section.wellbore)
             context["plan_ex"] = (True if len(Plan.objects.filter(run__in=runs)) != 0 else False)
             context['letter'] = Letter(run.section.wellbore)
@@ -131,7 +132,6 @@ def param(request):
     """Страница с параметрами"""
     context = {"title": 'Параметры', "active": 'param',
                "tree": get_tree(),
-               'form': AddWellForm(request.POST),
                'cards': list(),  # карточки стволов
                }
     if request.GET.get('run_id') is not None:
@@ -148,14 +148,17 @@ def param(request):
         for wellbore in Wellbore.objects.filter(well_name=run.section.wellbore.well_name):
             context['cards'].append(WellboreCard(wellbore))
     else:
+        context['form'] = AddWellForm(request.POST)
         return render(request, 'data_handler/param.html', {'context': context, })
 
-    if request.method == "GET":
-        context['form'] = AddWellForm(instance=run.section.wellbore.well_name)
+    context['form'] = AddWellForm(instance=run.section.wellbore.well_name)
 
     if request.method == 'POST':
+        context['form'] = AddWellForm(request.POST, instance=run.section.wellbore.well_name)
         if context['form'].is_valid():
             context['form'].save()
+        else:
+            print(context['form'].errors.as_data())
 
     selected_for_tree(context, run)  # для раскрытия списка
 

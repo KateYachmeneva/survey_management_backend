@@ -22,8 +22,8 @@ class Letter:
         """ Передаем экземпляр скважины по которой отправляем отчёт """
         self.data_body = BodyData(Wellbore)
         self.subject = 'test'  # тема письма Будет заполянться в js функции при выдаче файла (нужны отходы с отчета)
-        self.mailto = (Wellbore.well_name.mail_To if Wellbore.well_name.mail_To != '' else 'None')  # кому отправить
-        self.cc = (Wellbore.well_name.mail_Cc if Wellbore.well_name.mail_Cc != '' else 'None')  # копия
+        self.mailto = (Wellbore.well_name.mail_To.replace('\r\n', ' ') if Wellbore.well_name.mail_To != '' else 'None')  # кому отправить
+        self.cc = (Wellbore.well_name.mail_Cc.replace('\r\n', ' ') if Wellbore.well_name.mail_Cc != '' else 'None')  # копия
         # тело письма
         self.body = 'Это тело письма'  # get_body() - перезаписывает все переменные ниже
         self.comm_waste = "Это строка с общими отходами"

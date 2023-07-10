@@ -1,4 +1,5 @@
 import os
+import time
 
 from django.http import JsonResponse, FileResponse
 from django.shortcuts import render, redirect
@@ -63,8 +64,10 @@ def get_file(request):
 
 # report/api/wellbore_copy
 def wellbore_copy(request):
-    print('я тут', request.POST)
-    clone_wellbore_data(Wellbore.objects.get(id=request.POST['old_wellbore']), Wellbore.objects.get(id=request.POST['new_wellbore']))
-
+    """ По fetch запросу с клиента клонируются замеры ствола
+    (в request должны лежать id нового и старого стволов, сама модель Wellbore создается в модуле Field заранее)"""
+    clone_wellbore_data(Wellbore.objects.get(id=request.POST['old_wellbore']),
+                        Wellbore.objects.get(id=request.POST['new_wellbore']))
+    time.sleep(3)  # Данные не успевают добавиться в базу до отображения на странице
     return JsonResponse({'status': 'ok'})
 

@@ -34,25 +34,24 @@ th  {
 
         <div class="container" style="max-width:500em">
             <div class="row">
-                <div class="col-sm">
+                <div class="col-sm-4">
                     <table  class="table table-light table-sm table-bordered table-hover"
-                            name="table_axes"
-                            style="margin-top:2%">
+                            name="table_axes">
                         <thead class="thead-dark">
-                        <tr class="table">
-                            <th scope="col">Глубина</th>
-                            <th scope="col">GX</th>
-                            <th scope="col">GY</th>
-                            <th scope="col">GZ</th>
-                            <th scope="col">BX</th>
-                            <th scope="col">BY</th>
-                            <th scope="col">BZ</th>
+                        <tr class="table" style="text-align: center;">
+                            <th scope="col" style="width: 14%">Глубина</th>
+                            <th scope="col" style="width: 14%">GX</th>
+                            <th scope="col" style="width: 14%">GY</th>
+                            <th scope="col" style="width: 14%">GZ</th>
+                            <th scope="col" style="width: 14%">BX</th>
+                            <th scope="col" style="width: 14%">BY</th>
+                            <th scope="col" style="width: 14%">BZ</th>
                         </tr>
                         </thead>
 
                         <tbody>
                         {% for obj in context.data %}
-                        <tr>
+                        <tr style="text-align: center;">
                             <td scope="col"><input type="number" id="{{obj.id}}depth" value="{{obj.depth_dot}}" onchange="getName({{obj.id}},'depth')" step="0.01" style="text-align: center;Border: none; outline: none;width:100%;height:100%;"></td>
                             <td scope="col"><input type="number" id="{{obj.id}}gx" value="{{obj.CX_dot}}"  onchange="getName({{obj.id}},'gx')" step="0.00001" style="text-align: center;Border: none; outline: none;width:100%;height:100%;"></td>
                             <td scope="col"><input type="number" id="{{obj.id}}gy" value="{{obj.CY_dot}}"  onchange="getName({{obj.id}},'gy')" step="0.00001" style="text-align: center;Border: none; outline: none;width:100%;height:100%;"></td>
@@ -66,26 +65,25 @@ th  {
                     </table>
                 </div>
 
-                <div class="col-sm">
+                <div class="col-sm-8">
                     <table  class="table table-light table-sm table-bordered table-hover"
-                            name="table_calculation"
-                            style="margin-top:2%">
+                            name="table_calculation">
                         <thead class="thead-dark">
-                        <tr class="table">
+                        <tr class="table" style="text-align: center;">
                             <th scope="col">Gtotal</th>
                             <th scope="col">Btotal_raw</th>
                             <th scope="col">Btotal_corr</th>
                             <th scope="col">DIP_raw</th>
                             <th scope="col">DIP_corr</th>
-                            <th scope="col" style="width: 16%">Зенитный угол</th>
-                            <th scope="col">Азимут</th>
+                            <th scope="col">Зенитный угол</th>
+                            <th scope="col">{{context.selected_run.section.wellbore.well_name.get_north_direction}} азимут</th>
                             <th scope="col" style="width: 30%">Комментарий</th>
                         </tr>
                         </thead>
 
                         <tbody>
                         {% for obj in context.data %}
-                        <tr>
+                        <tr style="text-align: center;">
                             {% if obj.Gtotal < context.well.min_gtotal or obj.Gtotal > context.well.max_gtotal %}
                             <td style="background-color:red" scope="col"> {{obj.Gtotal}} </td>
                             {% else %}
@@ -128,7 +126,7 @@ th  {
 <!-- Загрузили страницу -->
 window.addEventListener('load', () => {
     <!-- При загрузке открываем выбранную ранее скважину -->
-    let run_id = localStorage.getItem("run_id");
+    let run_id = sessionStorage.getItem("run_id");
     if (run_id != null) {
     {% if context.selected_run == 'None' %}
     window.location = window.location.href +'?run_id='+ run_id
