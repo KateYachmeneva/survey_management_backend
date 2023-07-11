@@ -1,7 +1,7 @@
 from django.core.files.storage import FileSystemStorage
 from django.shortcuts import render, redirect
 from pytest import console_main
-from Field.models import Well, Run, Wellbore, Section, get_all_well
+from Field.models import Well, Run, Wellbore, Section
 from excel_parcer.models import Data
 from report.models import StaticNNBData, IgirgiStatic, Plan
 from report.function.work_with_data import work_with_plan
@@ -52,7 +52,10 @@ def traj(request):
 
             # Ищем план, формируем контекст для письма
             runs = Run.objects.filter(section__wellbore=run.section.wellbore)
-            context["plan_ex"] = (True if len(Plan.objects.filter(run__in=runs)) != 0 else False)
+            plan_data = Plan.objects.filter(run__in=runs)
+            context["plan_ex"] = (True if len(plan_data) != 0 else False)
+            context["plan_version"] = (Plan.objects.filter(run__in=runs)[0].plan_version if context["plan_ex"] else
+                                       '-')
             context['letter'] = Letter(run.section.wellbore)
 
     if request.method == 'POST':
@@ -139,9 +142,9 @@ def param(request):
         try:  # можем удалить из страницы с run_id самого себя, поэтому если не нашли рейс отображаем пустую страницу
             run = Run.objects.get(id=request.GET.get('run_id'))
         except:
+            context['form'] = AddWellForm()
             return render(request, 'data_handler/param.html', {'context': context, })
         # для работы с стволами
-        context["igirgi_data"] = IgirgiStatic.objects.filter(run=run_id)
         context["wellbore_choices"] = run.section.wellbore.get_choices()
         context['selected_obj'] = run.section.wellbore.well_name
         # карточки с стволами
@@ -165,80 +168,35 @@ def param(request):
     return render(request, 'data_handler/param.html', {'context': context, })
 
 
-def graph(request):
-    """Страница с графиком первичного контроля"""
-    context = {
-        'title': 'Контроль качества',
-        'well': get_all_well(),
-        "active": 'graph',
-        'depthGoxy': list(),
-        'depthGz': list(),
-        'depthGtotal': list(),
-        'depthGref': list(),
-        'depthGmax': list(),
-        'depthGmin': list(),
-        'depthBoxy': list(),
-        'depthBz': list(),
-        'depthBtotal': list(),
-        'depthBref': list(),
-        'depthBmax': list(),
-        'depthBmin': list(),
-        'depthBcorr': list(),
-        'depthDipraw': list(),
-        'depthDipref': list(),
-        'depthDipmax': list(),
-        'depthDipmin': list(),
-        'depthDipcorr': list(),
-        'depthHSTF': list(),
-        'selected': dict(),  # По переменной следим за перезагрузкой страницы
-        "tree": get_tree(),
-    }
-    context['selected']["well"] = 'None'
+def plan(request):
+    context = {'title': 'Плановая траектория',
+               "tree": get_tree(),
+               "active": 'plan', }
+
+    if request.GET.get('run_id') is not None:
+        try:  # проверка на существование рейса
+            run = Run.objects.get(id=request.GET.get('run_id'))
+            selected_for_tree(context, run)  # для раскрытия списка
+        except:
+            return render(request, 'data_handler/plan.html', {'context': context, })
+        context['selected_obj'] = run
+
+        # ищем план в БД
+        for section in run.section.wellbore.sections.all():
+            runs = section.runs.all()
+            plan_meas = Plan.objects.filter(run__in=runs)
+            if len(plan_meas) != 0:
+                context['plan'] = plan_meas
+                context["plan_ex"] = True
+                context["plan_version"] = (Plan.objects.filter(run__in=runs)[0].plan_version if context["plan_ex"] else
+                                           '-')
+                break
 
     if request.method == 'POST':
-        well = Well.objects.get(id=request.POST['well'])
-        selected_for_tree(context, well)
-        runs = Run.objects.filter(section__wellbore__well_name=well)
-        context['selected']["well"] = str(well)  # для отображения на странице
-        context['selected']["id"] = request.POST['well']
-        for run in runs:
-            surveys = Data.objects.filter(run=run)
-            for survey in surveys:
-                # График Goxy-Gz
-                context['depthGoxy'].append({'x': survey.depth, 'y': survey.get_goxy()})
-                context['depthGz'].append({'x': survey.depth, 'y': survey.CZ})
-                # График Gtotal
-                context['depthGtotal'].append({'x': survey.depth, 'y': survey.Gtotal()})
-                context['depthGref'].append({'x': survey.depth, 'y': well.gtotal_graph()})
-                context['depthGmax'].append({'x': survey.depth, 'y': well.max_gtotal()})
-                context['depthGmin'].append({'x': survey.depth, 'y': well.min_gtotal()})
-                # График Boxy-Bz
-                context['depthBoxy'].append({'x': survey.depth, 'y': survey.get_boxy()})
-                context['depthBz'].append({'x': survey.depth, 'y': survey.BZ})
-                # График Btotal
-                context['depthBtotal'].append({'x': survey.depth, 'y': survey.Btotal()})
-                context['depthBref'].append({'x': survey.depth, 'y': well.btotal_graph()})
-                context['depthBmax'].append({'x': survey.depth, 'y': well.max_btotal()})
-                context['depthBmin'].append({'x': survey.depth, 'y': well.min_btotal()})
-                context['depthBcorr'].append({'x': survey.depth, 'y': (survey.Btotal_corr if
-                                                                       survey.Btotal_corr is not None else 'Null')})
-                # График HSTF
-                context['depthHSTF'].append({'x': survey.depth, 'y': survey.get_hstf()})
-                # График Dip
-                context['depthDipraw'].append({'x': survey.depth, 'y': survey.Dip()})
-                context['depthDipref'].append({'x': survey.depth, 'y': well.dip_graph()})
-                context['depthDipmax'].append({'x': survey.depth, 'y': well.max_dip()})
-                context['depthDipmin'].append({'x': survey.depth, 'y': well.min_dip()})
-                context['depthDipcorr'].append({'x': survey.depth, 'y': (survey.DIP_corr if
-                                                                         survey.DIP_corr is not None else 'Null')})
+        if 'plan_depth' in request.POST:  # данные с модальной формы 2 (плановая траектория)
+            work_with_plan(request, run)
 
-    try:
-        context['firstDepth'] = context['depthHSTF'][0]['x']
-        context['lastDepth'] = context['depthHSTF'][-1]['x']
-    except IndexError:
-        context['firstDepth'] = context['lastDepth'] = 0
-
-    return render(request, 'data_handler/graph.html', {'context': context, })
+    return render(request, 'data_handler/plan.html', {'context': context, })
 
 
 # TODO вытащить в сервисы

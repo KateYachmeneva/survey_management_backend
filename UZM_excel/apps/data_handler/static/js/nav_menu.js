@@ -8,8 +8,7 @@ window.addEventListener('load', () => {
     let status = sessionStorage.getItem("url_status");
 
     if (status != null) { // востанавливаем выбранный элемент
-        if  (window.location.href.toString().includes('/data_handler/trajectories') || window.location.href.toString().includes('/data_handler/parametrs')){
-        window.location = window.location.href + status; }
+        window.location = window.location.href + status;
     }
 
     }

@@ -5,6 +5,7 @@ from django.shortcuts import render, redirect
 from . import serializer
 from .forms import *
 from .models import *
+from .serializer import ContractorNNBSerializer_Add, ContractorDrillSerializer_Add
 
 
 def add_contractor_nnb(request):
@@ -17,7 +18,7 @@ def add_contractor_nnb(request):
     context = {"title": 'Подрядчик',
                "form": form,
                "method": "add_contractor_nnb",
-               "data": ContractorNNB.objects.all().values()}
+               "data": ContractorNNBSerializer_Add(ContractorNNB.objects.all(), many=True).data}
     return render(request, 'Field/addModal.html', {'context': context, })
 
 
@@ -31,7 +32,7 @@ def add_contractor_drill(request):
     context = {"title": 'Подрядчик',
                "form": form,
                "method": "add_contractor_drill",
-               "data": ContractorDrill.objects.all().values()}
+               "data": ContractorDrillSerializer_Add(ContractorDrill.objects.all(), many=True).data}
     return render(request, 'Field/addModal.html', {'context': context, })
 
 

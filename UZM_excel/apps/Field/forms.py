@@ -56,9 +56,10 @@ class AddSectionForm(ModelForm):
 
 
 class AddRunForm(ModelForm):
+    """ Форма для создания экземпляра рейса"""
     class Meta:
         model = models.Run
-        fields = '__all__'
+        exclude = ['start_date', 'end_date', 'start_depth', 'end_depth']
         widgets = {
             'start_date': widgets.DateInput(attrs={'type': 'date'}),
             'end_date': widgets.DateInput(attrs={'type': 'date'}),

@@ -22,14 +22,19 @@
 <!-- ВЕРХНИИ КНОПКИ-->
 <div class="row" style="margin-top:1em;margin-right:0.1em;">
     <div class="col-7">
-        <label>Поиск:
-            <input type="search" class="form-control form-control-sm" id="SearchInput"
-                   onkeyup="SearchFilter()" placeholder="Введите число..." style="width:9em">
-        </label>
-        <label> <b>Выбрано:</b> {{context.selected_obj}}
+        <div class="row">
+            <div class="col-2"><b>Поиск:</b></div>
+            <div class="col-8"><b>Выбрано:</b></div>
+            <div class="col-2"><b>Версия плана:</b></div>
+        </div>
 
-        </label>
+        <div class="row">
+            <div class="col-2"><input type="search" class="form-control form-control-sm" id="SearchInput"
+                       onkeyup="SearchFilter()" placeholder="Введите число..." style="width:9em"></div>
 
+            <div class="col-8">{{context.selected_obj}}</div>
+            <div class="col-2">{{context.plan_version}}</div>
+        </div>
     </div>
     <div class="col-5" style="text-align: right;">
         {% block top_button%}
@@ -264,7 +269,7 @@
             <div class="modal-body">
                     <div class="form-group">
                         <label for="run-name" class="col-form-label">Рейс:</label>
-                        <input type="text" class="form-control" name="run" id="run_name">
+                        <input type="text" class="form-control" name="run" id="run_name" disabled>
                     </div>
                     <div class="form-group row">
                         <div class="form-group col-md-6">
@@ -272,6 +277,10 @@
                                 <a class="tooltip-test" title="Добавьте файл с замерами">
                                     <label class="col-form-label">Файл:</label></a>
                                 <input class="form-control" type="file" accept=".xls,.xlsx" name="plan_file">
+
+                                <a class="tooltip-test" title="Версия плана для идентификации">
+                                <label class="col-form-label">Версия плана:</label></a>
+                                <input class="form-control" type="text" name="plan_version" value="{{context.plan_version}}">
                             </div>
                         </div>
                         <div class="form-group col-md-6">

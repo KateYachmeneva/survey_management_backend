@@ -390,7 +390,6 @@ def bd_Write_data(all_data: dict, run_id: int) -> NoReturn:
     """
     # в run_id находится id модели с индексами,
     # через нее достанет объект рейса
-    print("Начали записывать данные в бд")
     updat_obj = []
 
     for key in data_name.keys():
@@ -434,6 +433,23 @@ def bd_Write_data(all_data: dict, run_id: int) -> NoReturn:
         updat_obj = []
 
 
+def bd_Write_plan(data_dict: dict, run_id: int, plan_version: str = None) -> NoReturn:
+    """Записываем считанные данные плана в бд с припиской версии
+    """
+    updat_obj = []
+    model = Plan
+    Run = get_run_by_id(run_id)
+
+    for meas in list(zip(data_dict['Глубина'], data_dict['Угол'], data_dict['Азимут'])):
+        # print(meas)
+        db_meas = model.objects.get_or_create(depth=meas[0], run=Run)
+        updat_obj.append(db_meas[0])
+        db_meas[0].corner = meas[1]
+        db_meas[0].azimut = meas[2]
+        db_meas[0].plan_version = plan_version
+    model.objects.bulk_update(updat_obj, ['corner', 'azimut', 'plan_version'])
+
+
 def work_with_plan(request: dict, run: object) -> bool:
     """Чтение и сохранение палновой траектории"""
     fs = FileSystemStorage(location=file_dir + '/Report_input')
@@ -444,14 +460,18 @@ def work_with_plan(request: dict, run: object) -> bool:
     plan_index(run, request.POST)  # перезапись индексов
 
     data = reader('plan_file', path, ReportIndex.objects.get(run=run).id)  # берём данные с плана
-    all_data = {'Плановая траектория': data}
 
     # удаляем старый план
+    plan_delete(run)
+
+    bd_Write_plan(data, run.id, request.POST['plan_version'])  # сохраняем в бд
+    return True
+
+
+def plan_delete(run):
+    """Удаляем все замеры с ствола, к которому привязан переданный рейс"""
     runs = Run.objects.filter(section__wellbore__well_name=run.section.wellbore.well_name)
     Plan.objects.filter(run__in=runs).delete()
-
-    bd_Write_data(all_data, run.id)  # сохраняем в бд
-    return True
 
 
 def plan_index(run, new_index):

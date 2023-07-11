@@ -97,24 +97,22 @@
                                           field_select.append(newOption);
                                           }
 
-                        <!--  Если у нас всего одно месторождение в ДО сразу заполняем куст -->
-                        if (Object.keys(data).length == 1) {
-                            var params = new FormData();
-                            params.set('field_id', Object.keys(data)[0]);
-                            fetch('http://'+window.location.hostname+':'+window.location.port+'/main_data/api/get_pad',
-                            { method: 'POST', body: params })
-                            .then(response=>response.json()).
-                            then(data=>{
-                               console.log(data);
-                               document.getElementById("id_pad_name").innerHTML = '';
-                                  for (key in data){
-                                     let newOption = new Option(data[key], key)
-                                        document.getElementById("id_pad_name").append(newOption);
-                                           }
-                                           });
-                        } else {
+                        <!--  Под месторождение сразу подтягиваем Куст -->
                         document.getElementById("id_pad_name").innerHTML = '';
-                        }
+                        var params = new FormData();
+                        params.set('field_id', Object.keys(data)[0]);
+                        fetch('http://'+window.location.hostname+':'+window.location.port+'/main_data/api/get_pad',
+                        { method: 'POST', body: params })
+                        .then(response=>response.json()).
+                        then(data=>{
+                           console.log(data);
+                           document.getElementById("id_pad_name").innerHTML = '';
+                              for (key in data){
+                                 let newOption = new Option(data[key], key)
+                                    document.getElementById("id_pad_name").append(newOption);
+                                       }
+                                       });
+
 
          });
 

@@ -8,7 +8,7 @@ from django.shortcuts import render, redirect
 from .function.api_func import get_index
 from .function.model_service import get_data, clone_wellbore_data
 from .function.work_with_Excel import write_data_in_Excel
-from .function.work_with_data import rewrite_ReportIndex, work_with_file
+from .function.work_with_data import rewrite_ReportIndex, work_with_file, plan_delete
 from Field.models import get_all_run, Run, Wellbore
 
 
@@ -71,3 +71,10 @@ def wellbore_copy(request):
     time.sleep(3)  # Данные не успевают добавиться в базу до отображения на странице
     return JsonResponse({'status': 'ok'})
 
+
+# report/api/plan_del
+def plan_del(request):
+    """ По fetch запросу с клиента удаляем замеры плана по указанному id"""
+    # удаляем старый план
+    plan_delete(Run.objects.get(id=request.POST['run_id']))
+    return JsonResponse({'status': 'ok'})

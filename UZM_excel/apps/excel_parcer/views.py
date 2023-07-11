@@ -7,7 +7,7 @@ from .function.functions import *
 from django.http import JsonResponse, HttpResponse
 import re
 
-from Field.models import Run, get_all_run
+from Field.models import Well, Run, Wellbore, Run, get_all_run, Section, get_all_well
 from .models import Data, TelesystemIndex, Device
 
 
@@ -194,6 +194,80 @@ def add_Device(request):
     return render(request, 'excel_parcer/device.html', {'context': context, })
 
 
+def graph(request):
+    """Страница с графиком первичного контроля"""
+    context = {
+        'title': 'Контроль качества',
+        'well': get_all_well(),
+        "active": 'graph',
+        'depthGoxy': list(),
+        'depthGz': list(),
+        'depthGtotal': list(),
+        'depthGref': list(),
+        'depthGmax': list(),
+        'depthGmin': list(),
+        'depthBoxy': list(),
+        'depthBz': list(),
+        'depthBtotal': list(),
+        'depthBref': list(),
+        'depthBmax': list(),
+        'depthBmin': list(),
+        'depthBcorr': list(),
+        'depthDipraw': list(),
+        'depthDipref': list(),
+        'depthDipmax': list(),
+        'depthDipmin': list(),
+        'depthDipcorr': list(),
+        'depthHSTF': list(),
+        'selected': dict(),  # По переменной следим за перезагрузкой страницы
+    }
+    context['selected']["well"] = 'None'
+
+    if request.method == 'POST':
+        well = Well.objects.get(id=request.POST['well'])
+        runs = Run.objects.filter(section__wellbore__well_name=well)
+        context['selected']["well"] = well  # для отображения на странице
+        context['selected']["id"] = request.POST['well']
+        for run in runs:
+            surveys = Data.objects.filter(run=run)
+            for survey in surveys:
+                # График Goxy-Gz
+                context['depthGoxy'].append({'x': survey.depth, 'y': survey.get_goxy()})
+                context['depthGz'].append({'x': survey.depth, 'y': survey.CZ})
+                # График Gtotal
+                context['depthGtotal'].append({'x': survey.depth, 'y': survey.Gtotal()})
+                context['depthGref'].append({'x': survey.depth, 'y': well.gtotal_graph()})
+                context['depthGmax'].append({'x': survey.depth, 'y': well.max_gtotal()})
+                context['depthGmin'].append({'x': survey.depth, 'y': well.min_gtotal()})
+                # График Boxy-Bz
+                context['depthBoxy'].append({'x': survey.depth, 'y': survey.get_boxy()})
+                context['depthBz'].append({'x': survey.depth, 'y': survey.BZ})
+                # График Btotal
+                context['depthBtotal'].append({'x': survey.depth, 'y': survey.Btotal()})
+                context['depthBref'].append({'x': survey.depth, 'y': well.btotal_graph()})
+                context['depthBmax'].append({'x': survey.depth, 'y': well.max_btotal()})
+                context['depthBmin'].append({'x': survey.depth, 'y': well.min_btotal()})
+                context['depthBcorr'].append({'x': survey.depth, 'y': (survey.Btotal_corr if
+                                                                       survey.Btotal_corr is not None else 'Null')})
+                # График HSTF
+                context['depthHSTF'].append({'x': survey.depth, 'y': survey.get_hstf()})
+                # График Dip
+                context['depthDipraw'].append({'x': survey.depth, 'y': survey.Dip()})
+                context['depthDipref'].append({'x': survey.depth, 'y': well.dip_graph()})
+                context['depthDipmax'].append({'x': survey.depth, 'y': well.max_dip()})
+                context['depthDipmin'].append({'x': survey.depth, 'y': well.min_dip()})
+                context['depthDipcorr'].append({'x': survey.depth, 'y': (survey.DIP_corr if
+                                                                         survey.DIP_corr is not None else 'Null')})
+
+    try:
+        context['firstDepth'] = context['depthHSTF'][0]['x']
+        context['lastDepth'] = context['depthHSTF'][-1]['x']
+    except IndexError:
+        context['firstDepth'] = context['lastDepth'] = 0
+
+    return render(request, 'excel_parcer/graph.html', {'context': context, })
+
+
 def del_Device(request):
     """Удаление телистемы по id"""
     dev = Device.objects.get(id=request.POST['device_id']).delete()
@@ -208,13 +282,13 @@ def get_coef_device(request):
     device = Device.objects.get(device_title=request.POST.get('device_title'))
 
     return JsonResponse({
-                        'GX': device.CX,
-                        'GY': device.CY,
-                        'GZ': device.CZ,
-                        'BX': device.BX,
-                        'BY': device.BY,
-                        'BZ': device.BZ,
-                        })
+        'GX': device.CX,
+        'GY': device.CY,
+        'GZ': device.CZ,
+        'BX': device.BX,
+        'BY': device.BY,
+        'BZ': device.BZ,
+    })
 
 
 def get_run_index(request):

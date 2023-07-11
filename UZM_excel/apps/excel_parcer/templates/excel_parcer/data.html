@@ -35,7 +35,7 @@
             <a  id="edit-redirect" href="{% url 'edit_axes' %}" style="text-decoration: none;color: #000;">
                 <button type="button" style="border:1">Редактировать</button></a>
 
-            <a  id="graph-redirect"  href="{% url 'graph' %}" style="text-decoration: none;color: #000;">
+            <a  id="graph-redirect"  href="{% url 'graph_axes' %}" style="text-decoration: none;color: #000;">
                 <button type="button" style="border:1">Графики контроля</button></a>
         </form>
 
@@ -94,6 +94,7 @@
                     <tbody>
                     {% for obj in context.data %}
                     <tr style="text-align: center;">
+
                         {% if obj.Gtotal < context.well.min_gtotal or obj.Gtotal > context.well.max_gtotal %}
                         <td style="background-color:red" scope="col"> {{obj.Gtotal}} </td>
                         {% else %}
@@ -106,7 +107,11 @@
                         <td scope="col"> {{obj.Btotal}} </td>
                         {% endif %}
 
-                        <td scope="col"> {{obj.Btotal_corrFix}}  </td>
+                        {% if obj.Btotal_corrFix < context.well.min_btotal or obj.Btotal_corrFix > context.well.max_btotal %}
+                        <td style="background-color:red" scope="col"> {{obj.Btotal_corrFix}}  </td>
+                        {% else %}
+                        <td scope="col"> {{obj.Btotal_corrFix}} </td>
+                        {% endif %}
 
                         {% if obj.Dip < context.well.min_dip or obj.Dip > context.well.max_dip %}
                         <td style="background-color:red" scope="col"> {{obj.Dip}} </td>
@@ -114,7 +119,11 @@
                         <td scope="col"> {{obj.Dip}} </td>
                         {% endif %}
 
+                        {% if obj.DIP_corrFix < context.well.min_dip or obj.DIP_corrFix > context.well.max_dip %}
+                        <td style="background-color:red" scope="col"> {{obj.DIP_corrFix}} </td>
+                        {% else %}
                         <td scope="col"> {{obj.DIP_corrFix}} </td>
+                        {% endif %}
 
                         <td scope="col">{{obj.Zenit}}</td>
                         <td scope="col">{{obj.Azimut}}</td>

@@ -111,7 +111,7 @@ class Pad(models.Model):
 class Well(models.Model):
     """Скважина"""
     well_name = models.CharField('Скважина', max_length=20)
-    active_from = models.FloatField('Глубина начала активной фазы', null=True, blank=True)
+    active_from = models.FloatField('Глубина начала активной фазы, м', null=True, blank=True)
     WELL_STATUS_CHOICES = [
         ('PLAN', 'Планируется'),
         ('NOTA', 'В бурении'),
@@ -126,7 +126,7 @@ class Well(models.Model):
         blank=True
     )
     DRILL_STATUS_CHOICES = [
-        ('ACTV', 'Активная стадия'),
+        ('ACTV', 'Активная фаза'),
         ('NOACT', 'Неактивная стадия'),
     ]
     status_drilling = models.CharField(
@@ -150,7 +150,7 @@ class Well(models.Model):
         verbose_name='Куст',
         related_name='wells'
     )
-    RKB = models.FloatField('Альтитуда стола ротора', null=True, blank=True, default=84)
+    RKB = models.FloatField('Альтитуда стола ротора, м', null=True, blank=True, default=84)
     VSaz = models.FloatField('Азимут вертикальной секции', null=True, blank=True, default=1,
                              validators=[validators.MinValueValidator(0), validators.MaxValueValidator(360)])
     coordinate_system = models.CharField(
@@ -159,10 +159,10 @@ class Well(models.Model):
         null=True,
         blank=True
     )
-    latitude = models.FloatField('Широта', null=True, blank=True)
-    longtitude = models.FloatField('Долгота', null=True, blank=True)
-    NY = models.FloatField('Широта (прямоугольные координаты)', null=True, blank=True)
-    EX = models.FloatField('Долгота (прямоугольные координаты)', null=True, blank=True)
+    latitude = models.FloatField('Широта (ось Y)', null=True, blank=True)
+    longtitude = models.FloatField('Долгота (ось X)', null=True, blank=True)
+    NY = models.FloatField('Широта (прямоугольные координаты), м', null=True, blank=True)
+    EX = models.FloatField('Долгота (прямоугольные координаты), м', null=True, blank=True)
     north_direction = models.CharField(
         'Направление на север',
         max_length=4,
@@ -172,12 +172,12 @@ class Well(models.Model):
     )
     geomagnetic_model = models.CharField('Геомагнитная модель', max_length=20, null=True, blank=True)
     geomagnetic_date = models.DateField('Дата геомагнитной привязки', null=True, blank=True)
-    btotal = models.FloatField('Напряженность геомагнитного поля', null=True, blank=True)
-    dip = models.FloatField('Магнитное наклонение', null=True, blank=True)
-    dec = models.FloatField('Магнитное склонение', null=True, blank=True)
-    grid_convergence = models.FloatField('Сближение меридианов', null=True, blank=True)
-    total_correction = models.FloatField('Общая поправка', null=True, blank=True)
-    gtotal = models.FloatField('Напряженность гравитационного поля', null=True, blank=True)
+    btotal = models.FloatField('Напряженность геомагнитного поля, нТл', null=True, blank=True)
+    dip = models.FloatField('Магнитное наклонение, град', null=True, blank=True)
+    dec = models.FloatField('Магнитное склонение, град', null=True, blank=True)
+    grid_convergence = models.FloatField('Сближение меридианов, град', null=True, blank=True)
+    total_correction = models.FloatField('Общая поправка, град', null=True, blank=True)
+    gtotal = models.FloatField('Напряженность гравитационного поля, G', null=True, blank=True)
     critical_azimuth = models.BooleanField('Критический азимут', null=True, blank=True)
     T1_start = models.DateField('Начало сопровождения до Т1', null=True, blank=True)
     T1_end = models.DateField('Начало сопровождения до Т3', null=True, blank=True)
@@ -186,6 +186,11 @@ class Well(models.Model):
     comment = models.TextField('Комментарий', max_length=3000, null=True, blank=True)
     mail_To = models.TextField('Список рассылки почта "Кому"', max_length=3000, null=True, blank=True)
     mail_Cc = models.TextField('Список рассылки почта "Копия"', max_length=3000, null=True, blank=True)
+
+    def get_status(self):
+        for i in self.WELL_STATUS_CHOICES:
+            if self.status in i:
+                return i[1]
 
     def get_client(self):
         """Получения ДО"""
@@ -302,7 +307,7 @@ class Section(models.Model):
         null=True,
         blank=True
     )
-    target_depth = models.FloatField('Плановая глубина', null=True, blank=True)
+    target_depth = models.FloatField('Плановая глубина секции, м', null=True, blank=True)
 
     class Meta:
         verbose_name = 'Секция'

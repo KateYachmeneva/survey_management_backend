@@ -137,6 +137,7 @@ class Plan(models.Model):
     depth = models.FloatField('глубина')
     corner = models.FloatField('угол', null=True)
     azimut = models.FloatField('азимут', null=True)
+    plan_version = models.CharField('версия плана', max_length=20, null=True)
     run = models.ForeignKey(Run, on_delete=models.CASCADE, null=True)
 
     def __str__(self):

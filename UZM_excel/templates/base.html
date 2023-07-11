@@ -39,10 +39,11 @@
         <div class="collapse navbar-collapse" id="navbarText">
             <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                 <li class="nav-item dropdown">
-                     <a class="nav-link dropdown-toggle active" id="navbarDropdown1" role='button' data-bs-toggle="dropdown" aria-expanded="false">
+                     <a class="nav-link dropdown-toggle active" role='button' data-bs-toggle="dropdown"
+                        aria-expanded="false" style="font-weight: 600;">
                          Добавить модель
                      </a>
-                    <ul class="dropdown-menu" aria-labelleby="dropdownMenuButton1">
+                    <ul class="dropdown-menu" >
                         <li><a class="dropdown-item" href="{% url 'add_contractor_nnb'%}">Создать Подрядчика по ННБ</a></li>
 
                         <li><a class="dropdown-item" href="{% url 'add_contractor_drill'%}">Создать Подрядчика по бурению</a></li>
@@ -62,11 +63,13 @@
                 </li>
 
                 <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle active" id="navbarDropdown2" role='button' data-bs-toggle="dropdown" aria-expanded="false">
+                    <a class="nav-link dropdown-toggle active" role='button' data-bs-toggle="dropdown"
+                       aria-expanded="false" style="font-weight: 600;">
                         Данные рейса (оси)
                     </a>
                     <ul class="dropdown-menu">
                         <li><a class="dropdown-item" href="{% url 'axes'%}">Показать данные</a></li>
+                        <li><a class="dropdown-item" href="{% url 'graph_axes'%}">Графики контроля качества</a></li>
                         <li><hr class="dropdown-divider"></li>
                         <li><a class="dropdown-item" href="{% url 'add_device'%}">Создать телесистему</a></li>
                         <li><a class="dropdown-item" href="{% url 'add_axes'%}">Загрузить новые данные</a></li>
@@ -74,14 +77,14 @@
                 </li>
 
                 <li class="nav-item">
-                    <a href="{% url 'report' %}" class="nav-link active">
+                    <a href="{% url 'report' %}" class="nav-link">
                         Генератор отчетов
                     </a>
                 </li>
 
                 <li class="nav-item">
-                    <a href="{% url 'data_info' %}" class="nav-link active" style="">
-                        Работа с данными
+                    <a href="{% url 'data_info' %}" class="nav-link active" style="font-weight: 600;">
+                        Формирование оперативного отчета
                     </a>
                 </li>
 

@@ -180,7 +180,7 @@
             <form id="create_form">
             <div class="modal-body">
                 <div class="form-group">
-                    <label class="col-form-label">Скважина id:</label>
+                    <label class="col-form-label">Скважина id: (отладочная информация)</label>
                     <input class="form-control" name="well_name" value="{{context.selected_obj.id}}" readonly>
                 </div>
                 <div class="form-group">
@@ -215,7 +215,7 @@
             <form id="clone_form">
             <div class="modal-body">
                 <div class="form-group">
-                    <label class="col-form-label">Id:</label>
+                    <label class="col-form-label">Id ствола: (отладочная информация)</label>
                     <input type="text" class="form-control" id="wellbore_id" name="wellbore_id" readonly>
                 </div>
                 <div class="form-group">
@@ -226,23 +226,6 @@
                         {% endfor %}
                     </select>
                 </div>
-                <div class="form-group">
-                    <label class="col-form-label">Замеры:</label>
-                    <div class="scroll-body" style="height: 34em;">
-                        <table name="table-data" class="table table-light table-sm table-bordered table-hover">
-                            <tbody>
-                            {% for meas in context.igirgi_data %}
-                            <tr>
-                                <td scope="col">{{meas.depth}}</td>
-                                <td scope="col">{{meas.corner}}</td>
-                                <td scope="col">{{meas.azimut}}</td>
-                            </tr>
-                            {% endfor %}
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Закрыть</button>
@@ -276,9 +259,12 @@ function clone_wellbore(){
                      location.reload());
    })};
 
+
+
 function delete_wellbore(){
-  fetch('http://'+window.location.hostname+':'+window.location.port+'/main_data/api/wellbore/'+arguments[0],
-   { method: 'DELETE' }).then(response => response.json()).then(location.reload());
+    fetch('http://'+window.location.hostname+':'+window.location.port+'/main_data/api/wellbore/'+arguments[0]+'/',
+     { method: 'DELETE', headers: {'X-CSRFToken':'wFH4wGagd3i0Ki79jrFo6CyUc5SsChbovphWCqSCK5Tl8MIvS17IS0D8Z1R1Yp69'}, })
+     .then(response => response.json()).then(location.reload());
 }
 
 function create_wellbore(){

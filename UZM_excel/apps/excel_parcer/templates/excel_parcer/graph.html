@@ -1,4 +1,4 @@
-{% extends 'data_handler/index.html' %}
+{% extends 'base.html' %}
 {% load static%}
 
 
@@ -10,10 +10,9 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js@latest/dist/Chart.min.js"></script>
 
 {% endblock %}
-{% block left_panel %}
-{% endblock %}
 
-{% block data %}
+
+{% block content %}
 <style>
   body{
     overflow: auto;}
@@ -50,7 +49,7 @@
 
 <div class="well-header">
   <h2>  {{context.selected.well}}</h2>
-<label class = "status">В бурении</label></div>
+<label class = "status">{{context.selected.well.get_status}}</label></div>
 <div class="container" >
   <div class="container-form" >  
   <div class="chart-header"> График соотношения показаний осевого и поперечных акселерометров </div>

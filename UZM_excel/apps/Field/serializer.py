@@ -42,22 +42,49 @@ class WellSerializer(serializers.ModelSerializer):
         }
 
 
+class ContractorNNBSerializer_Add(serializers.ModelSerializer):
+    """Сериализатор для подрядчика ДЛЯ СОЗДАНИЯ МОДЕЛЕЙ """
+    class Meta:
+        model = ContractorNNB
+        fields = ['Подрядчики по ННБ',]
+        extra_kwargs = {
+            'Подрядчики по ННБ': {'source': 'dd_contractor_name', 'read_only': True},
+        }
+
+
+class ContractorDrillSerializer_Add(serializers.ModelSerializer):
+    """Сериализатор для подрядчика ДЛЯ СОЗДАНИЯ МОДЕЛЕЙ """
+    class Meta:
+        model = ContractorDrill
+        fields = ['Подрядчики по бурению',]
+        extra_kwargs = {
+            'Подрядчики по бурению': {'source': 'drill_contractor_name', 'read_only': True},
+        }
+
 class PadnameSerializer(serializers.ModelSerializer):
     """Сериализатор для куста с именами (имя) ДЛЯ СОЗДАНИЯ МОДЕЛЕЙ """
-    field_name = serializers.CharField(source='get_field', read_only=True)
+    # field_name = serializers.CharField(source='get_field', read_only=True)
 
     class Meta:
         model = Pad
-        fields = ['id', 'field_name', 'pad_name']
+        fields = ['Месторождение', 'Куст']
+        extra_kwargs = {
+            'Месторождение': {'source': 'get_field', 'read_only': True},
+            'Куст': {'source': 'pad_name', 'read_only': True},
+        }
 
 
 class FieldnameSerializer(serializers.ModelSerializer):
     """Сериализатор для месторождение с именами (имя) ДЛЯ СОЗДАНИЯ МОДЕЛЕЙ """
-    client_name = serializers.CharField(source='get_client', read_only=True)
+    # client_name = serializers.CharField(source='get_client', read_only=True)
 
     class Meta:
         model = Field
-        fields = ['id', 'client_name', 'field_name', ]
+        fields = ['ДО', 'Месторождение', ]
+        extra_kwargs = {
+            'ДО': {'source': 'get_client', 'read_only': True},
+            'Месторождение': {'source': 'field_name', 'read_only': True},
+        }
 
 
 class PadSerializer(serializers.ModelSerializer):

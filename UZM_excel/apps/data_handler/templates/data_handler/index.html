@@ -27,10 +27,10 @@ body{
           {% endif %}
         </li>
         <li class="nav-item active">
-          {% if context.active == 'graph' %}
-          <a href="{% url 'graph' %}" class="nav-link active" style="font-size:large">Графики контроля</a>
+          {% if context.active == 'plan' %}
+          <a href="{% url 'plan' %}" class="nav-link active" style="font-size:large">Плановая траектория</a>
           {% else %}
-          <a href="{% url 'graph' %}" class="nav-link" style="font-size:large">Графики контроля</a>
+          <a href="{% url 'plan' %}" class="nav-link" style="font-size:large">Плановая траектория</a>
           {% endif %}
         </li>
         <li class="nav-item">

@@ -1,5 +1,6 @@
 from django.http import JsonResponse
 from rest_framework import generics, viewsets, mixins
+from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.viewsets import GenericViewSet
@@ -81,6 +82,7 @@ class SectionViewSet(viewsets.ModelViewSet):
 class WellboreViewSet(viewsets.ModelViewSet):
     queryset = Wellbore.objects.all()
     serializer_class = WellboreSerializer
+    permission_classes = [AllowAny]
 
 
 class WellViewSet(viewsets.ModelViewSet):
