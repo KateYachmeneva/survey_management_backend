@@ -16,5 +16,6 @@ urlpatterns = [
     path('telesystem', views.add_Device, name='add_device'),
     path('run_index', views.get_run_index, name='run_index'),  # надо оформить как api
     path('api/device_del', views.del_Device, name='device_del'),
+    path('api/meas_del', views.del_Meas, name='meas_del'),
     path('api/coef_device', views.get_coef_device, name='device_coef')
 ]

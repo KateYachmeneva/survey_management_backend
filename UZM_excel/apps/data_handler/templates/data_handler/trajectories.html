@@ -21,6 +21,7 @@
 
 <!-- ВЕРХНИИ КНОПКИ-->
 <div class="row" style="margin-top:1em;margin-right:0.1em;">
+    {% block top_title%}
     <div class="col-7">
         <div class="row">
             <div class="col-2"><b>Поиск:</b></div>
@@ -36,39 +37,41 @@
             <div class="col-2">{{context.plan_version}}</div>
         </div>
     </div>
+    {% endblock %}
+    {% block top_btn%}
     <div class="col-5" style="text-align: right;">
-        {% block top_button%}
         <br>
         {% if context.selected_id is not None %}
         <!--    Кнопка отвечает за плановую траекторию    -->
         {% if context.plan_ex == True %}
-        <button type="button" data-toggle="modal" data-target="#data_Modal2" data-run="{{context.selected_obj}}">
-            <a style="text-decoration: none;color: #000;">Заменить план</a>
+        <button type="button" class="btn btn-secondary" data-toggle="modal" data-target="#data_Modal2" data-run="{{context.selected_obj}}">
+            Заменить план
         </button>
         <!--    Кнопка отвечает за отправку отчёта    -->
-        <button id='btn_send' type="button" class="" onclick="Send_mail()">
+        <button id='btn_send' type="button" class="btn btn-primary" onclick="Send_mail()">
             <i id='fa_send' class="fa fa-spinner fa-spin" hidden></i>Отправить отчет
         </button>
         {% else %}
-        <button type="button" data-toggle="modal" data-target="#data_Modal2" data-run="{{context.selected_obj}}">
-            <a style="text-decoration: none;color: #000;">Добавить план</a>
+        <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#data_Modal2" data-run="{{context.selected_obj}}">
+            Добавить план
         </button>
         <!--    Кнопка отвечает за отправку отчёта    -->
-        <button  type="button" disabled>
-            Отправить отчет
-        </button>
+        <a class="tooltip-test" title="Для генерации отчёта необходимо добавить плановую траекторию.">
+        <button  type="button" class="btn btn-primary" disabled>
+            Отправить отчет </button><a>
         {% endif %}
 
         <!--    Кнопка отвечает за редактирование значений траектории    -->
-        <button type="button" class="" placeholder="" aria-controls="dtDynamicVerticalScrollExample">
-            <a href="{% url 'edit_traj' %}?run_id={{context.selected_id}} " style="text-decoration: none;color: #000;">Редактировать значения</a>
-        </button>
+        <a href="{% url 'edit_traj' %}?run_id={{context.selected_id}} " style="text-decoration: none;color: #000;">
+            <button type="button" class="btn btn-secondary" aria-controls="dtDynamicVerticalScrollExample">
+            Редактировать</button></a>
+
 
         {% else %}
         Выберите рейс в меню слева
         {% endif %}
-        {% endblock %}
     </div>
+    {% endblock %}
 </div>
 
 <!-- Для работы с таблицей как с формой-->
@@ -80,7 +83,7 @@
 <div class="scroll-table" style="margin-top: 0.5%;">
     <div class="scroll-table-head">
         <div class="row align-items-start">
-
+            {% block NnbTableHead%}
             <div class="col-3">
                 <table class="table table-light table-sm table-bordered table-hover" style="">
                     <thead class="thead-dark">
@@ -95,6 +98,8 @@
                     </thead>
                 </table>
             </div>
+            {% endblock %}
+            {% block IgirgiTableHead %}
             <div class="col-3">
                 <table class="table table-light table-sm table-bordered table-hover" style="">
                     <thead class="thead-dark">
@@ -109,6 +114,8 @@
                     </thead>
                 </table>
             </div>
+            {% endblock %}
+            {% block WasteTableHead %}
             <div class="col-6">
                 <table class="table table-light table-sm table-bordered table-hover" style="">
                     <thead class="thead-dark">
@@ -126,40 +133,45 @@
                     </thead>
                 </table>
             </div>
+            {% endblock %}
     </div>
     </div>
     <div class="scroll-table-body" style="margin-top:0.1%;">
         <div class="row align-items-start ">
+            {% block NnbTableBody%}
             <div class="col-3">
                 <table name="table-data" class="table table-light table-sm table-bordered table-hover">
                     <tbody>
                     {% for meas in context.nnb_data%}
-                    {% block data_tr2%}
                     <tr>
                         <td id="nnb_depth{{ forloop.counter0 }}" scope="col">{{meas.depth}}</td>
                         <td id="nnb_cor{{ forloop.counter0 }}" scope="col">{{meas.corner}}</td>
                         <td id="nnb_azimut{{ forloop.counter0 }}" scope="col">{{meas.azimut}}</td>
                     </tr>
-                    {% endblock %}
                     {% endfor %}
                     </tbody>
                 </table>
             </div>
+            {% endblock %}
+            {% block IgirgiTableBody %}
             <div class="col-3">
                 <table name="table-data" class="table table-light table-sm table-bordered table-hover">
                     <tbody>
                     {% for meas in context.igirgi_data%}
-                    {% block data_tr1%}
+
                     <tr>
                         <td id="igirgi_depth{{ forloop.counter0 }}" scope="col">{{meas.depth}}</td>
                         <td id="igirgi_cor{{ forloop.counter0 }}" scope="col">{{meas.corner}}</td>
                         <td id="igirgi_azimut{{ forloop.counter0 }}" scope="col">{{meas.azimut}}</td>
                     </tr>
-                    {% endblock %}
+
                     {% endfor %}
                     </tbody>
                 </table>
             </div>
+            {% endblock %}
+
+            {% block WasteTableBody %}
             <div class="col-6">
                 <table name="table-data" class="table table-light table-sm table-bordered table-hover">
                     <tbody>
@@ -175,29 +187,27 @@
                     </tbody>
                 </table>
             </div>
-
-
-
+            {% endblock %}
         </div>
     </div>
 </div>
 
 
 <!-- НИЖНИИ КНОПКИ-->
-{% block bottom_button%}
+{% block bottom_btn%}
 </form>
 
 {% if context.selected_id is not None %} <!-- Не отображать кнопки добавления без выбранного рейса-->
 <div class="row" style="margin-top:0.5em;margin-right:0.1em;">
-    <div class="col-3" style="text-align: right">
-       <button type="button" class="" placeholder="" data-toggle="modal" data-target="#data_Modal1" style="width:100%"
+    <div class="col-3" style="text-align: center;">
+       <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#data_Modal1" style="width:100%"
                 data-whatever="ННБ" data-run="{{context.selected_obj}}">
             Добавить значения
         </button>
 
     </div>
-    <div class="col-3" style="text-align: right;">
-        <button type="button" class="" placeholder="" data-toggle="modal" data-target="#data_Modal1" style="width:100%"
+    <div class="col-3" style="text-align: center;">
+        <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#data_Modal1" style="width:100%"
                data-whatever="ИГиРГИ" data-run="{{context.selected_obj}}">
             Добавить значения
         </button>
@@ -246,8 +256,8 @@
 
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Закрыть</button>
                 <button type="submit" class="btn btn-primary">Добавить</button>
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Закрыть</button>
             </div>
             </form>
         </div>
@@ -315,8 +325,8 @@
 
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Закрыть</button>
                 <button type="submit" class="btn btn-primary">Загрузить</button>
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Закрыть</button>
             </div>
             </form>
         </div>
@@ -383,6 +393,7 @@ function SearchFilter() {
   tables = document.getElementsByName("table-data");
   tr1 = tables[0].getElementsByTagName("tr");
   tr2 = tables[1].getElementsByTagName("tr");
+  tr3 = tables[2].getElementsByTagName("tr");
 
   // Цикл по всем строкам таблицы и сокрытие данных, что не подходят под поиск
   for (i = 0; i < tr1.length; i++) {
@@ -391,8 +402,10 @@ function SearchFilter() {
       txtValue = td.textContent || td.innerText;
       if (txtValue.toUpperCase().indexOf(filter) > -1) {
         tr1[i].style.display = "";
+        tr3[i].style.display = "";
       } else {
         tr1[i].style.display = "none";
+        tr3[i].style.display = "none";
       }
     }
   }

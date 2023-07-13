@@ -38,21 +38,21 @@
         {% if context.selected_run is not None %}
         <!--    Кнопка отвечает за загрузку плановой траектории    -->
         {% if context.plan_ex == True %}
-        <button type="button" data-toggle="modal" data-target="#data_Modal2" data-run="{{context.selected_obj}}">
-            <a style="text-decoration: none;color: #000;">Загрузить план</a>
+        <button type="button" class="btn btn-secondary" data-toggle="modal" data-target="#data_Modal2" data-run="{{context.selected_obj}}">
+            Заменить план
         </button>
         <!--    Кнопка отвечает за удаление плана    -->
-        <button id='btn_send' type="button" class="" onclick="delete_plan({{context.selected_obj.id}})">Удалить план
+        <button id='btn_send' type="button" class="btn btn-danger" onclick="delete_plan({{context.selected_obj.id}})">Удалить план
         </button>
         {% else %}
-        <button type="button" data-toggle="modal" data-target="#data_Modal2" data-run="{{context.selected_obj}}">
-            <a style="text-decoration: none;color: #000;">Добавить план</a>
+        <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#data_Modal2" data-run="{{context.selected_obj}}">
+            Добавить план
         </button>
         {% endif %}
 
         <!--    Кнопка отвечает за редактирование значений траектории    -->
-        <button type="button" class="" placeholder="" aria-controls="dtDynamicVerticalScrollExample" disabled>
-            Редактировать значения
+        <button type="button" class="btn btn-secondary" placeholder="" disabled>
+            Редактировать
         </button>
         {% else %}
         Выберите рейс в меню слева
@@ -166,8 +166,8 @@
 
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Закрыть</button>
                 <button type="submit" class="btn btn-primary">Загрузить</button>
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Закрыть</button>
             </div>
             </form>
         </div>

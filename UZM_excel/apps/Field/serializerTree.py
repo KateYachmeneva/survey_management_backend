@@ -68,7 +68,7 @@ class Tree(serializers.ModelSerializer):
     class Meta:
         model = Client
         depth = 6
-        fields = ['id','client', 'fields', ]
+        fields = ['id', 'client', 'fields', ]
 
     def get_client(self, obj):
         return str(obj)

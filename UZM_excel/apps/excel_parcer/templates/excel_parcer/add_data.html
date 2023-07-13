@@ -55,9 +55,9 @@
                   <select type="text" name="device" class="form-select" id="device">
                       {% for element in context.telesystem %}
                         {% if element == context.last_form.device %}
-                          <option selected>{{element}}</option>
+                          <option value="{{element}}" selected>{{element}}</option>
                         {% else %}
-                          <option>{{element}}</option>
+                          <option value="{{element}}">{{element}}</option>
                         {% endif %}
                       {% endfor %}
                   </select>
@@ -239,8 +239,9 @@
         fetch('http://'+window.location.hostname+':'+window.location.port+'/axes/run_index', {
         method: 'POST',
         body: params }).then(response=>response.json())
-        .then(data=>{console.log(data);
-                    document.getElementById("device").value=data.device;
+        .then(data=>{
+                    var device = data.device;
+                    document.getElementById("device").value= device;
                     document.getElementById("inp_depth").value = data.depth;
                     document.getElementById("inp_gx").value = data.GX;
                     document.getElementById("inp_gy").value = data.GY;
@@ -250,22 +251,22 @@
                     document.getElementById("inp_bz").value = data.BZ;
                     document.getElementById("inp_unit").value = data.unit;
                     document.getElementById("inp_string").value = data.string;
-                    })
 
-        var params = new FormData();
-        params.set('device_title', document.getElementById("device").value);
-        <!--    Заполнение коэффициентов пересчёта    -->
-        fetch('http://'+window.location.hostname+':'+window.location.port+'/axes/api/coef_device', {
-        method: 'POST',
-        body: params }).then(response=>response.json())
-        .then(data=>{console.log(data);
-                    document.getElementById("coef_gx").value = data.GX;
-                    document.getElementById("coef_gy").value = data.GY;
-                    document.getElementById("coef_gz").value = data.GZ;
-                    document.getElementById("coef_bx").value = data.BX;
-                    document.getElementById("coef_by").value = data.BY;
-                    document.getElementById("coef_bz").value = data.BZ;
-                    });
+                    var params = new FormData();
+                    params.set('device_title', device);
+                    <!--    Заполнение коэффициентов пересчёта    -->
+                    fetch('http://'+window.location.hostname+':'+window.location.port+'/axes/api/coef_device', {
+                    method: 'POST',
+                    body: params }).then(response=>response.json())
+                    .then(data=>{
+                                document.getElementById("coef_gx").value = data.GX;
+                                document.getElementById("coef_gy").value = data.GY;
+                                document.getElementById("coef_gz").value = data.GZ;
+                                document.getElementById("coef_bx").value = data.BX;
+                                document.getElementById("coef_by").value = data.BY;
+                                document.getElementById("coef_bz").value = data.BZ;
+                                });
+                    })
 
     });
 

@@ -37,9 +37,8 @@ def index(request):
         context['selected_run'] = current_run
 
         if 'data-axes' in request.POST:  # Модальная форма с ОСЯМИ
-            axes_data = request.POST['data-axes'].replace(',', '.').replace(' ', '').replace('\r', '').replace('\n',
-                                                                                                               '\t') \
-                .split('\t')
+            axes_data = request.POST['data-axes'].replace(',', '.'). \
+                replace(' ', '').replace('\r', '').replace('\n', '\t').split('\t')
             counter = 0
             manually_bz = list()
             manually_by = list()
@@ -68,7 +67,10 @@ def index(request):
                 counter = (0 if counter == 6 else counter + 1)
             # result - считанные данные
             result = zip(manually_depth, manually_gx, manually_gy, manually_gz, manually_bx, manually_by, manually_bz)
-            if request.POST.get('device') != '-----':
+            if request.POST.get('device') != '-----' and request.POST.get('device') != '':
+                telesystem_ind = TelesystemIndex.objects.get(run_id=current_run)
+                telesystem_ind.device = Device.objects.get(device_title=request.POST.get('device'))
+                telesystem_ind.save()
                 result2 = new_measurements(list(result), request.POST.get('device'))  # перобразованные данные
                 write_to_bd(result2, current_run)
             else:
@@ -108,9 +110,13 @@ def edit_index(request):
     # FIXME
     if request.method == 'POST':
         for items in request.POST.lists():
-            print(items)
             key = str(items[0]).split(' ')
-            obj = Data.objects.get(id=key[0])
+            try:
+                obj = Data.objects.get(id=key[0])
+            except:
+                continue
+                print('Замер уже удалён')
+
             if items[1][0] == '':
                 if key[1] == 'btotal':
                     obj.Btotal_corr = None
@@ -268,6 +274,13 @@ def graph(request):
     return render(request, 'excel_parcer/graph.html', {'context': context, })
 
 
+def del_Meas(request):
+    """Удаление замеров POST методом"""
+    for key, value in request.POST.dict().items():
+        Data.objects.get(id=key).delete()
+    return JsonResponse({'status': 'ok'})
+
+
 def del_Device(request):
     """Удаление телистемы по id"""
     dev = Device.objects.get(id=request.POST['device_id']).delete()
@@ -278,8 +291,10 @@ def get_coef_device(request):
     """api для fetch запроса
     Получаем коэффициенты
     """
-
-    device = Device.objects.get(device_title=request.POST.get('device_title'))
+    try:
+        device = Device.objects.get(device_title=request.POST.get('device_title'))
+    except:
+        return JsonResponse({'status': str(request.POST.get('device_title')) + '- такой телесистемы нет', })
 
     return JsonResponse({
         'GX': device.CX,

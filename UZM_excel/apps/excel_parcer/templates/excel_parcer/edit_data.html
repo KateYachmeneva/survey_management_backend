@@ -23,12 +23,14 @@ th  {
 {% block content %}
 <br>
 <center>
-    <form action="" method="post" enctype="multipart/form-data" style="margin-top:0%">
+    <form action="" method="post" enctype="multipart/form-data" style="margin-top:0%" id="meas_edit">
 
-        <button type="submit" style="border:1"> Сохранить </button>
+        <a class="tooltip-test" title="Удалить выбранные замеры">
+            <button type="button" id="del-btn" style="border:1" onclick="delete_meas()"> Удалить </button></a>
+        <a class="tooltip-test" title="Сохранить изменения (помеченные цветом замеры будут изменены)">
+        <button type="submit" style="border:1"> Сохранить </button></a>
         <a  href="{% url 'axes' %}" style="text-decoration: none;color: #000;">
             <button type="button" style="border:1"> Назад </button></a>
-
 
         <hr style="color:#FFC501;margin-top:1%;border-width: 3p2x">
 
@@ -39,6 +41,7 @@ th  {
                             name="table_axes">
                         <thead class="thead-dark">
                         <tr class="table" style="text-align: center;">
+                            <th><input type="checkbox" id="checkall"></th>
                             <th scope="col" style="width: 14%">Глубина</th>
                             <th scope="col" style="width: 14%">GX</th>
                             <th scope="col" style="width: 14%">GY</th>
@@ -52,6 +55,7 @@ th  {
                         <tbody>
                         {% for obj in context.data %}
                         <tr style="text-align: center;">
+                            <td><input type="checkbox" class="meas" name="{{obj.id}}" value="{{obj.id}}id"> </td>
                             <td scope="col"><input type="number" id="{{obj.id}}depth" value="{{obj.depth_dot}}" onchange="getName({{obj.id}},'depth')" step="0.01" style="text-align: center;Border: none; outline: none;width:100%;height:100%;"></td>
                             <td scope="col"><input type="number" id="{{obj.id}}gx" value="{{obj.CX_dot}}"  onchange="getName({{obj.id}},'gx')" step="0.00001" style="text-align: center;Border: none; outline: none;width:100%;height:100%;"></td>
                             <td scope="col"><input type="number" id="{{obj.id}}gy" value="{{obj.CY_dot}}"  onchange="getName({{obj.id}},'gy')" step="0.00001" style="text-align: center;Border: none; outline: none;width:100%;height:100%;"></td>
@@ -120,7 +124,7 @@ th  {
             </div>
         </div>
     </form>
-
+</center>
 
 <script>
 <!-- Загрузили страницу -->
@@ -167,6 +171,44 @@ function getName(depth, name) {
   if (arguments[1] == 'bz') {bz.name=arguments[0]+' '+'bz'}
   if (arguments[1] == 'btotal') {btotal.name=arguments[0]+' '+'btotal'}
   if (arguments[1] == 'dip') {dip.name=arguments[0]+' '+'dip'}
+}
+
+
+
+
+<!-- Чекбоксы для удаления замеров-->
+var checkboxes=document.querySelectorAll('input.meas'),
+checkall = document.getElementById('checkall');
+
+// если отметить все checkbox, то будет отмечен и главный,
+//если снять checked хотя бы с одного checkbox группы, то будет снят checked и с общего чекбокса,
+for (var i = 0; i < checkboxes.length; i++) {
+  checkboxes[i].onclick = function () {
+  var checkedCount = document.querySelectorAll('input.meas:checked').length;
+  checkall.checked = checkedCount > 0;
+  checkall.indeterminate = checkedCount > 0 && checkedCount < checkboxes.length;
+  }
+}
+//если будет поставлена/убрана галочка с основного чекбокса, то автоматом будут
+//убраны/установлены все флажки второстепенных checkbox.
+checkall.onclick = function () {
+for (var i = 0; i < checkboxes.length; i++) {
+  console.log("i " + i);
+  checkboxes[i].checked = this.checked;
+  }
+}
+
+<!-- Удаляем выбранные замеры-->
+function delete_meas(){
+    var params = new FormData(document.getElementById('meas_edit'));
+    fetch('http://'+window.location.hostname+':'+window.location.port+'/axes/api/meas_del',
+     { method: 'POST', body: params })
+     .then(response=>response.json()).
+      then(data=>{
+      location.reload();
+      console.log('Удалили');
+      });
+
 }
 </script>
 

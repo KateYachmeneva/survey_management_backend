@@ -10,13 +10,13 @@ from .function.model_service import get_data, clone_wellbore_data
 from .function.work_with_Excel import write_data_in_Excel
 from .function.work_with_data import rewrite_ReportIndex, work_with_file, plan_delete
 from Field.models import get_all_run, Run, Wellbore
-
+from .models import *
 
 def index(request):
     """Главная страница для генератора отчетов"""
 
     context = {"title": 'Отчет',
-               "run": get_all_run(),}
+               "run": get_all_run(), }
 
     if request.method == 'POST':
         index_id = rewrite_ReportIndex(request.POST.dict())  # перезапись индексов, получаем id текущего рейса
@@ -77,4 +77,16 @@ def plan_del(request):
     """ По fetch запросу с клиента удаляем замеры плана по указанному id"""
     # удаляем старый план
     plan_delete(Run.objects.get(id=request.POST['run_id']))
+    return JsonResponse({'status': 'ok'})
+
+
+def traj_del(request):
+    """ По fetch запросу с клиента удаляем замеры траектории по id"""
+    for key, value in request.POST.dict().items():
+        if 'igirgi' in key:
+            IgirgiStatic.objects.get(id=value).delete()
+        elif 'nnb' in key:
+            StaticNNBData.objects.get(id=value).delete()
+        else:
+            continue
     return JsonResponse({'status': 'ok'})

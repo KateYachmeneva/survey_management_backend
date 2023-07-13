@@ -9,15 +9,21 @@
     background-color: #fdb30d;}
 
 .link {
-  text-decoration: none;
+    text-decoration: none;
 }
-body{
-    overflow: hidden;}
+
+body{ overflow: hidden; }
 </style>
 
 <nav class="navbar navbar-expand-lg navbar-light bg-light">
   <div class="container-fluid">
-    <div class="collapse navbar-collapse">
+    <button class="btn btn-outline-secondary"
+            type="button"
+            data-bs-toggle="offcanvas"
+            data-bs-target="#TreeNavBar"
+            aria-controls="TreeNavBar">
+      <span class="navbar-toggler-icon"></span>
+    </button>
       <ul class="nav nav-pills m-auto">
         <li class="nav-item">
           {% if context.active == 'param' %}
@@ -41,12 +47,11 @@ body{
           {% endif %}
         </li>
       </ul>
-    </div>
   </div>
 </nav>
 
 <div class="row" style="margin: 0em;">
-      {% block left_panel %}
+    {% block left_panel %}
     <div class="col-2">
         <!-- Дерево -->
         <div class="flex-shrink-0 p-3 bg-white" style="width: 280px;">
@@ -97,7 +102,7 @@ body{
                                                                                         <ul class="btn-toggle-nav">
                                                                                             <!-- Рейс-->
                                                                                             {% for run_dict in section_dict.runs %}
-                                                                                            <li><a href="?run_id={{run_dict.id}}" class="run" {% if run_dict.run_number == context.selected_run and well_dict.well_name == context.selected_well and wellbore_dict.wellbore == context.selected_wellbore %} style="background-color: #fdb30d;" {% endif %}>{{run_dict.run_number}}</a></li>
+                                                                                            <li><a href="?run_id={{run_dict.id}}" onclick="SetRun({{run_dict.id}})" class="run" {% if run_dict.run_number == context.selected_run and well_dict.well_name == context.selected_well and wellbore_dict.wellbore == context.selected_wellbore %} style="background-color: #fdb30d;" {% endif %}>{{run_dict.run_number}}</a></li>
                                                                                             {% endfor %}
                                                                                             <!-- Конец Рейс-->
                                                                                         </ul>
@@ -135,6 +140,71 @@ body{
 
     </div>
     {% endblock %}
+
+
+  <!--  НОВОЕ ДЕРЕВО -->
+  <div class="offcanvas offcanvas-start" tabindex="-1" id="TreeNavBar">
+    <div class="offcanvas-header">
+      <h5 class="offcanvas-title" id="offcanvasNavbarLabel">
+        Выбор модели
+      </h5>
+      <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+    </div>
+    <div class="offcanvas-body">
+      <input class="form-control me-2" type="search" placeholder="Поиск(в разработке)">
+      <br>
+      {% for dict in context.tree %}
+      <div class="DO" id='tree'>
+          <button class="collapsed btn btn-toggle" data-bs-toggle="collapse" onclick="SetClient({{dict.id}})" href="#Client{{dict.id}}">
+          {{dict.client}}
+        </button>
+          <ul class="collapse" id="Client{{dict.id}}">
+            {% for field_dict in dict.fields %}
+            <!--      Месторождение      -->
+            <li style="cursor: pointer;"><span class="collapsed" data-bs-toggle="collapse" onclick="SetField({{field_dict.id}})" href="#Field{{field_dict.id}}">
+              {{field_dict.field_name}}</span>
+              <ul class="collapse" id="Field{{field_dict.id}}">
+                {% for pad_dict in field_dict.pads %}
+                <!--      Куст      -->
+                <li style="cursor: pointer;"><span  class="collapsed" data-bs-toggle="collapse" onclick="SetPad({{pad_dict.id}})" href="#Pad{{pad_dict.id}}">Куст {{pad_dict.pad_name}}</span>
+                  <ul class="collapse" id="Pad{{pad_dict.id}}">
+                    {% for well_dict in pad_dict.wells %}
+                    <!--      Скважина      -->
+                    <li style="cursor: pointer;"><span  class="collapsed" data-bs-toggle="collapse" onclick="SetWell({{well_dict.id}})" href="#Well{{well_dict.id}}">Скв. {{well_dict.well_name}}</span>
+                      <ul class="collapse" id="Well{{well_dict.id}}">
+                        {% for wellbore_dict in well_dict.wellbores %}
+                        <!--      Ствол     -->
+                        <li style="cursor: pointer;"><span  class="collapsed" data-bs-toggle="collapse" onclick="SetWellbore({{wellbore_dict.id}})" href="#Wellbore{{wellbore_dict.id}}">Ствол {{wellbore_dict.wellbore}}</span>
+                          <ul class="collapse" id="Wellbore{{wellbore_dict.id}}">
+                            {% for section_dict in wellbore_dict.sections %}
+                            <!--      Секция      -->
+                            <li style="cursor: pointer;"><span  class="collapsed" data-bs-toggle="collapse" onclick="SetSection({{section_dict.id}})" href="#Section{{section_dict.id}}">{{section_dict.section}}</span>
+                              <ul class="collapse run" id="Section{{section_dict.id}}">
+                                {% for run_dict in section_dict.runs %}
+                                <!--      Рейс      -->
+                                <li style="cursor: pointer;"><a href="?run_id={{run_dict.id}}" id='Run{{run_dict.id}}' onclick="SetRun({{run_dict.id}})" class="run"> Рейс {{run_dict.run_number}} </a>
+                                </li>
+                                {% endfor %}
+                              </ul>
+                            </li>
+                            {% endfor %}
+                          </ul>
+                        </li>
+                        {% endfor %}
+                      </ul>
+                    </li>
+                    {% endfor %}
+                  </ul>
+                </li>
+                {% endfor %}
+              </ul>
+            </li>
+            {% endfor %}
+          </ul>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
     <div class="col">
       {% block data %}
       {% endblock %}
@@ -143,5 +213,54 @@ body{
 
 
 <script src="{% static 'js/nav_menu.js'%}"></script>
+
+<script>
+<!-- Новое дерево открываем выбранный элемент -->
+window.addEventListener('load', () => {
+  console.log(data);
+  var selected_run = document.getElementById('Run'+ sessionStorage.getItem("run_id"));
+  console.log(selected_run)
+  selected_run.parentNode.style.background = "linear-gradient(to right, yellow 40%, transparent 80%)";
+  selected_run.classList.add('show');
+  selected_run.parentNode.parentNode.classList.add('show');
+  selected_run.parentNode.parentNode.parentNode.parentNode.classList.add('show');
+  selected_run.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.classList.add('show');
+  selected_run.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.classList.add('show');
+  selected_run.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.classList.add('show');
+  selected_run.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.classList.add('show');
+  selected_run.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.classList.add('show');
+  selected_run.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.style.background= "linear-gradient(to right, yellow 1%, transparent 5%)";
+});
+
+
+<!-- Записываем в session storage объекты которые храним -->
+function SetClient(id){
+    sessionStorage.setItem("client_id", id)
+}
+
+function SetField(id){
+    sessionStorage.setItem("field_id", id)
+}
+
+function SetPad(id){
+    sessionStorage.setItem("pad_id", id)
+}
+
+function SetWell(id){
+    sessionStorage.setItem("well_id", id)
+}
+
+function SetWellbore(id){
+    sessionStorage.setItem("wellbore_id", id)
+}
+
+function SetSection(id){
+    sessionStorage.setItem("section_id", id)
+}
+
+function SetRun(id){
+    sessionStorage.setItem("run_id", id)
+}
+</script>
 {% endblock %}
 
