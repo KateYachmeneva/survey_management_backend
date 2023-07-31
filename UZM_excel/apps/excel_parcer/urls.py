@@ -1,6 +1,6 @@
 from django.urls import path, include
 
-from . import views
+from . import views, views_api
 from .views_api import *
 from rest_framework import routers
 
@@ -17,5 +17,6 @@ urlpatterns = [
     path('run_index', views.get_run_index, name='run_index'),  # надо оформить как api
     path('api/device_del', views.del_Device, name='device_del'),
     path('api/meas_del', views.del_Meas, name='meas_del'),
-    path('api/coef_device', views.get_coef_device, name='device_coef')
+    path('api/coef_device', views.get_coef_device, name='device_coef'),
+    path('api/wellbore_copy', views_api.wellbore_copy)
 ]

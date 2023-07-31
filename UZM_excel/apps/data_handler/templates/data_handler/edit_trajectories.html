@@ -18,6 +18,15 @@ th  {
     height:2.5rem;
 }
 
+.noselect {
+	-webkit-touch-callout: none;
+	-webkit-user-select: none;
+	-khtml-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
+}
+
 </style>
 {% endblock %}
 
@@ -51,14 +60,16 @@ th  {
 
     <!--  ТАБЛИЦЫ С ДАННЫМИ  -->
     {% block NnbTableHead%}
-    <div class="col-6">
+    <div class="col-6 noselect">
         <table class="table table-light table-sm table-bordered table-hover" style="">
             <thead class="thead-dark">
             <tr>
                 <th scope="col" colspan="4">Данные ННБ</th>
             </tr>
             <tr >
-                <th><input type="checkbox" style="width:50%;height:50%" id="checkall_NNB"></th>
+                <th>
+                    <input type="checkbox" style="width:50%;height:50%" id="checkall_NNB">
+                </th>
                 <th scope="col" style="width:32%">Глубина</th>
                 <th scope="col" style="width:32%">Угол</th>
                 <th scope="col" style="width:32%">Азимут</th>
@@ -69,14 +80,16 @@ th  {
     {% endblock %}
 
     {% block IgirgiTableHead %}
-     <div class="col-6">
+     <div class="col-6 noselect">
          <table class="table table-light table-sm table-bordered table-hover" style="">
              <thead class="thead-dark">
              <tr>
                  <th scope="col" colspan="4">Данные ИГиРГИ</th>
              </tr>
              <tr>
-                 <th><input type="checkbox" style="width:50%;height:50%" id="checkall_IGIRGI"></th>
+                 <th>
+                     <input type="checkbox" style="width:50%;height:50%" id="checkall_IGIRGI">
+                 </th>
                  <th scope="col" style="width:32%">Глубина</th>
                  <th scope="col" style="width:32%">Угол</th>
                  <th scope="col" style="width:32%">Азимут</th>
@@ -89,12 +102,15 @@ th  {
     {% endblock %}
     <!--  тело таблицы  -->
     {% block NnbTableBody%}
-    <div class="col-6">
+    <div class="col-6 noselect">
         <table name="table-data" class="table table-light table-sm table-bordered table-hover">
             <tbody>
             {% for meas in context.nnb_data%}
             <tr>
-                <td><input type="checkbox" style="width:50%;height:50%" class="meas_nnb" name="nnb{{meas.id}}" value="{{meas.id}}"> </td>
+                <td>
+                    <input type="checkbox" style="width:50%;height:50%" onmouseover="if(isMouseDown){this.click();}"
+                           class="meas_nnb" name="nnb{{meas.id}}" value="{{meas.id}}">
+                </td>
                 <td style="width:32%"><input id="di{{meas.id}}" type="number" value="{{ meas.depth|formatted_float  }}"  onchange="getName({{meas.id}},'igi')" step="0.01" style="text-align: center;Border: none; outline: none;width:100%;height:100%;"></td>
                 <td style="width:32%"><input id="ci{{meas.id}}" type="number" value="{{ meas.corner|formatted_float  }}" onchange="getName({{meas.id}},'igi')" step="0.01" style="text-align: center;Border: none; outline: none;width:100%;height:100%;"></td>
                 <td style="width:32%"><input id="ai{{meas.id}}" type="number" value="{{ meas.azimut|formatted_float  }}" onchange="getName({{meas.id}},'igi')" step="0.01" style="text-align: center;Border: none; outline: none;width:100%;height:100%;"></td>
@@ -105,12 +121,15 @@ th  {
     </div>
     {% endblock %}
     {% block IgirgiTableBody %}
-    <div class="col-6">
+    <div class="col-6 noselect">
         <table name="table-data" class="table table-light table-sm table-bordered table-hover">
             <tbody>
             {% for meas in context.igirgi_data%}
             <tr>
-                <td><input type="checkbox"  style="width:50%;height:50%" class="meas_igirgi" name="igirgi{{meas.id}}" value="{{meas.id}}"> </td>
+                <td>
+                    <input type="checkbox"  style="width:50%;height:50%" onmouseover="if(isMouseDown){this.click();}"
+                           class="meas_igirgi" name="igirgi{{meas.id}}" value="{{meas.id}}">
+                </td>
                 <td style="width:32%"><input id="dn{{meas.id}}" type="number" value="{{meas.depth |formatted_float  }}"   onchange="getName({{meas.id}},'nnb')" step="0.01" style="text-align: center;padding:0em; Border: none; outline: none;width:100%;height:100%;"></td>
                 <td style="width:32%"><input id="cn{{meas.id}}" type="number" value="{{meas.corner|formatted_float  }}"  onchange="getName({{meas.id}},'nnb')"  step="0.01" style="text-align: center;padding:0em; Border: none; outline: none;width:100%;height:100%;"></td>
                 <td style="width:32%"><input id="an{{meas.id}}" type="number" value="{{meas.azimut|formatted_float  }}"  onchange="getName({{meas.id}},'nnb')"  step="0.01" style="text-align: center;padding:0em; Border: none; outline: none;width:100%;height:100%;"></td>
@@ -231,6 +250,16 @@ function delete_meas(){
       });
 
 }
+
+<!-- Для определения зажата ли кнопка ЛКМ-->
+var isMouseDown = false;
+document.body.onmousedown = function() {
+  isMouseDown = true;
+}
+document.body.onmouseup = function() {
+  isMouseDown = false;
+}
+
 
 </script>
 {% endblock %}

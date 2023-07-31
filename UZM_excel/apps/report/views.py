@@ -6,7 +6,7 @@ from django.shortcuts import render, redirect
 
 # Create your views here.
 from .function.api_func import get_index
-from .function.model_service import get_data, clone_wellbore_data
+from .function.model_service import get_data, clone_wellbore_traj
 from .function.work_with_Excel import write_data_in_Excel
 from .function.work_with_data import rewrite_ReportIndex, work_with_file, plan_delete
 from Field.models import get_all_run, Run, Wellbore
@@ -66,7 +66,7 @@ def get_file(request):
 def wellbore_copy(request):
     """ По fetch запросу с клиента клонируются замеры ствола
     (в request должны лежать id нового и старого стволов, сама модель Wellbore создается в модуле Field заранее)"""
-    clone_wellbore_data(Wellbore.objects.get(id=request.POST['old_wellbore']),
+    clone_wellbore_traj(Wellbore.objects.get(id=request.POST['old_wellbore']),
                         Wellbore.objects.get(id=request.POST['new_wellbore']))
     time.sleep(3)  # Данные не успевают добавиться в базу до отображения на странице
     return JsonResponse({'status': 'ok'})

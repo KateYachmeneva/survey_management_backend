@@ -159,10 +159,10 @@ class Well(models.Model):
         null=True,
         blank=True
     )
-    latitude = models.FloatField('Широта (ось Y)', null=True, blank=True)
-    longtitude = models.FloatField('Долгота (ось X)', null=True, blank=True)
-    NY = models.FloatField('Широта (прямоугольные координаты), м', null=True, blank=True)
-    EX = models.FloatField('Долгота (прямоугольные координаты), м', null=True, blank=True)
+    latitude = models.TextField('Широта географическая', null=True, blank=True)
+    longtitude = models.TextField('Долгота географическая', null=True, blank=True)
+    NY = models.FloatField('Широта Y (прямоугольные координаты), м', null=True, blank=True)
+    EX = models.FloatField('Долгота X (прямоугольные координаты), м', null=True, blank=True)
     north_direction = models.CharField(
         'Направление на север',
         max_length=4,

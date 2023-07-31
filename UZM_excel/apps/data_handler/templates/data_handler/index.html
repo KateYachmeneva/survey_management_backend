@@ -22,7 +22,7 @@ body{ overflow: hidden; }
             data-bs-toggle="offcanvas"
             data-bs-target="#TreeNavBar"
             aria-controls="TreeNavBar">
-      <span class="navbar-toggler-icon"></span>
+      <span class="navbar-toggler-icon"></span> Выбор модели
     </button>
       <ul class="nav nav-pills m-auto">
         <li class="nav-item">
@@ -217,19 +217,24 @@ body{ overflow: hidden; }
 <script>
 <!-- Новое дерево открываем выбранный элемент -->
 window.addEventListener('load', () => {
-  console.log(data);
   var selected_run = document.getElementById('Run'+ sessionStorage.getItem("run_id"));
-  console.log(selected_run)
-  selected_run.parentNode.style.background = "linear-gradient(to right, yellow 40%, transparent 80%)";
+  var selected_section = document.getElementById('Section'+ sessionStorage.getItem("section_id"));
+  var selected_wellbore = document.getElementById('Wellbore'+ sessionStorage.getItem("wellbore_id"));
+  var selected_well = document.getElementById('Well'+ sessionStorage.getItem("well_id"));
+  var selected_pad = document.getElementById('Pad'+ sessionStorage.getItem("pad_id"));
+  var selected_field = document.getElementById('Field'+ sessionStorage.getItem("field_id"));
+  var selected_client = document.getElementById('Client'+ sessionStorage.getItem("client_id"));
+   <!--  console.log(selected_run)-->
+  selected_client.classList.add('show');
+  selected_client.parentNode.style.background= "linear-gradient(to right, yellow 1%, transparent 5%)";
+  selected_field.classList.add('show');
+  selected_pad.classList.add('show');
+  selected_well.classList.add('show');
+  selected_wellbore.classList.add('show');
+  selected_section.classList.add('show');
+
   selected_run.classList.add('show');
-  selected_run.parentNode.parentNode.classList.add('show');
-  selected_run.parentNode.parentNode.parentNode.parentNode.classList.add('show');
-  selected_run.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.classList.add('show');
-  selected_run.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.classList.add('show');
-  selected_run.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.classList.add('show');
-  selected_run.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.classList.add('show');
-  selected_run.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.classList.add('show');
-  selected_run.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.style.background= "linear-gradient(to right, yellow 1%, transparent 5%)";
+  selected_run.parentNode.style.background = "linear-gradient(to right, yellow 40%, transparent 80%)";
 });
 
 

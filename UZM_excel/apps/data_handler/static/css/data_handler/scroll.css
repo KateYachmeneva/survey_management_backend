@@ -6,13 +6,6 @@
 }
 
 .scroll-body {  /*Скрол по аналогии с таблице для div*/
-	height: 80em;
-	width: 100%;
-	overflow-y: auto;
-	overflow-x: hidden;
-}
-
-.scroll-body {  /*Скрол по аналогии с таблице для div*/
 	height: 44em;
 	width: 100%;
 	overflow-y: auto;
@@ -20,21 +13,20 @@
 }
 
 .scroll-table-head {
-	width: 100%;
+	width: 99%;
 }
 
 .scroll-table table {
-	width:100%;
+	width: 100%;
 }
-
 .scroll-table thead th {
-    width:10em;
+    width: 10em;
     text-align: center;
     vertical-align: middle;
 
 }
 .scroll-table tbody td {
-    width:10em;
+    width: 10em;
     text-align: center;
     vertical-align: middle;
 }

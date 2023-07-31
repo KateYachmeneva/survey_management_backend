@@ -91,9 +91,9 @@
                         <th scope="col" colspan="3">Данные ННБ</th>
                     </tr>
                     <tr >
-                        <th scope="col">Глубина</th>
-                        <th scope="col">Угол</th>
-                        <th scope="col">Азимут</th>
+                        <th scope="col" style="font-size:0.8em">Глубина</th>
+                        <th scope="col" style="font-size:0.8em">Угол</th>
+                        <th scope="col" style="font-size:0.8em">Азимут</th>
                     </tr>
                     </thead>
                 </table>
@@ -107,29 +107,40 @@
                         <th scope="col" colspan="3">Данные ИГиРГИ</th>
                     </tr>
                     <tr >
-                        <th scope="col">Глубина</th>
-                        <th scope="col">Угол</th>
-                        <th scope="col">Азимут</th>
+                        <th scope="col" style="font-size:0.8em">Глубина</th>
+                        <th scope="col" style="font-size:0.8em">Угол</th>
+                        <th scope="col" style="font-size:0.8em">Азимут</th>
                     </tr>
                     </thead>
                 </table>
             </div>
             {% endblock %}
             {% block WasteTableHead %}
-            <div class="col-6">
+            <div class="col-4">
                 <table class="table table-light table-sm table-bordered table-hover" style="">
                     <thead class="thead-dark">
                     <tr>
                         <th scope="col" colspan="2">Разница</th>
                         <th scope="col" colspan="3">Отходы</th>
                     </tr>
-                    <tr >
-                        <th scope="col">∆Угол</th>
-                        <th scope="col">∆Азимут</th>
-                        <th scope="col">По горизонтали</th>
-                        <th scope="col">По вертикали</th>
-                        <th scope="col">Общий</th>
+                    <tr>
+                        <th scope="col" style="font-size:0.8em">∆Угол</th>
+                        <th scope="col" style="font-size:0.8em">∆Азимут</th>
+                        <th scope="col" style="font-size:0.8em">По горизонтали</th>
+                        <th scope="col" style="font-size:0.8em">По вертикали</th>
+                        <th scope="col" style="font-size:0.8em">Общий</th>
                     </tr>
+                    </thead>
+                </table>
+            </div>
+
+            <div class="col-2">
+                <table class="table table-light table-sm table-bordered table-hover">
+                    <thead class="thead-dark">
+                    <tr>
+                        <th scope="col" style="width: 240px;" rowspan="2">Комментарии</th>
+                    </tr>
+                    <tr></tr>
                     </thead>
                 </table>
             </div>
@@ -158,30 +169,45 @@
                 <table name="table-data" class="table table-light table-sm table-bordered table-hover">
                     <tbody>
                     {% for meas in context.igirgi_data%}
-
                     <tr>
                         <td id="igirgi_depth{{ forloop.counter0 }}" scope="col">{{meas.depth}}</td>
                         <td id="igirgi_cor{{ forloop.counter0 }}" scope="col">{{meas.corner}}</td>
                         <td id="igirgi_azimut{{ forloop.counter0 }}" scope="col">{{meas.azimut}}</td>
                     </tr>
-
                     {% endfor %}
                     </tbody>
                 </table>
             </div>
             {% endblock %}
-
+            <!--       Таблица с отхоадми и комментариями     -->
             {% block WasteTableBody %}
-            <div class="col-6">
+            <div class="col-4">
                 <table name="table-data" class="table table-light table-sm table-bordered table-hover">
                     <tbody>
                     {% for ind in context.waste_index %}
                     <tr>
-                        <td id="delta_cor{{ forloop.counter0 }}" name="delta1" scope="col"></td>
-                        <td id="delta_azimut{{ forloop.counter0 }}" name="delta2" scope="col"></td>
-                        <td name="waste1" scope="col">{{ context.waste_hor|index:ind }}</td>
-                        <td name="waste2" scope="col">{{ context.waste_vert|index:ind }}</td>
-                        <td name="waste3" scope="col">{{ context.waste_common|index:ind }}</td>
+                        <td id="delta_cor{{ forloop.counter0 }}" name="delta1"></td>
+                        <td id="delta_azimut{{ forloop.counter0 }}" name="delta2"></td>
+                        <td name="waste1">{{ context.waste_hor|index:ind }}</td>
+                        <td name="waste2">{{ context.waste_vert|index:ind }}</td>
+                        <td name="waste3">{{ context.waste_common|index:ind }}</td>
+                    </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+
+            <div class="col-2">
+                <table class="table table-light table-sm table-bordered table-hover">
+                    <tbody>
+                    {% for ind in context.waste_index %}
+                    <tr>
+                        <td style="width: 340px; padding: 0em;">
+                            <textarea style="width: 100%; height: 1.6em;
+                                             padding: 0em; border: none;">{{ind}}
+                            </textarea>
+                        </td>
                     </tr>
                     {% endfor %}
                     </tbody>
@@ -380,8 +406,6 @@ function Send_mail() {
     document.getElementById("fa_send").hidden = true;
     })
 
-
-
 }
 
 <!-- Функция поиска -->
@@ -409,7 +433,7 @@ function SearchFilter() {
       }
     }
   }
-  // Цикл по всем строкам таблицы и сокрытие данных, что неподходят под поиск
+  // Цикл по всем строкам таблицы и сокрытие данных, что не подходят под поиск
   for (i = 0; i < tr2.length; i++) {
     td = tr2[i].getElementsByTagName("td")[0];
     if (td) {

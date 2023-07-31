@@ -41,6 +41,27 @@ class AddWellForm(ModelForm):
             'longtitude': widgets.TextInput(),
         }
 
+    def transform(self):
+        """ [Доп. функционал] [Не используется] Преобразуем значения долготы и широты в десятичные значения """
+        if self.data['latitude'] != '' or self.data['longtitude'] != '':  # Ввод КООРДИНАТЫ УСТЬЯ XX YY ZZ
+            _mutable = self.data._mutable  # изменяем QueryDicts
+            self.data._mutable = True
+            try:
+                lat_v = [float(idx) for idx in self.data['latitude'].replace(',', '.').split(' ')]
+                self.data['latitude'] = (round(float(lat_v[0]) + float(lat_v[1]) / 60 + float(lat_v[2]) / 3600, 3)
+                                         if len(lat_v) > 2 else float(lat_v[0]))
+            except:
+                self.data['latitude'] = ''
+
+            try:
+                long_v = [float(idx) for idx in self.data['longtitude'].replace(',', '.').split(' ')]
+                self.data['longtitude'] = (round(float(long_v[0]) + float(long_v[1]) / 60 + float(long_v[2]) / 3600, 3)
+                                           if len(long_v) > 2 else float(long_v[0]))
+            except:
+                self.data['longtitude'] = ''
+
+            self.data._mutable = _mutable
+
 
 class AddWellboreForm(ModelForm):
     class Meta:

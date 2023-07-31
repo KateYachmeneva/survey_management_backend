@@ -15,9 +15,11 @@ from Field.forms import AddWellForm
 
 def index(request):
     """Главная страница"""
-    context = {"title": 'Работа с данными',
-               }
-    return render(request, 'data_handler/index.html', {'context': context, })
+    return redirect(param)
+    # context = {"title": 'Работа с данными',
+    #            "tree": get_tree(),
+    #            }
+    # return render(request, 'data_handler/index.html', {'context': context, })
 
 
 def traj(request):

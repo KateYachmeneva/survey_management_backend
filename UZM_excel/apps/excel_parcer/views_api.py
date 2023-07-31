@@ -2,6 +2,7 @@
 from rest_framework import viewsets
 
 from .function.functions import new_measurements, write_to_bd
+from .function.model_service import clone_wellbore_axes
 from .models import *
 from .serializer import *
 from django.http import JsonResponse
@@ -66,3 +67,9 @@ class DataByRunAPIView(APIView):
         return JsonResponse({'status': 'good'})
 
 
+# axes/api/wellbore_copy
+def wellbore_copy(request):
+    """ По fetch запросу с клиента клонируются замеры ствола c осями
+    (в request должны лежать id нового и старого стволов, сама модель Wellbore создается в модуле Field заранее)"""
+    clone_wellbore_axes(request)
+    return JsonResponse({'status': 'ok'})

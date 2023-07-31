@@ -1,3 +1,5 @@
+""" Функции по чтению осей с файла и их преобразованию """
+
 import csv
 import re
 from typing import NoReturn

@@ -248,11 +248,17 @@ $('#data_Modal1').on('show.bs.modal', function (event) {
 
 function clone_wellbore(){
     var params = new FormData(document.getElementById('clone_form'));
+    <!--    Запрос на создание моделей скважины, секций и рейсов     -->
     fetch('http://'+window.location.hostname+':'+window.location.port+'/main_data/api/wellbore/clone',
    { method: 'POST', body: params }).then(response => response.json()).then(data=>{
             params = new FormData();
             params.set('old_wellbore', data['old_wellbore']);
             params.set('new_wellbore', data['new_wellbore']);
+            <!--    Запрос на копию замеров     -->
+                <!--       Копия осей     -->
+            fetch('http://'+window.location.hostname+':'+window.location.port+'/axes/api/wellbore_copy',
+                     { method: 'POST', body: params });
+                <!--       Копия траектории     -->
             fetch('http://'+window.location.hostname+':'+window.location.port+'/report/api/wellbore_copy',
                      { method: 'POST', body: params })
                      .then(response=>response.json()).then(

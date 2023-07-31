@@ -135,7 +135,7 @@ def waste(Wellbore: object, full: int = 0):
     return horiz, vert, departure
 
 
-def clone_wellbore_data(old_wellbore: object, new_wellbore: object) -> str:
+def clone_wellbore_traj(old_wellbore: object, new_wellbore: object) -> str:
     """Клонирование всех замеров старого ствола в новый ствол"""
     igirgi_list = list()
     nnb_list = list()

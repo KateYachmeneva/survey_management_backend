@@ -1,3 +1,4 @@
+""" Новый файл для работы с экселем [удалить]"""
 from openpyxl import Workbook
 
 
