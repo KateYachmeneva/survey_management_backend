@@ -299,10 +299,10 @@ window.addEventListener('load', () => {
 
 <!--Записываем выбранный рейс и его скважину-->
 document.getElementById('run-select').addEventListener('change', function () {
-    let well_list = {{context.wells_id}};
+    let wellbores_list = {{context.wellbores_id}};
     let num_select = document.getElementById('run-select').selectedIndex;
 
-    sessionStorage.setItem("well_id", well_list[num_select]);
+    sessionStorage.setItem("wellbore_id", wellbores_list[num_select]);
     sessionStorage.setItem("run_id", document.getElementById('run-select').options[num_select].value);
 });
 

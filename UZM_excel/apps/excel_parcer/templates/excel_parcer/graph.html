@@ -1,5 +1,5 @@
-{% extends 'base.html' %}
-{% load static%}
+{% extends 'excel_parcer/index.html' %}
+{% load static %}
 
 {% block head %}
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.bundle.min.js"></script>
@@ -8,40 +8,54 @@
 
 {% endblock %}
 
-{% block content %}
+{% block menu %}
+<div class="col-6" style="text-align:center;">
+  <form action="" id="well-select" method="post">
+    {% csrf_token %}
+    <input name="wellbore" value="" id="wellbore_id" hidden>
+  <div class="btn-group" role="group">
+    <button id='show-graph' type="submit" class="btn btn-outline-primary">Показать данные</button>
+    <button onclick="location.href = {% url 'axes' %}" type="button" class="btn btn-outline-primary">
+      Вернуться к данным</button>
+  </div>
+  </form>
+</div>
+{% endblock %}
+
+{% block data %}
 <link type="text/css" href="{% static 'css/data_handler/chart.css' %}" rel="stylesheet">
 <center>
 
-<div style="max-width:5000px">
-    <!--      /start Временное решение      -->
-    <form action="" method="post" enctype="multipart/form-data" style="margin-top:1%">
-        {% csrf_token %}
-        <div style="max-width:500px">
-            <a>Выберите скважину</a>
-                <p></p>
-                 <div class="input-group mb-3">
-                   <select name="well" class="form-select" id="well-select">
-                       {% for w in context.well %}
-                       {% if w.id == context.selected.id%}
-                       <option value="{{w.id}}" selected>{{w}}</option>
-                       {% else %}
-                       <option value="{{w.id}}">{{w}}</option>
-                       {% endif %}
-                       {% endfor %}
-                   </select>
-                 </div>
-        </div>
-        <button type="submit" id='show-graph' style="border:1">Показать графики</button>
-        <button type="button" id="data-redirect" style="border:1">Вернуться к данным</button>
-    </form>
-    <!--      /end Временное решение      -->
-</div>
+<!--<div>-->
+<!--    &lt;!&ndash;      /start Временное решение      &ndash;&gt;-->
+<!--    <form action="" method="post" enctype="multipart/form-data" style="margin-top:1%">-->
+<!--        {% csrf_token %}-->
+<!--        <div style="max-width:500px">-->
+<!--            <a>Выберите скважину</a>-->
+<!--                <p></p>-->
+<!--                 <div class="input-group mb-3">-->
+<!--                   <select name="well" class="form-select" id="well-select">-->
+<!--                       {% for w in context.well %}-->
+<!--                       {% if w.id == context.selected.id%}-->
+<!--                       <option value="{{w.id}}" selected>{{w}}</option>-->
+<!--                       {% else %}-->
+<!--                       <option value="{{w.id}}">{{w}}</option>-->
+<!--                       {% endif %}-->
+<!--                       {% endfor %}-->
+<!--                   </select>-->
+<!--                 </div>-->
+<!--        </div>-->
+<!--        <button type="submit" id='show-graph' style="border:1">Показать графики</button>-->
+<!--        <button type="button" id="data-redirect" style="border:1">Вернуться к данным</button>-->
+<!--    </form>-->
+<!--    &lt;!&ndash;      /end Временное решение      &ndash;&gt;-->
+<!--</div>-->
 
-<hr style="color:#FFC501;margin-top:1%;border-width: 3px">
+<!--<hr style="color:#FFC501;margin-top:1%;border-width: 3px">-->
 
 <div class="well-header">
-  <h2>  {{context.selected.well}}</h2>
-<label class = "status">{{context.selected.well.get_status}}</label></div>
+  <h2>{{context.selected}}</h2>
+  <label class = "status">{{context.selected.well_name.get_status}}</label></div>
 <div class="container" >
   <div class="container-form" >  
   <div class="chart-header"> График соотношения показаний осевого и поперечных акселерометров </div>
@@ -182,6 +196,7 @@
   </div>
 </div>
 
+</center>
 <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/hammer.js/2.0.8/hammer.min.js"></script>
 <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.bundle.min.js"></script>
 <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/chartjs-plugin-zoom/0.6.6/chartjs-plugin-zoom.js"></script>
@@ -1514,24 +1529,15 @@ document.getElementById('well-select').addEventListener('change', function () {
 
 <!-- При загрузке открываем выбранную ранее скважину -->
 window.addEventListener('load', () => {
-    let well_id = sessionStorage.getItem("well_id");
-    if (well_id != null) {
-      Array.from(document.getElementById('well-select').options).forEach(function(element){
-      if (element.value == well_id) {element.selected = true;}
-      });
-      {% if context.selected.well == 'None' %}
+    let wellbore_id = sessionStorage.getItem("wellbore_id");
+    if (wellbore_id != null) {
+      document.getElementById('wellbore_id').value = wellbore_id
+      {% if context.selected == 'None' %}
        document.getElementById('show-graph').click();
       {% endif %}
-
     }
 });
 
-
-<!-- Перенаправление на стринцу с данными рейса (осями) для их изменения/добавления-->
-document.getElementById('data-redirect').addEventListener('click', function () {
-  window.location.href = {% url 'axes' %};
-});
 </script>
 
-</center>
 {% endblock %}

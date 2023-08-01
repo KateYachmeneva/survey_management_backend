@@ -80,6 +80,15 @@ def plan_del(request):
     return JsonResponse({'status': 'ok'})
 
 
+# report/api/traj_comm
+def put_comment(request):
+    """Обновить/создать комментарий у замера ННБ"""
+    meas = StaticNNBData.objects.get(id=request.POST['id'])
+    meas.comment = request.POST['comment']
+    meas.save()
+    return JsonResponse({'status': 'ok'})
+
+
 def traj_del(request):
     """ По fetch запросу с клиента удаляем замеры траектории по id"""
     for key, value in request.POST.dict().items():

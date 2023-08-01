@@ -6,7 +6,7 @@ from .function.functions import *
 
 from django.http import JsonResponse, HttpResponse
 import re
-
+from Field.views_api import get_tree
 from Field.models import Well, Run, Wellbore, Run, get_all_run, Section, get_all_well
 from .models import Data, TelesystemIndex, Device
 
@@ -17,20 +17,21 @@ def index(request):
     """
     context = {"title": 'Оси',
                "run": get_all_run(),
-               "wells_id": list(),  # повторяет run только с индексами скважин
+               "wellbores_id": list(),  # повторяет run только с индексами скважин
                'selected_run': 'None',
                'error_depth': list(),  # глубины замеров при вставке которых нашли ошибку
                "telesystem": Device.objects.all(),
                }
     # Для сохранения в SessionStorage на клиенте id выбранной скважине по рейсу
     for run in context['run']:
-        context['wells_id'].append(run.section.wellbore.well_name.id)
+        context['wellbores_id'].append(run.section.wellbore.id)
 
     if request.method == 'POST':
         # получение данных для отображения
         try:
             current_run = Run.objects.get(id=request.POST['run'])
-        except:
+        except Exception as e:
+            print(e)
             return render(request, 'excel_parcer/data.html', {'context': context, })
         context['well'] = current_run.section.wellbore.well_name
         context['data'] = Data.objects.filter(run=request.POST['run'], in_statistics=1).order_by('depth')
@@ -202,38 +203,17 @@ def add_Device(request):
 
 def graph(request):
     """Страница с графиком первичного контроля"""
-    context = {
-        'title': 'Контроль качества',
-        'well': get_all_well(),
-        "active": 'graph',
-        'depthGoxy': list(),
-        'depthGz': list(),
-        'depthGtotal': list(),
-        'depthGref': list(),
-        'depthGmax': list(),
-        'depthGmin': list(),
-        'depthBoxy': list(),
-        'depthBz': list(),
-        'depthBtotal': list(),
-        'depthBref': list(),
-        'depthBmax': list(),
-        'depthBmin': list(),
-        'depthBcorr': list(),
-        'depthDipraw': list(),
-        'depthDipref': list(),
-        'depthDipmax': list(),
-        'depthDipmin': list(),
-        'depthDipcorr': list(),
-        'depthHSTF': list(),
-        'selected': dict(),  # По переменной следим за перезагрузкой страницы
-    }
-    context['selected']["well"] = 'None'
+    context = {'title': 'Контроль качества', "tree": get_tree(), 'depthGoxy': list(),
+               'depthGz': list(), 'depthGtotal': list(), 'depthGref': list(), 'depthGmax': list(), 'depthGmin': list(),
+               'depthBoxy': list(), 'depthBz': list(), 'depthBtotal': list(), 'depthBref': list(), 'depthBmax': list(),
+               'depthBmin': list(), 'depthBcorr': list(), 'depthDipraw': list(), 'depthDipref': list(),
+               'depthDipmax': list(), 'depthDipmin': list(), 'depthDipcorr': list(), 'depthHSTF': list(),
+               'selected': 'None'}
 
-    if request.method == 'POST':
-        well = Well.objects.get(id=request.POST['well'])
-        runs = Run.objects.filter(section__wellbore__well_name=well)
-        context['selected']["well"] = well  # для отображения на странице
-        context['selected']["id"] = request.POST['well']
+    if request.method == 'POST' and request.POST['wellbore'] != '':
+        wellbore = Wellbore.objects.get(id=request.POST['wellbore'])
+        runs = Run.objects.filter(section__wellbore=wellbore)
+        context['selected'] = wellbore
         for run in runs:
             surveys = Data.objects.filter(run=run)
             for survey in surveys:
@@ -242,26 +222,26 @@ def graph(request):
                 context['depthGz'].append({'x': survey.depth, 'y': survey.CZ})
                 # График Gtotal
                 context['depthGtotal'].append({'x': survey.depth, 'y': survey.Gtotal()})
-                context['depthGref'].append({'x': survey.depth, 'y': well.gtotal_graph()})
-                context['depthGmax'].append({'x': survey.depth, 'y': well.max_gtotal()})
-                context['depthGmin'].append({'x': survey.depth, 'y': well.min_gtotal()})
+                context['depthGref'].append({'x': survey.depth, 'y': wellbore.well_name.gtotal_graph()})
+                context['depthGmax'].append({'x': survey.depth, 'y': wellbore.well_name.max_gtotal()})
+                context['depthGmin'].append({'x': survey.depth, 'y': wellbore.well_name.min_gtotal()})
                 # График Boxy-Bz
                 context['depthBoxy'].append({'x': survey.depth, 'y': survey.get_boxy()})
                 context['depthBz'].append({'x': survey.depth, 'y': survey.BZ})
                 # График Btotal
                 context['depthBtotal'].append({'x': survey.depth, 'y': survey.Btotal()})
-                context['depthBref'].append({'x': survey.depth, 'y': well.btotal_graph()})
-                context['depthBmax'].append({'x': survey.depth, 'y': well.max_btotal()})
-                context['depthBmin'].append({'x': survey.depth, 'y': well.min_btotal()})
+                context['depthBref'].append({'x': survey.depth, 'y': wellbore.well_name.btotal_graph()})
+                context['depthBmax'].append({'x': survey.depth, 'y': wellbore.well_name.max_btotal()})
+                context['depthBmin'].append({'x': survey.depth, 'y': wellbore.well_name.min_btotal()})
                 context['depthBcorr'].append({'x': survey.depth, 'y': (survey.Btotal_corr if
                                                                        survey.Btotal_corr is not None else 'Null')})
                 # График HSTF
                 context['depthHSTF'].append({'x': survey.depth, 'y': survey.get_hstf()})
                 # График Dip
                 context['depthDipraw'].append({'x': survey.depth, 'y': survey.Dip()})
-                context['depthDipref'].append({'x': survey.depth, 'y': well.dip_graph()})
-                context['depthDipmax'].append({'x': survey.depth, 'y': well.max_dip()})
-                context['depthDipmin'].append({'x': survey.depth, 'y': well.min_dip()})
+                context['depthDipref'].append({'x': survey.depth, 'y': wellbore.well_name.dip_graph()})
+                context['depthDipmax'].append({'x': survey.depth, 'y': wellbore.well_name.max_dip()})
+                context['depthDipmin'].append({'x': survey.depth, 'y': wellbore.well_name.min_dip()})
                 context['depthDipcorr'].append({'x': survey.depth, 'y': (survey.DIP_corr if
                                                                          survey.DIP_corr is not None else 'Null')})
 

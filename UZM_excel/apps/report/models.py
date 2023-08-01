@@ -71,6 +71,7 @@ class StaticNNBData(models.Model):
     corner = models.FloatField('угол', null=True)
     azimut = models.FloatField('азимут', null=True)
     run = models.ForeignKey(Run, on_delete=models.CASCADE, null=True)
+    comment = models.TextField('комментарий', null=True)
 
     def __str__(self):
         return f"Глубина {self.depth}"

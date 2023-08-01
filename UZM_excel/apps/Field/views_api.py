@@ -111,9 +111,10 @@ class WellWithRunViewSet(mixins.RetrieveModelMixin,
 
 
 def get_tree() -> list:
-    """ Дерево для меню """
+    """ Дерево для меню [Здесь лежит дерево на сериализаторах и все рейсы для поиска]"""
     trees = Tree(Client.objects.all(), many=True).data
-    return trees
+    runs = get_all_run()
+    return {'main': trees, 'search': runs}
 
 
 # смежные api

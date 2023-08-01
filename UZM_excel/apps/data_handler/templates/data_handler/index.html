@@ -62,7 +62,7 @@ body{ overflow: hidden; }
             <!-- Начало дерева(по id работаем с деревом в js) -->
             <ul class="list-unstyled ps-0" id="tree-menu">
                 <!-- ДО -->
-                {% for dict in context.tree %}
+                {% for dict in context.tree.main %}
                 <li class="mb-1">
                     <a class="btn btn-toggle align-items-center rounded collapsed " data-bs-toggle="collapse"
                        href="#{{ dict.client }}" role="button" aria-expanded="false">
@@ -142,6 +142,7 @@ body{ overflow: hidden; }
     {% endblock %}
 
 
+
   <!--  НОВОЕ ДЕРЕВО -->
   <div class="offcanvas offcanvas-start" tabindex="-1" id="TreeNavBar">
     <div class="offcanvas-header">
@@ -151,9 +152,27 @@ body{ overflow: hidden; }
       <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
     </div>
     <div class="offcanvas-body">
-      <input class="form-control me-2" type="search" placeholder="Поиск(в разработке)">
+      <input class="form-control me-2" type="search" placeholder="Поиск..." onchange="search(this.value);">
       <br>
-      {% for dict in context.tree %}
+      <div id="search-field" hidden>
+        {% for run in context.tree.search %}
+        <ul>
+          <a href="?run_id={{run.id}}" onclick="
+          SetClient({{run.section.wellbore.well_name.pad_name.field.client.id}});
+          SetField({{run.section.wellbore.well_name.pad_name.field.id}});
+          SetPad({{run.section.wellbore.well_name.pad_name.id }});
+          SetWell({{run.section.wellbore.well_name.id }});
+          SetWellbore({{run.section.wellbore.id}});
+          SetSection({{run.section.id}});
+          SetRun({{run.id}});">
+          <li class="run_search" hidden>{{ run }}</li>
+          </a>
+        </ul>
+        {% endfor %}
+
+      </div> <!-- Поле для поиска -->
+      <div id="menu-field"> <!-- Поле для меню -->
+      {% for dict in context.tree.main %}
       <div class="DO" id='tree'>
           <button class="collapsed btn btn-toggle" data-bs-toggle="collapse" onclick="SetClient({{dict.id}})" href="#Client{{dict.id}}">
           {{dict.client}}
@@ -203,6 +222,7 @@ body{ overflow: hidden; }
           </ul>
       </div>
       {% endfor %}
+      </div>
     </div>
   </div>
     <div class="col">
@@ -215,27 +235,61 @@ body{ overflow: hidden; }
 <script src="{% static 'js/nav_menu.js'%}"></script>
 
 <script>
+<!-- Поиск в дереве -->
+function search(string) {
+  filter = string.replace(/\s+/g, ' ').trim().toUpperCase();
+  let elementList = document.querySelectorAll('.run_search');
+  for (let elem of elementList) {
+    elem.hidden = false;
+    for (let str of filter.split(' ')) {
+      if (elem.innerText.toUpperCase().indexOf(str) == -1){
+      elem.hidden = true;
+      }
+    }
+
+  }
+  if (string != '') {
+    document.getElementById('menu-field').hidden = true;
+    document.getElementById('search-field').hidden = false;
+    } else {
+    document.getElementById('menu-field').hidden = false;
+    document.getElementById('search-field').hidden = true;
+    }
+}
+
 <!-- Новое дерево открываем выбранный элемент -->
 window.addEventListener('load', () => {
-  var selected_run = document.getElementById('Run'+ sessionStorage.getItem("run_id"));
-  var selected_section = document.getElementById('Section'+ sessionStorage.getItem("section_id"));
-  var selected_wellbore = document.getElementById('Wellbore'+ sessionStorage.getItem("wellbore_id"));
-  var selected_well = document.getElementById('Well'+ sessionStorage.getItem("well_id"));
-  var selected_pad = document.getElementById('Pad'+ sessionStorage.getItem("pad_id"));
-  var selected_field = document.getElementById('Field'+ sessionStorage.getItem("field_id"));
-  var selected_client = document.getElementById('Client'+ sessionStorage.getItem("client_id"));
-   <!--  console.log(selected_run)-->
-  selected_client.classList.add('show');
-  selected_client.parentNode.style.background= "linear-gradient(to right, yellow 1%, transparent 5%)";
-  selected_field.classList.add('show');
-  selected_pad.classList.add('show');
-  selected_well.classList.add('show');
-  selected_wellbore.classList.add('show');
-  selected_section.classList.add('show');
-
-  selected_run.classList.add('show');
-  selected_run.parentNode.style.background = "linear-gradient(to right, yellow 40%, transparent 80%)";
+  if (sessionStorage.getItem("client_id") !== null) {
+    var selected_client = document.getElementById('Client'+ sessionStorage.getItem("client_id"));
+    selected_client.classList.add('show');
+    selected_client.parentNode.style.background= "linear-gradient(to right, yellow 1%, transparent 5%)";
+  }
+  if (sessionStorage.getItem("field_id") !== null) {
+    var selected_field = document.getElementById('Field'+ sessionStorage.getItem("field_id"));
+    selected_field.classList.add('show');
+    }
+  if (sessionStorage.getItem("pad_id") !== null) {
+    var selected_pad = document.getElementById('Pad'+ sessionStorage.getItem("pad_id"));
+    selected_pad.classList.add('show');
+    }
+  if (sessionStorage.getItem("well_id") !== null) {
+    var selected_well = document.getElementById('Well'+ sessionStorage.getItem("well_id"));
+    selected_well.classList.add('show');
+    }
+  if (sessionStorage.getItem("wellbore_id") !== null) {
+    var selected_wellbore = document.getElementById('Wellbore'+ sessionStorage.getItem("wellbore_id"));
+    selected_wellbore.classList.add('show');
+    }
+  if (sessionStorage.getItem("section_id") !== null) {
+    var selected_section = document.getElementById('Section'+ sessionStorage.getItem("section_id"));
+    selected_section.classList.add('show');
+    }
+  if (sessionStorage.getItem("run_id") !== null) {
+    var selected_run = document.getElementById('Run'+ sessionStorage.getItem("run_id"));
+    selected_run.classList.add('show');
+    selected_run.parentNode.style.background = "linear-gradient(to right, yellow 40%, transparent 80%)"; }
 });
+
 
 
 <!-- Записываем в session storage объекты которые храним -->

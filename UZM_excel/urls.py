@@ -17,7 +17,7 @@ schema_view = get_schema_view(
       description="Swagger для управления замерами.",
       terms_of_service="http://portal.corp.igirgi.su/",
       contact=openapi.Contact(email="DovidenkovAL@igirgi.rosneft.ru"),
-      license=openapi.License(name="АО 'ИГиРГИ' License"),
+      license=openapi.License(name=""),
    ),
    public=True,
    permission_classes=(permissions.AllowAny,),
