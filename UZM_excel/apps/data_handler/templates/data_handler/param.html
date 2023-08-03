@@ -14,152 +14,222 @@
 <div style="margin-top:1em">
     <form action="" method="POST">
         <div class="scroll-body form-row">
-            <hr style="color:#FFC501;margin-top:1%;border-width: 3px">
-            <legend><b>Параметры скважины:</b> {{context.selected_obj}}</legend>
-            <div class="form-group col-md">
-                {{context.form.pad_name|as_crispy_field}}
-            </div>
             <div class="row">
-                <div class="form-group col-md-4">
-                    {{context.form.well_name|as_crispy_field}}
-                </div>
-                <div class="form-group col-md-4">
-                    {{context.form.status|as_crispy_field}}
-                </div>
-                <div class="form-group col-md-4">
-                    {{context.form.in_statistics|as_crispy_field}}
-                </div>
-            </div>
-            <div class="row">
-                <div class="form-group col-md-4">
-                    {{context.form.well_type|as_crispy_field}}
-                </div>
-                <div class="form-group col-md-4">
-                    {{context.form.active_from|as_crispy_field}}
-                </div>
-                <div class="form-group col-md-4">
-                    {{context.form.status_drilling|as_crispy_field}}
-                </div>
-            </div>
-            <div class="row">
-                <div class="form-group col-md-4">
-                    {{context.form.RKB|as_crispy_field}}
-                </div>
-                <div class="form-group col-md-4">
-                    {{context.form.VSaz|as_crispy_field}}
-                </div>
-                <div class="form-group col-md-4">
-                    {{context.form.coordinate_system|as_crispy_field}}
-                </div>
-            </div>
-            <div class="row">
-                <div class="form-group col-md-3">
-                    {{context.form.latitude|as_crispy_field}}
-                </div>
-                <div class="form-group col-md-3">
-                    {{context.form.longtitude|as_crispy_field}}
-                </div>
-                <div class="form-group col-md-3">
-                    {{context.form.NY|as_crispy_field}}
-                </div>
-                <div class="form-group col-md-3">
-                    {{context.form.EX|as_crispy_field}}
-                </div>
-            </div>
-            <div class="row">
-                <div class="form-group col-md-3">
-                    {{context.form.north_direction|as_crispy_field}}
-                </div>
-                <div class="form-group col-md-3">
-                    {{context.form.geomagnetic_model|as_crispy_field}}
-                </div>
-                <div class="form-group col-md-3">
-                    {{context.form.geomagnetic_date|as_crispy_field}}
-                </div>
-                <div class="form-group col-md-3">
-                    {{context.form.btotal|as_crispy_field}}
-                </div>
-            </div>
-            <div class="row">
-                <div class="form-group col-md-3">
-                    {{context.form.dip|as_crispy_field}}
-                </div>
-                <div class="form-group col-md-3">
-                    {{context.form.dec|as_crispy_field}}
-                </div>
-                <div class="form-group col-md-3">
-                    {{context.form.grid_convergence|as_crispy_field}}
-                </div>
-                <div class="form-group col-md-3">
-                    {{context.form.total_correction|as_crispy_field}}
-                </div>
-            </div>
-            <div class="row">
-                <div class="form-group col-md-6">
-                    {{context.form.gtotal|as_crispy_field}}
-                </div>
-                <div class="form-group col-md-6">
-                    {{context.form.critical_azimuth|as_crispy_field}}
-                </div>
-            </div>
-
-            <div class="row">
-                <div class="form-group col-md-3">
-                    {{context.form.T1_start|as_crispy_field}}
-                </div>
-                <div class="form-group col-md-3">
-                    {{context.form.T1_end|as_crispy_field}}
-                </div>
-                <div class="form-group col-md-3">
-                    {{context.form.T3_start|as_crispy_field}}
-                </div>
-                <div class="form-group col-md-3">
-                    {{context.form.T3_end|as_crispy_field}}
-                </div>
-            </div>
-
-            <div class="row">
-                <div class="form-group col-md-6">
-                    {{context.form.mail_To|as_crispy_field}}
-                </div>
-                <div class="form-group col-md-6">
-                    {{context.form.mail_Cc|as_crispy_field}}
-                </div>
-            </div>
-            <div class="form-group col-md-12">
-                {{context.form.comment|as_crispy_field}}
-            </div>
-            <hr style="color:#FFC501;margin-top:1%;border-width: 3px">
-            <legend><b>Стволы скважины:</b></legend>
-            <div class="row">
-                {% for wellbore in context.cards %}
-                <div class="col-sm-3" style="margin-top:1em;">
-                    <div class="card" style="width: 18rem;">
-                        <div class="card-header">
-                            <h5 class="card-title">{{wellbore.title}}</h5>
+                <hr style="color:#FFC501;margin-top:1%;border-width: 3px">
+                <div class="col-9">
+                    <legend><b>Параметры скважины:</b> {{context.selected_obj}}</legend>
+                    <div class="form-group col-md">
+                        {{context.form.pad_name|as_crispy_field}}
+                    </div>
+                    <div class="row">
+                        <div class="form-group col-md-4">
+                            {{context.form.well_name|as_crispy_field}}
                         </div>
-                        <div class="card-body">
-                            <p class="card-text">Количество секций: {{ wellbore.section_len }}</p>
-                            <p class="card-text">Замеров траектории ННБ: {{ wellbore.nnb_len }}</p>
-                            <p class="card-text">Замеров траектории ИГиРГИ: {{ wellbore.igirgi_len }}</p>
+                        <div class="form-group col-md-4">
+                            {{context.form.status|as_crispy_field}}
                         </div>
-                        <div class="card-footer">
-                            <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#data_Modal1"
-                                    data-wellbore="{{wellbore.id}}">
-                                Клонировать </button>
-                            <button type="button" onclick="delete_wellbore({{wellbore.id}});" class="btn btn-danger">
-                                Удалить</button>
+                        <div class="form-group col-md-4">
+                            {{context.form.in_statistics|as_crispy_field}}
                         </div>
                     </div>
-                </div>
-                {% endfor %}
-                <div class="col-sm-3" style="margin-top:6.5em;">
-                    <div class="card" style="width: 18rem;">
-                        <button type="button" class="btn btn-warning" data-toggle="modal" data-target="#data_Modal2" >
-                            Добавить</button>
+                    <div class="row">
+                        <div class="form-group col-md-4">
+                            {{context.form.well_type|as_crispy_field}}
+                        </div>
+                        <div class="form-group col-md-4">
+                            {{context.form.active_from|as_crispy_field}}
+                        </div>
+                        <div class="form-group col-md-4">
+                            {{context.form.status_drilling|as_crispy_field}}
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="form-group col-md-4">
+                            {{context.form.RKB|as_crispy_field}}
+                        </div>
+                        <div class="form-group col-md-4">
+                            {{context.form.VSaz|as_crispy_field}}
+                        </div>
+                        <div class="form-group col-md-4">
+                            {{context.form.coordinate_system|as_crispy_field}}
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="form-group col-md-3">
+                            {{context.form.latitude|as_crispy_field}}
+                        </div>
+                        <div class="form-group col-md-3">
+                            {{context.form.longtitude|as_crispy_field}}
+                        </div>
+                        <div class="form-group col-md-3">
+                            {{context.form.NY|as_crispy_field}}
+                        </div>
+                        <div class="form-group col-md-3">
+                            {{context.form.EX|as_crispy_field}}
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="form-group col-md-3">
+                            {{context.form.north_direction|as_crispy_field}}
+                        </div>
+                        <div class="form-group col-md-3">
+                            {{context.form.geomagnetic_model|as_crispy_field}}
+                        </div>
+                        <div class="form-group col-md-3">
+                            {{context.form.geomagnetic_date|as_crispy_field}}
+                        </div>
+                        <div class="form-group col-md-3">
+                            {{context.form.btotal|as_crispy_field}}
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="form-group col-md-3">
+                            {{context.form.dip|as_crispy_field}}
+                        </div>
+                        <div class="form-group col-md-3">
+                            {{context.form.dec|as_crispy_field}}
+                        </div>
+                        <div class="form-group col-md-3">
+                            {{context.form.grid_convergence|as_crispy_field}}
+                        </div>
+                        <div class="form-group col-md-3">
+                            {{context.form.total_correction|as_crispy_field}}
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="form-group col-md-6">
+                            {{context.form.gtotal|as_crispy_field}}
+                        </div>
+                        <div class="form-group col-md-6">
+                            {{context.form.critical_azimuth|as_crispy_field}}
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="form-group col-md-3">
+                            {{context.form.T1_start|as_crispy_field}}
+                        </div>
+                        <div class="form-group col-md-3">
+                            {{context.form.T1_end|as_crispy_field}}
+                        </div>
+                        <div class="form-group col-md-3">
+                            {{context.form.T3_start|as_crispy_field}}
+                        </div>
+                        <div class="form-group col-md-3">
+                            {{context.form.T3_end|as_crispy_field}}
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="form-group col-md-6">
+                            {{context.form.mail_To|as_crispy_field}}
+                        </div>
+                        <div class="form-group col-md-6">
+                            {{context.form.mail_Cc|as_crispy_field}}
+                        </div>
+                    </div>
+                    <div class="form-group col-md-12">
+                        {{context.form.comment|as_crispy_field}}
                     </div>
                 </div>
 
+                <div class="col">
+                    <legend><b>Сводка:</b></legend>
+                    <div class="container text-center"
+                         style="overflow-y: auto; max-height:72em; border-radius: 15px; background-color: #9DB1CC;">
+                        <br>
+                        <div class="card border-dark mb-3" style="max-width: 18rem; max-width: 0em">
+                            <div class="card-header">17:45 02.08.2023</div>
+                            <div class="card-body">
+                                <h5 class="card-title">Заголовок карточки</h5>
+                                <p class="card-text">Несколько быстрых примеров текста для построения на основе
+                                    Заголовок карточки и составления основной части содержимого карточки.</p>
+                            </div>
+                        </div>
+                        <div class="card border-dark mb-3" style="max-width: 18rem;">
+                            <div class="card-header">16:33 23.06.2023</div>
+                            <div class="card-body">
+                                <h5 class="card-title">Заголовок карточки</h5>
+                                <p class="card-text">Несколько быстрых примеров текста для построения на основе
+                                    Заголовок карточки и составления основной части содержимого карточки.</p>
+                            </div>
+                        </div>
+                        <div class="card border-dark mb-3" style="max-width: 18rem;">
+                            <div class="card-header">16:33 23.06.2023</div>
+                            <div class="card-body">
+                                <h5 class="card-title">Заголовок карточки</h5>
+                                <p class="card-text">Несколько быстрых примеров текста для построения на основе
+                                    Заголовок карточки и составления основной части содержимого карточки.</p>
+                            </div>
+                        </div>
+                        <div class="card border-dark mb-3" style="max-width: 18rem;">
+                            <div class="card-header">16:33 23.06.2023</div>
+                            <div class="card-body">
+                                <h5 class="card-title">Заголовок карточки</h5>
+                                <p class="card-text">Несколько быстрых примеров текста для построения на основе
+                                    Заголовок карточки и составления основной части содержимого карточки.</p>
+                            </div>
+                        </div>
+                        <div class="card border-dark mb-3" style="max-width: 18rem;">
+                            <div class="card-header">16:33 23.06.2023</div>
+                            <div class="card-body">
+                                <h5 class="card-title">Заголовок карточки</h5>
+                                <p class="card-text">Несколько быстрых примеров текста для построения на основе
+                                    Заголовок карточки и составления основной части содержимого карточки.</p>
+                            </div>
+                        </div>
+                        <div class="card border-dark mb-3" style="max-width: 18rem;">
+                            <div class="card-header">16:33 23.06.2023</div>
+                            <div class="card-body">
+                                <h5 class="card-title">Заголовок карточки</h5>
+                                <p class="card-text">Несколько быстрых примеров текста для построения на основе
+                                    Заголовок карточки и составления основной части содержимого карточки.</p>
+                            </div>
+                        </div>
+                        <div class="card border-dark mb-3" style="max-width: 18rem;">
+                            <div class="card-header">16:33 23.06.2023</div>
+                            <div class="card-body">
+                                <h5 class="card-title">Заголовок карточки</h5>
+                                <p class="card-text">Несколько быстрых примеров текста для построения на основе
+                                    Заголовок карточки и составления основной части содержимого карточки.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <hr style="color:#FFC501;margin-top:1%;border-width: 3px">
+                <legend><b>Стволы скважины:</b></legend>
+                <div class="row">
+                    {% for wellbore in context.cards %}
+                    <div class="col-sm-3" style="margin-top:1em;">
+                        <div class="card" style="width: 18rem;">
+                            <div class="card-header">
+                                <h5 class="card-title">{{wellbore.title}}</h5>
+                            </div>
+                            <div class="card-body">
+                                <p class="card-text">Количество секций: {{ wellbore.section_len }}</p>
+                                <p class="card-text">Замеров траектории ННБ: {{ wellbore.nnb_len }}</p>
+                                <p class="card-text">Замеров траектории ИГиРГИ: {{ wellbore.igirgi_len }}</p>
+                            </div>
+                            <div class="card-footer">
+                                <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#data_Modal1"
+                                        data-wellbore="{{wellbore.id}}">
+                                    Клонировать </button>
+                                <button type="button" onclick="delete_wellbore({{wellbore.id}});" class="btn btn-danger">
+                                    Удалить</button>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                    <div class="col-sm-3" style="margin-top:6.5em;">
+                        <div class="card" style="width: 18rem;">
+                            <button type="button" class="btn btn-warning" data-toggle="modal" data-target="#data_Modal2" >
+                                Добавить</button>
+                        </div>
+                    </div>
+
+                </div>
             </div>
 
         </div> <!--Конец скрола -->

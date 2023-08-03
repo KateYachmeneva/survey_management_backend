@@ -31,3 +31,18 @@
     vertical-align: middle;
 }
 
+@media screen and (min-width: 2200px) {
+    .scroll-table-body {
+	height: 47em;
+	width: 100%;
+	overflow-y: auto;
+	overflow-x: hidden;
+    }
+
+    .scroll-body {
+    	height: 54em;
+    	width: 100%;
+    	overflow-y: auto;
+    	overflow-x: hidden;
+    }
+}
