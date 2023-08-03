@@ -277,6 +277,13 @@ for (let i = 0; i < array.length; i+=1) {
 } 
 return coords;
 };
+function getXminValue(array) {
+var coords = [];
+for (let i = 0; i < array.length; i+=1) {
+   coords.push(array[i].x)
+}
+return coords;
+};
 function getYmaxValue(array) {
 var coords = [];
 for (let i = 0; i < array.length; i+=1) {
@@ -1109,9 +1116,7 @@ new Chart(grafica2,
         // for zooming
         xAxes: [{
           ticks: {
-            min:0,
-            stepSize: 100,
-            autoSkip: false,
+           autoSkip: false,
             },
           scaleLabel: {
             display: true,
@@ -1293,19 +1298,20 @@ const depthBmin = [{ x: fDepthB, y: Bmin },
   });
 
 // глубина последне предоставленной точки замера
+let firstDepth = Math.min(...getXminValue(depthHSTF));
 let lastDepth = Math.max(...getXmaxValue(depthHSTF));
 const hstf90 = [
-{ x: 0,	y:90},
+{ x: firstDepth,y:90},
 { x: lastDepth, y: 90 },
 ];
-const hstf180  = [{ x: 0, y: 180 },
+const hstf180  = [{ x: firstDepth, y: 180 },
   { x: lastDepth, y:180 },
 ];
 
-const hstf270 = [{ x: 0, y: 270 },
+const hstf270 = [{ x: firstDepth, y: 270 },
   { x: lastDepth, y: 270 },
 ];
-const hstf360 = [{ x: 0, y: 360 },
+const hstf360 = [{ x: firstDepth, y: 360 },
   { x: lastDepth, y: 360 },
 ];
 new Chart(grafica5,
@@ -1390,11 +1396,7 @@ new Chart(grafica5,
             display: true,
             labelString: 'Измеренная глубина, м',
           },
-          ticks: {
-            max: lastDepth,
-            min: 0,
-            stepSize:100,
-          },
+
         }],
       },
       pan: {
