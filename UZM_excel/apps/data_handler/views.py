@@ -139,9 +139,9 @@ def param(request):
                "tree": get_tree(),
                'cards': list(),  # карточки стволов
                }
+
     if request.GET.get('run_id') is not None:
-        run_id = request.GET.get('run_id')
-        try:  # можем удалить из страницы с run_id самого себя, поэтому если не нашли рейс отображаем пустую страницу
+        try:  # если не нашли рейс отображаем пустую страницу
             run = Run.objects.get(id=request.GET.get('run_id'))
         except:
             context['form'] = AddWellForm()

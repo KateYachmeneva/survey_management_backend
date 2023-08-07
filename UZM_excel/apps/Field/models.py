@@ -78,8 +78,8 @@ class Field(models.Model):
     def __str__(self):
         return self.field_name
 
-    # FIXME найти зачем используется и убрать
     def get_client(self):
+        """Источник в сериализаторе"""
         return str(self.client)
 
 
@@ -365,6 +365,27 @@ class Run(models.Model):
 
     def __str__(self):
         return f'{self.section}; {self.run_number};'
+
+
+class WellSummary(models.Model):
+    """ Сводка к скважине """
+    well = models.ForeignKey(
+        Well,
+        on_delete=models.CASCADE,
+        verbose_name='Сводка',
+        related_name='summary',
+        null=True,
+        blank=True
+    )
+    text = models.TextField('Текст', null=True)
+    time = models.DateTimeField('Время создания', auto_now_add=True, null=True, blank=True)
+
+    class Meta:
+        verbose_name = 'Сводка'
+        verbose_name_plural = 'Сводка'
+
+    def __str__(self):
+        return f'Well:{self.well} Text:{self.text};'
 
 
 def get_all_run() -> QuerySet:
