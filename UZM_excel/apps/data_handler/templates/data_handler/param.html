@@ -135,65 +135,34 @@
 
                 <div class="col">
                     <legend><b>Сводка:</b></legend>
-                    <div class="container text-center"
-                         style="overflow-y: auto; max-height:72em; border-radius: 15px; background-color: #9DB1CC;">
+                    <div class="d-grid gap-2 mx-auto" style="overflow-y: auto; max-height:72em; border-radius: 15px; background-color: #9DB1CC;">
+                        <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#data_Modal3">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-plus-square-fill" viewBox="0 0 16 16">
+                                <path d="M2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2zm6.5 4.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3a.5.5 0 0 1 1 0z"></path>
+                            </svg>
+                            Добавить
+                        </button>
+                        {% for comment in context.selected_obj.summary.all %}
+                        <div class="card border-dark mx-3" style="max-width: 18rem; max-width: none;">
+                            <div class="row card-header">
+                                <div class="col-8" style="vertical-align: middle;">
+                                {{comment.time}}
+                                </div>
+                                <div class="col-4" style="text-align: right">
+                                    <button type="button" class="btn btn-outline-danger" onclick="delete_summary({{comment.id}})">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash" viewBox="0 0 16 16">
+                                            <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5Zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5Zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6Z"></path>
+                                            <path d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1ZM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118ZM2.5 3h11V2h-11v1Z"></path>
+                                        </svg>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                <p class="card-text">{{comment.text}}.</p>
+                            </div>
+                        </div>
+                        {% endfor %}
                         <br>
-                        <div class="card border-dark mb-3" style="max-width: 18rem; max-width: 0em">
-                            <div class="card-header">17:45 02.08.2023</div>
-                            <div class="card-body">
-                                <h5 class="card-title">Заголовок карточки</h5>
-                                <p class="card-text">Несколько быстрых примеров текста для построения на основе
-                                    Заголовок карточки и составления основной части содержимого карточки.</p>
-                            </div>
-                        </div>
-                        <div class="card border-dark mb-3" style="max-width: 18rem;">
-                            <div class="card-header">16:33 23.06.2023</div>
-                            <div class="card-body">
-                                <h5 class="card-title">Заголовок карточки</h5>
-                                <p class="card-text">Несколько быстрых примеров текста для построения на основе
-                                    Заголовок карточки и составления основной части содержимого карточки.</p>
-                            </div>
-                        </div>
-                        <div class="card border-dark mb-3" style="max-width: 18rem;">
-                            <div class="card-header">16:33 23.06.2023</div>
-                            <div class="card-body">
-                                <h5 class="card-title">Заголовок карточки</h5>
-                                <p class="card-text">Несколько быстрых примеров текста для построения на основе
-                                    Заголовок карточки и составления основной части содержимого карточки.</p>
-                            </div>
-                        </div>
-                        <div class="card border-dark mb-3" style="max-width: 18rem;">
-                            <div class="card-header">16:33 23.06.2023</div>
-                            <div class="card-body">
-                                <h5 class="card-title">Заголовок карточки</h5>
-                                <p class="card-text">Несколько быстрых примеров текста для построения на основе
-                                    Заголовок карточки и составления основной части содержимого карточки.</p>
-                            </div>
-                        </div>
-                        <div class="card border-dark mb-3" style="max-width: 18rem;">
-                            <div class="card-header">16:33 23.06.2023</div>
-                            <div class="card-body">
-                                <h5 class="card-title">Заголовок карточки</h5>
-                                <p class="card-text">Несколько быстрых примеров текста для построения на основе
-                                    Заголовок карточки и составления основной части содержимого карточки.</p>
-                            </div>
-                        </div>
-                        <div class="card border-dark mb-3" style="max-width: 18rem;">
-                            <div class="card-header">16:33 23.06.2023</div>
-                            <div class="card-body">
-                                <h5 class="card-title">Заголовок карточки</h5>
-                                <p class="card-text">Несколько быстрых примеров текста для построения на основе
-                                    Заголовок карточки и составления основной части содержимого карточки.</p>
-                            </div>
-                        </div>
-                        <div class="card border-dark mb-3" style="max-width: 18rem;">
-                            <div class="card-header">16:33 23.06.2023</div>
-                            <div class="card-body">
-                                <h5 class="card-title">Заголовок карточки</h5>
-                                <p class="card-text">Несколько быстрых примеров текста для построения на основе
-                                    Заголовок карточки и составления основной части содержимого карточки.</p>
-                            </div>
-                        </div>
                     </div>
                 </div>
             </div>
@@ -224,8 +193,12 @@
                     {% endfor %}
                     <div class="col-sm-3" style="margin-top:6.5em;">
                         <div class="card" style="width: 18rem;">
-                            <button type="button" class="btn btn-warning" data-toggle="modal" data-target="#data_Modal2" >
-                                Добавить</button>
+                            <button type="button" class="btn btn-warning" data-toggle="modal" data-target="#data_Modal2">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-plus-square" viewBox="0 0 16 16">
+                                    <path d="M14 1a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1h12zM2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2z"/>
+                                    <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"/>
+                                </svg>
+                                Создать</button>
                         </div>
                     </div>
 
@@ -237,9 +210,11 @@
     </form>
 </div>
 
+<!-- Модальные окна -->
+
 <!-- Модальное окно для создания ствола-->
 <div class="modal fade" id="data_Modal2" tabindex="-1" role="dialog">
-    <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-dialog modal-dialog-centered  modal-lg" role="document">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title">Создание ствола</h5>
@@ -274,7 +249,7 @@
 
 <!-- Модальное окно для клонирования ствола -->
 <div class="modal fade" id="data_Modal1" tabindex="-1" role="dialog">
-    <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-dialog modal-dialog-centered  modal-lg" role="document">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title">Клонирование ствола</h5>
@@ -306,7 +281,31 @@
     </div>
 </div>
 
-
+<!-- Модальное окно для создания комментария в сводку-->
+<div class="modal fade" id="data_Modal3" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Комментарий сводки</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form action="{% url 'add_summary' %}" method="post" id="comm_form">
+                <input name="well_id" value="{{ context.selected_obj.id }}" hidden>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <textarea name='text' class="form-control" placeholder="Напишите комментарий" rows="5"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary">Добавить</button>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Закрыть</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
 
 <script>
 <!--Функция для модального окна под клонирование-->
@@ -335,20 +334,25 @@ function clone_wellbore(){
                      location.reload());
    })};
 
+    <!--  Удалить ствол  -->
+    function delete_wellbore(){
+        fetch('http://'+window.location.hostname+':'+window.location.port+'/main_data/api/wellbore/'+arguments[0]+'/',
+         { method: 'DELETE', headers: {'X-CSRFToken':'wFH4wGagd3i0Ki79jrFo6CyUc5SsChbovphWCqSCK5Tl8MIvS17IS0D8Z1R1Yp69'}, })
+         .then(response => response.json()).then(location.reload());
+    }
+    <!--  Создать ствол  -->
+    function create_wellbore(){
+        var params = new FormData(document.getElementById('create_form'));
+        fetch('http://'+window.location.hostname+':'+window.location.port+'/main_data/api/wellbore/',
+        { method: 'POST', body: params}).then(response => response.json()).then(location.reload());
+    }
+    <!--  Удалить комментарий  -->
+    function delete_summary(id){
+        fetch('http://'+window.location.hostname+':'+window.location.port+'/main_data/api/well/summary?'+
+        new URLSearchParams({id: id}),
+        { method: 'DELETE'}).then(response => response.json()).then(location.reload());
 
-
-function delete_wellbore(){
-    fetch('http://'+window.location.hostname+':'+window.location.port+'/main_data/api/wellbore/'+arguments[0]+'/',
-     { method: 'DELETE', headers: {'X-CSRFToken':'wFH4wGagd3i0Ki79jrFo6CyUc5SsChbovphWCqSCK5Tl8MIvS17IS0D8Z1R1Yp69'}, })
-     .then(response => response.json()).then(location.reload());
-}
-
-function create_wellbore(){
-    var params = new FormData(document.getElementById('create_form'));
-    fetch('http://'+window.location.hostname+':'+window.location.port+'/main_data/api/wellbore/',
-    { method: 'POST', body: params}).then(response => response.json()).then(location.reload());
-}
-
+    }
 </script>
 
 {% endblock %}

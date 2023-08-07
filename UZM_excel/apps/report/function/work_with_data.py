@@ -172,7 +172,6 @@ def processing_data(start_data: dict, run_id: int, index_id: int) -> FileRespons
     Run = get_run_by_id(run_id)
 
     # перезапись данных (расширение подаваемых значений, данными БД)
-    # FIXME - протестировать
     all_data = get_data(Run)
     # выдача файлов на скачивание
     file_type = 0 if start_data["response_type"] == "cut_version" else 1

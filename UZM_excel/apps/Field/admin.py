@@ -14,5 +14,5 @@ admin.site.register(Well)
 admin.site.register(Wellbore)
 admin.site.register(Section)
 admin.site.register(Run)
-
+admin.site.register(WellSummary)
 

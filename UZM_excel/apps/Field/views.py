@@ -121,6 +121,7 @@ def add_run(request):
 
 
 def clone_wellbore(request):
+    """ Клонирует все модели стоящие ниже переданного ствола """
     # print(request.POST)
     old_wellbore = Wellbore.objects.get(id=request.POST['wellbore_id'])
     new_wellbore = Wellbore.objects.create(well_name=old_wellbore.well_name, wellbore=request.POST['wellbore_name'])
@@ -140,3 +141,13 @@ def clone_wellbore(request):
                                          dd_contractor_name=old_run.dd_contractor_name)
 
     return JsonResponse({'old_wellbore': old_wellbore.id, 'new_wellbore': new_wellbore.id})
+
+
+def well_summary(request):
+    """Добавляем новый комментарий в сводку"""
+    if request.method == 'POST':
+        WellSummary.objects.create(well=Well.objects.get(id=int(request.POST['well_id'])), text=request.POST['text'])
+    if request.method == 'DELETE':
+        WellSummary.objects.get(id=request.GET['id']).delete()
+        return JsonResponse({'status': 'ok'})
+    return redirect('param')

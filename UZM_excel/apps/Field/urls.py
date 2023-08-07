@@ -30,10 +30,9 @@ urlpatterns = [
     path('api/run_by_well/<int:well_id>/', RunByWell.as_view()),
     path('api/contractorNNB', ContractorNnbAPIView.as_view()),
     path('api/contractorDrill', ContractorDrillAPIView.as_view()),
-    # path('api/full_field', FieldApiView.as_view()),
-    # path('api/full_pad', PadApiView.as_view()),
     path('api/', include(router.urls)),
     path('api/get_field', get_field_by_do, name='get_field_by_do'),
     path('api/get_pad', get_pad_by_field, name='run_index'),
     path('api/wellbore/clone', views.clone_wellbore),
+    path('api/well/summary', views.well_summary, name='add_summary'),
 ]
