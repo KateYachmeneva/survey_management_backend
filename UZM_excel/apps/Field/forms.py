@@ -28,15 +28,16 @@ class AddPadForm(ModelForm):
 
 
 class AddWellForm(ModelForm):
+    """Форма для ручного добавления модели скважины"""
     class Meta:
         model = models.Well
         fields = '__all__'
         widgets = {
-            'geomagnetic_date': widgets.DateInput(attrs={'type': 'date'}),
-            'T1_start': widgets.DateInput(attrs={'type': 'date'}),
-            'T1_end': widgets.DateInput(attrs={'type': 'date'}),
-            'T3_start': widgets.DateInput(attrs={'type': 'date'}),
-            'T3_end': widgets.DateInput(attrs={'type': 'date'}),
+            'geomagnetic_date': widgets.DateInput(format='%Y-%m-%d', attrs={'type': 'date'}),
+            'T1_start': widgets.DateInput(format='%Y-%m-%d', attrs={'type': 'date'}),
+            'T1_end': widgets.DateInput(format='%Y-%m-%d', attrs={'type': 'date'}),
+            'T3_start': widgets.DateInput(format='%Y-%m-%d', attrs={'type': 'date'}),
+            'T3_end': widgets.DateInput(format='%Y-%m-%d', attrs={'type': 'date'}),
             'latitude': widgets.TextInput(),
             'longtitude': widgets.TextInput(),
         }
@@ -66,7 +67,7 @@ class AddWellForm(ModelForm):
 class AddWellboreForm(ModelForm):
     class Meta:
         model = models.Wellbore
-        fields = '__all__'
+        exclude = ('igirgi_drilling',)
         # exclude = ['wellbore']
 
 

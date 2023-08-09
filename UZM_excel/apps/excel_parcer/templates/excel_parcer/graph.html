@@ -1,15 +1,14 @@
 {% extends 'excel_parcer/index.html' %}
 {% load static %}
 
-{% block head %}
+{% block header %}
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.bundle.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/chartjs-plugin-zoom/0.6.6/chartjs-plugin-zoom.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@latest/dist/Chart.min.js"></script>
-
 {% endblock %}
 
 {% block menu %}
-<div class="col-6" style="text-align:center;">
+<div class="m-auto" style="text-align:center;">
   <form action="" id="well-select" method="post">
     {% csrf_token %}
     <input name="wellbore" value="" id="wellbore_id" hidden>
@@ -25,45 +24,17 @@
 {% block data %}
 <link type="text/css" href="{% static 'css/data_handler/chart.css' %}" rel="stylesheet">
 <center>
-
-<!--<div>-->
-<!--    &lt;!&ndash;      /start Временное решение      &ndash;&gt;-->
-<!--    <form action="" method="post" enctype="multipart/form-data" style="margin-top:1%">-->
-<!--        {% csrf_token %}-->
-<!--        <div style="max-width:500px">-->
-<!--            <a>Выберите скважину</a>-->
-<!--                <p></p>-->
-<!--                 <div class="input-group mb-3">-->
-<!--                   <select name="well" class="form-select" id="well-select">-->
-<!--                       {% for w in context.well %}-->
-<!--                       {% if w.id == context.selected.id%}-->
-<!--                       <option value="{{w.id}}" selected>{{w}}</option>-->
-<!--                       {% else %}-->
-<!--                       <option value="{{w.id}}">{{w}}</option>-->
-<!--                       {% endif %}-->
-<!--                       {% endfor %}-->
-<!--                   </select>-->
-<!--                 </div>-->
-<!--        </div>-->
-<!--        <button type="submit" id='show-graph' style="border:1">Показать графики</button>-->
-<!--        <button type="button" id="data-redirect" style="border:1">Вернуться к данным</button>-->
-<!--    </form>-->
-<!--    &lt;!&ndash;      /end Временное решение      &ndash;&gt;-->
-<!--</div>-->
-
-<!--<hr style="color:#FFC501;margin-top:1%;border-width: 3px">-->
-
 <div class="well-header">
   <h2>{{context.selected}}</h2>
   <label class = "status">{{context.selected.well_name.get_status}}</label></div>
-<div class="container" >
+<div class="container">
   <div class="container-form" >  
   <div class="chart-header"> График соотношения показаний осевого и поперечных акселерометров </div>
   <canvas id="grafica1" width="50" height="15"></canvas>
   <form id ="form">
   <label>Глубина, м </label>
   <div class="mb-3">
-<label>Минимальное  значение: <input id="depthMin" type="number" step="10"></label>
+<label>Минимальное значение: <input id="depthMin" type="number" step="10"></label>
 <label>Максимальное значение: <input id="depthMax" type="number" step="10"></label>
 <label>Шаг: <input id="depthStep" type="number" step="10"></label>
 </div>

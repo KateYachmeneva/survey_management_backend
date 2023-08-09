@@ -109,6 +109,7 @@ def add_section(request):
 
 def add_run(request):
     form = AddRunForm(request.POST)
+    form.base_fields['run_number'].help_text = 'Чтобы задать материнский ствол в поле "Рейс" укажите "-1".'
     if request.method == 'POST':
         if form.is_valid():
             form.save()
@@ -151,3 +152,13 @@ def well_summary(request):
         WellSummary.objects.get(id=request.GET['id']).delete()
         return JsonResponse({'status': 'ok'})
     return redirect('param')
+
+
+def edit_igirgi_drilling(request):
+    """Функция переключает флаг по генерации отчётов на основе траектории ИГиРГИ"""
+    obj = Wellbore.objects.get(id=request.POST['wellbore_id'])
+    # obj.igirgi_drilling = (True if request.POST['status'] == 'True' else False)
+    obj.igirgi_drilling = True if request.POST["status"] == 'true' else False
+    obj.save()
+    # print(f'Сменили режим отчёта на {request.POST["status"]}')
+    return JsonResponse({'status': 'ok'})

@@ -46,3 +46,20 @@
     	overflow-x: hidden;
     }
 }
+
+
+@media screen and (min-width: 3200px) {
+    .scroll-table-body {
+	height: 75em;
+	width: 100%;
+	overflow-y: auto;
+	overflow-x: hidden;
+    }
+
+    .scroll-body {
+    	height: 80em;
+    	width: 100%;
+    	overflow-y: auto;
+    	overflow-x: hidden;
+    }
+}

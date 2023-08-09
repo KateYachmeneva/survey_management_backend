@@ -15,7 +15,7 @@ from Field.forms import AddWellForm
 
 def index(request):
     """Главная страница"""
-    return redirect(param)
+    return redirect(traj)
     # context = {"title": 'Работа с данными',
     #            "tree": get_tree(),
     #            }
@@ -24,17 +24,19 @@ def index(request):
 
 def traj(request):
     """Страница с траекторией ННБ и ИГиРГИ"""
-    context = {"title": 'Траектория', "active": 'traj',
-               "tree": get_tree(), }
+    context = {"title": 'Траектория',
+               "active": 'traj',
+               "tree": get_tree(),
+               }
 
     if request.method == "GET":
         if request.GET.get('run_id') is not None:  # если в get запросе не run_id выводим пустую страницу
             run_id = request.GET.get('run_id')
             try:
                 run = Run.objects.get(id=run_id)
+                context['title'] = run.section.wellbore.well_name.get_title()
             except:  # если не нашли рейс возвращаем пустую страницу
                 return render(request, 'data_handler/trajectories.html', {'context': context, })
-            selected_for_tree(context, run)  # для раскрытия списка
 
             context['selected_obj'] = str(run)  # для отображения текущей модели на странице (текст)
             context['selected_id'] = run_id  # для перенаправления по id на редактирование
@@ -62,6 +64,7 @@ def traj(request):
 
     if request.method == 'POST':
         run = Run.objects.get(id=request.GET.get('run_id'))
+        context['title'] = run.section.wellbore.well_name.get_title()
 
         if 'plan_depth' in request.POST:  # данные с модальной формы 2 (плановая траектория)
             work_with_plan(request, run)
@@ -94,29 +97,25 @@ def edit_traj(request):
     context = {"title": 'Траектория',
                "active": 'traj',
                "tree": get_tree(),
-               "igirgi_data": range(100),
-               "nnb_data": range(100),
                }
 
     run_id = request.GET.get('run_id')
-
-    if request.method == "GET":
-        run = Run.objects.get(id=request.GET.get('run_id'))
-        context['selected_obj'] = str(run)
-        context['selected_id'] = run_id
-        selected_for_tree(context, run)  # для раскрытия списка
-        context["igirgi_data"] = IgirgiStatic.objects.filter(run=run_id)
-        context["nnb_data"] = StaticNNBData.objects.filter(run=run_id)
+    run = Run.objects.get(id=request.GET.get('run_id'))
+    context['title'] = run.section.wellbore.well_name.get_title()
+    context['selected_obj'] = str(Run.objects.get(id=run_id))
+    context['selected_id'] = run_id
+    context["igirgi_data"] = IgirgiStatic.objects.filter(run=run_id)
+    context["nnb_data"] = StaticNNBData.objects.filter(run=run_id)
 
     if request.method == 'POST':
         for items in request.POST.lists():
             key = str(items[0]).split(' ')
-            # print(key)
+            print(key)
             if 'nnb' in key:
                 obj = StaticNNBData.objects.get(id=key[0])
             else:
                 obj = IgirgiStatic.objects.get(id=key[0])
-            # print(items[1]) - все 3 числа замеров
+            print(items[1])  # - все 3 числа замеров
             if items[1][0] == '' or items[1][1] == '' or items[1][2] == '':
                 obj.delete()
             else:
@@ -125,17 +124,14 @@ def edit_traj(request):
                 obj.azimut = float(items[1][2])
                 obj.save()
 
-        context['selected_obj'] = str(Run.objects.get(id=run_id))
-        context['selected_id'] = run_id
-        context["igirgi_data"] = IgirgiStatic.objects.filter(run=run_id)
-        context["nnb_data"] = StaticNNBData.objects.filter(run=run_id)
         return redirect('traj')
     return render(request, 'data_handler/edit_trajectories.html', {'context': context, })
 
 
 def param(request):
     """Страница с параметрами"""
-    context = {"title": 'Параметры', "active": 'param',
+    context = {"title": 'Параметры',
+               "active": 'param',
                "tree": get_tree(),
                'cards': list(),  # карточки стволов
                }
@@ -143,13 +139,16 @@ def param(request):
     if request.GET.get('run_id') is not None:
         try:  # если не нашли рейс отображаем пустую страницу
             run = Run.objects.get(id=request.GET.get('run_id'))
+            context['title'] = run.section.wellbore.well_name.get_title()
         except:
             context['form'] = AddWellForm()
             return render(request, 'data_handler/param.html', {'context': context, })
-        # для работы с стволами
+        # сводка
+        context['summary'] = run.section.wellbore.well_name.summary.all().order_by('-time')
+        # для работы со стволами
         context["wellbore_choices"] = run.section.wellbore.get_choices()
         context['selected_obj'] = run.section.wellbore.well_name
-        # карточки с стволами
+        # карточки со стволами
         for wellbore in Wellbore.objects.filter(well_name=run.section.wellbore.well_name):
             context['cards'].append(WellboreCard(wellbore))
     else:
@@ -165,8 +164,6 @@ def param(request):
         else:
             print(context['form'].errors.as_data())
 
-    selected_for_tree(context, run)  # для раскрытия списка
-
     return render(request, 'data_handler/param.html', {'context': context, })
 
 
@@ -178,7 +175,7 @@ def plan(request):
     if request.GET.get('run_id') is not None:
         try:  # проверка на существование рейса
             run = Run.objects.get(id=request.GET.get('run_id'))
-            selected_for_tree(context, run)  # для раскрытия списка
+            context['title'] = run.section.wellbore.well_name.get_title()
         except:
             return render(request, 'data_handler/plan.html', {'context': context, })
         context['selected_obj'] = run
@@ -204,6 +201,7 @@ def plan(request):
 # TODO вытащить в сервисы
 class WellboreCard:
     def __init__(self, wellbore):
+        self.obj = wellbore
         self.id = wellbore.id
         self.title = wellbore.get_full_wellbore_name
         runs = Run.objects.filter(section__wellbore=wellbore)

@@ -37,11 +37,17 @@ def get_data(runs: Union[object, Iterable[object]]) -> dict:
                           'Угол': list(),
                           'Азимут': list(),
                           }
+            if key == 'Статические замеры ННБ':
+                meas_lists['Комментарий'] = list()
+                meas_lists['Рейс'] = list()  # для самотлорского
 
             for meas in queryset:
                 meas_lists['Глубина'].append(meas.depth)
                 meas_lists['Угол'].append(meas.corner)
                 meas_lists['Азимут'].append(meas.azimut)
+                if key == 'Статические замеры ННБ':
+                    meas_lists['Рейс'].append(meas.run.run_number)
+                    meas_lists['Комментарий'].append(meas.comment)
             data[key] = meas_lists
         else:
             del_key.append(key)  # удаляем те ключи у которых нет данных (например если нет динамических замеров)
@@ -64,6 +70,9 @@ def get_data(runs: Union[object, Iterable[object]]) -> dict:
         data['Статические замеры ННБ']['Глубина'] = [0, *data['Статические замеры ННБ']['Глубина']]
         data['Статические замеры ННБ']['Угол'] = [0, *data['Статические замеры ННБ']['Угол']]
         data['Статические замеры ННБ']['Азимут'] = [0, *data['Статические замеры ННБ']['Азимут']]
+        data['Статические замеры ННБ']['Комментарий'] = ['', *data['Статические замеры ННБ']['Комментарий']]
+        data['Статические замеры ННБ']['Рейс'] = [data['Статические замеры ННБ']['Рейс'][0],
+                                                  *data['Статические замеры ННБ']['Рейс']]
 
     return data
 

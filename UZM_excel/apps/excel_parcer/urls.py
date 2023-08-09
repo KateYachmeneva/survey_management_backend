@@ -11,12 +11,14 @@ urlpatterns = [
                                                     'delete': 'destroy'})),
     path('', views.index, name='axes'),
     path('graph', views.graph, name='graph_axes'),
-    path('add', views.file, name="add_axes"),
+    path('settings', views.settings, name="axes-settings"),
     path('edit', views.edit_index, name='edit_axes'),
     path('telesystem', views.add_Device, name='add_device'),
     path('run_index', views.get_run_index, name='run_index'),  # надо оформить как api
     path('api/device_del', views.del_Device, name='device_del'),
     path('api/meas_del', views.del_Meas, name='meas_del'),
     path('api/coef_device', views.get_coef_device, name='device_coef'),
-    path('api/wellbore_copy', views_api.wellbore_copy)
+    path('api/wellbore_copy', views_api.wellbore_copy),
+    path('api/upload_file', views.uploadAxesFile),
+    path('api/comm', views.axes_comm),
 ]

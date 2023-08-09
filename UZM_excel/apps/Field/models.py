@@ -218,6 +218,10 @@ class Well(models.Model):
     def get_field_name(self):
         return self.pad_name.field.field_name
 
+    def get_title(self):
+        """Получаем title для выбранной скважжины"""
+        return f'Куст {self.pad_name.pad_name}; Скв.{self.well_name}; {self.pad_name.field};'
+
     class Meta:
         verbose_name = 'Скважина'
         verbose_name_plural = 'Скважины'
@@ -275,6 +279,7 @@ class Wellbore(models.Model):
         max_length=4,
         choices=choices.WELLBORE_CHOICES,
     )
+    igirgi_drilling = models.BooleanField('Бурение по траектории ИГиРГИ', default=False, blank=True)
 
     def get_choices(self):
         """Для выпадающих меню"""

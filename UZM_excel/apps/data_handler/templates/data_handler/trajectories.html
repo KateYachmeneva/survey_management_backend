@@ -466,12 +466,15 @@ $('#data_Modal2').on('show.bs.modal', function (event) {
   document.getElementById('run_name').value = run_name;
 })
 
-<!-- Загрзка страницы-->
+<!-- Загрзка страницы / Расчет углов-->
 window.addEventListener('load', () => {
     <!--  Разность углов  -->
     document.getElementsByName('delta1').forEach(function(element, ind){
-        element.innerHTML = (parseFloat(document.getElementById('igirgi_cor'+ind).innerHTML.replace(",", "."))-
+        let dif = (parseFloat(document.getElementById('igirgi_cor'+ind).innerHTML.replace(",", "."))-
         parseFloat(document.getElementById('nnb_cor'+ind).innerHTML.replace(",", "."))).toFixed(2);
+        element.innerHTML = dif;
+        if(Math.abs(dif) > 0.1){
+            element.style.backgroundColor = '#facfcf';}
         })
 
     <!--  Разность азимутов  -->

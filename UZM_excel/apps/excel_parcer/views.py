@@ -16,30 +16,28 @@ def index(request):
     Оси вывод по рейсам данных
     """
     context = {"title": 'Оси',
-               "run": get_all_run(),
-               "wellbores_id": list(),  # повторяет run только с индексами скважин
+               "tree": get_tree(),
                'selected_run': 'None',
                'error_depth': list(),  # глубины замеров при вставке которых нашли ошибку
                "telesystem": Device.objects.all(),
                }
-    # Для сохранения в SessionStorage на клиенте id выбранной скважине по рейсу
-    for run in context['run']:
-        context['wellbores_id'].append(run.section.wellbore.id)
 
     if request.method == 'POST':
         # получение данных для отображения
         try:
             current_run = Run.objects.get(id=request.POST['run'])
+            context['title'] = current_run.section.wellbore.well_name.get_title()
         except Exception as e:
             print(e)
-            return render(request, 'excel_parcer/data.html', {'context': context, })
+            return render(request, 'excel_parcer/axes.html', {'context': context, })
         context['well'] = current_run.section.wellbore.well_name
         context['data'] = Data.objects.filter(run=request.POST['run'], in_statistics=1).order_by('depth')
         context['selected_run'] = current_run
 
         if 'data-axes' in request.POST:  # Модальная форма с ОСЯМИ
             axes_data = request.POST['data-axes'].replace(',', '.'). \
-                replace(' ', '').replace('\r', '').replace('\n', '\t').split('\t')
+                replace(' ', '').replace('\r', '').replace('\n', '\t').replace('\t\t', '\t').split('\t')
+            # print(axes_data)
             counter = 0
             manually_bz = list()
             manually_by = list()
@@ -68,6 +66,7 @@ def index(request):
                 counter = (0 if counter == 6 else counter + 1)
             # result - считанные данные
             result = zip(manually_depth, manually_gx, manually_gy, manually_gz, manually_bx, manually_by, manually_bz)
+            # print(list(result))
             if request.POST.get('device') != '-----' and request.POST.get('device') != '':
                 telesystem_ind = TelesystemIndex.objects.get(run_id=current_run)
                 telesystem_ind.device = Device.objects.get(device_title=request.POST.get('device'))
@@ -76,7 +75,7 @@ def index(request):
                 write_to_bd(result2, current_run)
             else:
                 write_to_bd(result, current_run)
-        if 'depth' in request.POST:  # Модальная форма с  Скорректированными значениями
+        if 'depth' in request.POST:  # Модальная форма со Скорректированными значениями
             depth_data = request.POST['depth'].replace(',', '.').replace(' ', '').replace('\r', ''). \
                 replace('\n', '\t').split('\t')
             Btotal_data = request.POST['Btotal_corr'].replace(',', '.').replace(' ', '').replace('\r', ''). \
@@ -92,7 +91,7 @@ def index(request):
                         obj.save()
                     except:
                         context['error_depth'].append(float(meas[0]))
-    return render(request, 'excel_parcer/data.html', {'context': context, })
+    return render(request, 'excel_parcer/axes.html', {'context': context, })
 
 
 def edit_index(request):
@@ -148,48 +147,33 @@ def edit_index(request):
                     obj.DIP_corr = items[1][0]
                 obj.save()
         return redirect('axes')
-    return render(request, 'excel_parcer/edit_data.html', {'context': context, })
+    return render(request, 'excel_parcer/edit_axes.html', {'context': context, })
 
 
-def file(request):
-    """добавление данных \add"""
+def settings(request):
+    """Настройки импорта файлов с осями"""
     context = {"telesystem": Device.objects.all(),
-               "run": get_all_run(),
+               "tree": get_tree(),
                "title": 'Загрузка осей',
                }
 
     if request.method == 'POST':
-        if 'file' in request.FILES:
-            doc = request.FILES['file']
-            fs = FileSystemStorage()
-            file_name = fs.save(doc.name, doc)  # сохраняем файл для дальнейшего считывания
-            current_run = Run.objects.get(id=request.POST.get('run'))
-            update_values = {'GX': request.POST.get('manually_gx'),
-                             'GY': request.POST.get('manually_gy'),
-                             'GZ': request.POST.get('manually_gz'),
-                             'BX': request.POST.get('manually_bx'),
-                             'BY': request.POST.get('manually_by'),
-                             'BZ': request.POST.get('manually_bz'),
-                             'depth': request.POST.get('manually_depth'),
-                             'units': request.POST.get('manually_measurement'),
-                             'string_index': request.POST.get('manually_import'),
-                             'device': Device.objects.get(device_title=request.POST.get('device'))}
-            TelesystemIndex.objects.update_or_create(run=current_run, defaults=update_values)
-            result = parcing_manually("./media/" + file_name, request.POST.get('manually_depth'),
-                                      request.POST.get('manually_gx'), request.POST.get('manually_gy'),
-                                      request.POST.get('manually_gz'), request.POST.get('manually_bx'),
-                                      request.POST.get('manually_by'), request.POST.get('manually_bz'),
-                                      request.POST.get('manually_import'))
-            result2 = new_measurements(result, request.POST.get('device'))
-            context['result2'] = result2
-            context['result'] = result
-            write_to_bd(result2, current_run)
-
-    return render(request, 'excel_parcer/add_data.html', {'context': context, })
+        update_values = {'GX': request.POST.get('inp_gx'),
+                         'GY': request.POST.get('inp_gy'),
+                         'GZ': request.POST.get('inp_gz'),
+                         'BX': request.POST.get('inp_bx'),
+                         'BY': request.POST.get('inp_by'),
+                         'BZ': request.POST.get('inp_bz'),
+                         'depth': request.POST.get('inp_depth'),
+                         'units': request.POST.get('inp_measurement'),
+                         'string_index': request.POST.get('inp_import'),
+                         'device': Device.objects.get(device_title=request.POST.get('device'))}
+        TelesystemIndex.objects.update_or_create(run=request.POST.get('run_id'), defaults=update_values)
+    return render(request, 'excel_parcer/settings.html', {'context': context, })
 
 
 def add_Device(request):
-    """добавление телесистемы"""
+    """Добавление телесистемы"""
     context = {"telesystem": Device.objects.all(),
                "title": 'Телесистема',
                "form": AddDeviceForm(request.POST),
@@ -212,6 +196,7 @@ def graph(request):
 
     if request.method == 'POST' and request.POST['wellbore'] != '':
         wellbore = Wellbore.objects.get(id=request.POST['wellbore'])
+        context['title'] = wellbore.well_name.get_title()
         runs = Run.objects.filter(section__wellbore=wellbore)
         context['selected'] = wellbore
         for run in runs:
@@ -254,6 +239,38 @@ def graph(request):
     return render(request, 'excel_parcer/graph.html', {'context': context, })
 
 
+def uploadAxesFile(request):
+    if request.method == 'POST':
+        if 'file' in request.FILES:
+            doc = request.FILES['file']
+            fs = FileSystemStorage()
+            file_name = fs.save(doc.name, doc)
+            current_run = Run.objects.get(id=request.POST.get('run_id'))
+            telesystem = TelesystemIndex.objects.get(run=current_run)
+            result = parcing_manually("./media/" + file_name,
+                                      telesystem.depth,
+                                      telesystem.GX,
+                                      telesystem.GY,
+                                      telesystem.GZ,
+                                      telesystem.BX,
+                                      telesystem.BY,
+                                      telesystem.BZ,
+                                      telesystem.string_index, )
+            print(result)
+            result2 = new_measurements(result, telesystem.device.device_title)
+            write_to_bd(result2, current_run)
+
+    return JsonResponse({'status': 'ok'})
+
+
+def axes_comm(request):
+    """Функция для добавления комментария к замерам осей"""
+    obj = Data.objects.get(id=request.POST['id'])
+    obj.comment = request.POST['comment']
+    obj.save()
+    return JsonResponse({'status': 'ok'})
+
+
 def del_Meas(request):
     """Удаление замеров POST методом"""
     for key, value in request.POST.dict().items():
@@ -287,11 +304,12 @@ def get_coef_device(request):
 
 
 def get_run_index(request):
-    """api для fetch запроса
+    """Api для fetch запроса
     Получаем индексы для выбранного рейса
     """
+    # print(request.POST.get('run_id'))
     if request.method == 'POST':
-        telesystem_tuple = TelesystemIndex.objects.get_or_create(run=Run.objects.get(id=request.POST.get('run_title')))
+        telesystem_tuple = TelesystemIndex.objects.get_or_create(run=Run.objects.get(id=request.POST.get('run_id')))
         telesystem_index = telesystem_tuple[0]
         try:
             return JsonResponse({

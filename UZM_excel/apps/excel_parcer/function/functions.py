@@ -91,8 +91,7 @@ def parcing_manually(path, manually_depth, manually_gx, manually_gy, manually_gz
             x2x = XLS2XLSX(path)
             wb = x2x.to_xlsx()
 
-        sheet = wb.worksheets[0]
-
+        sheet = wb.active
         for i, name in enumerate(
                 [manually_bz, manually_by, manually_bx, manually_gz, manually_gy, manually_gx, manually_depth]):
             colum_id = column_index_from_string(name)
@@ -100,6 +99,8 @@ def parcing_manually(path, manually_depth, manually_gx, manually_gy, manually_gz
                 cell = sheet.cell(row_id, colum_id)
                 if cell.value is not None:
                     data[i].append(cell.value)
+                else:
+                    data[i].append('')
 
     return tuple(zip(*data[::-1]))
 
@@ -230,6 +231,8 @@ def new_measurements(data, name):
     for i in range(len(data)):
         new_data = []
         for j in range(len(data[i])):
+            if '' in data[i]:
+                continue
             if j == 0:  # depth[i]
                 new_data.append(toFixed((round(float(eval("((data[i])[j])")), 2)), 2))
             if j == 1:  # GX[i]

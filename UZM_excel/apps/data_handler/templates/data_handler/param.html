@@ -4,8 +4,10 @@
 
 
 {%  block header %}
-<link type="text/css" href="{% static 'css/data_handler/scroll.css' %}" rel="stylesheet"
-      xmlns="http://www.w3.org/1999/html"/>
+    <link type="text/css" href="{% static 'css/data_handler/scroll.css' %}" rel="stylesheet"
+          xmlns="http://www.w3.org/1999/html"/>
+    <link type="text/css" href="{% static 'css/data_handler/toogle_switch.css' %}" rel="stylesheet"/>
+
     {% load crispy_forms_tags %}
 {% endblock %}
 
@@ -142,7 +144,7 @@
                             </svg>
                             Добавить
                         </button>
-                        {% for comment in context.selected_obj.summary.all %}
+                        {% for comment in context.summary %}
                         <div class="card border-dark mx-3" style="max-width: 18rem; max-width: none;">
                             <div class="row card-header">
                                 <div class="col-8" style="vertical-align: middle;">
@@ -158,7 +160,7 @@
                                 </div>
                             </div>
                             <div class="card-body">
-                                <p class="card-text">{{comment.text}}.</p>
+                                <p class="card-text">{{comment.text}}</p>
                             </div>
                         </div>
                         {% endfor %}
@@ -177,9 +179,19 @@
                                 <h5 class="card-title">{{wellbore.title}}</h5>
                             </div>
                             <div class="card-body">
-                                <p class="card-text">Количество секций: {{ wellbore.section_len }}</p>
+                                <p class="card-text">Количество секций: {{wellbore.section_len}}</p>
                                 <p class="card-text">Замеров траектории ННБ: {{ wellbore.nnb_len }}</p>
                                 <p class="card-text">Замеров траектории ИГиРГИ: {{ wellbore.igirgi_len }}</p>
+                                <hr style="color:#FFC501;margin-top:1%;border-width: 3px">
+                                <label class="toggle">
+                                    {% if wellbore.obj.igirgi_drilling == True %}
+                                    <input class="toggle-checkbox" type="checkbox" onchange="igirgi_drilling({{wellbore.id}}, this.checked);" name="checkbox-report" checked >
+                                    {% else %}
+                                    <input class="toggle-checkbox" type="checkbox" onchange="igirgi_drilling({{wellbore.id}}, this.checked);" name="checkbox-report">
+                                    {% endif %}
+                                    <div class="toggle-switch"></div>
+                                    <span class="toggle-label">Бурение по траектории ИГиРГИ</span>
+                                </label>
                             </div>
                             <div class="card-footer">
                                 <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#data_Modal1"
@@ -205,6 +217,7 @@
                 </div>
             </div>
 
+            <br>
         </div> <!--Конец скрола -->
         <button type="submit" class="btn btn-primary" style="margin-top:1%;width:100%;">Подтвердить</button>
     </form>
@@ -352,6 +365,18 @@ function clone_wellbore(){
         new URLSearchParams({id: id}),
         { method: 'DELETE'}).then(response => response.json()).then(location.reload());
 
+    }
+
+    <!--  Отслеживаем смену формата отчёта  -->
+    function igirgi_drilling(wellbore_id, status){
+        console.log('Меняем формат отчёта');
+        params = new FormData();
+        params.set('wellbore_id', wellbore_id);
+        params.set('status', status);
+
+
+        fetch('http://'+window.location.hostname+':'+window.location.port+'/main_data/api/well/igirgi_drilling',
+        { method: 'POST', body: params});
     }
 </script>
 

@@ -44,7 +44,7 @@ class Device(models.Model):
 
 
 class Data(models.Model):
-    """один из замеров под рейс"""
+    """Один из замеров под рейс"""
     run = models.ForeignKey(Run, on_delete=models.CASCADE)
     depth = models.FloatField('Глубина', max_length=10)
     CX = models.FloatField('GX', max_length=10, null=True)
@@ -56,6 +56,7 @@ class Data(models.Model):
     Btotal_corr = models.FloatField('Btotal_corr', null=True)
     DIP_corr = models.FloatField('DIP_corr', null=True)
     in_statistics = models.BooleanField('Учитывать в статистике', null=True)
+    comment = models.TextField('Комментарий', default='', null=True, blank='True')
 
     def __str__(self):
         return str(self.run) + ' ' + str(self.depth)
@@ -63,6 +64,10 @@ class Data(models.Model):
     class Meta:
         verbose_name = 'Данные'
         verbose_name_plural = 'Данные'
+
+    # def comment_template(self):
+    #     """Вывод комментария на страницу (чтобы не отображать None в поле)"""
+    #     return self.comment if self.comment is not None else ''
 
     def Btotal_corrFix(self):
         """Округленное значение"""
@@ -94,8 +99,14 @@ class Data(models.Model):
     def Azimut(self):
         azim = round(math.degrees(math.atan2(
             (self.CX * self.BY - self.CY * self.BX) * self.Gtotal(),
+            self.BZ * (self.CX ** 2 + self.CY ** 2) - self.CZ * (self.CX * self.BX + self.CY * self.BY), )), 2)
+        return azim if azim > 0 else round(azim + 360, 2)
+
+    def ItogAzimut(self):
+        """Азимут с поправками картографический или географический"""
+        azim = round(math.degrees(math.atan2(
+            (self.CX * self.BY - self.CY * self.BX) * self.Gtotal(),
             self.BZ * (self.CX ** 2 + self.CY ** 2) - self.CZ * (self.CX * self.BX + self.CY * self.BY),))
-                     + (self.run.section.wellbore.well_name.dec if self.run.section.wellbore.well_name.dec is not None else 0)
                      + (self.run.section.wellbore.well_name.total_correction if
                         self.run.section.wellbore.well_name.total_correction is not None else 0), 2)
         return azim if azim > 0 else round(azim + 360, 2)

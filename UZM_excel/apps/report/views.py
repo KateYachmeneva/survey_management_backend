@@ -12,26 +12,27 @@ from .function.work_with_data import rewrite_ReportIndex, work_with_file, plan_d
 from Field.models import get_all_run, Run, Wellbore
 from .models import *
 
-def index(request):
-    """Главная страница для генератора отчетов"""
 
-    context = {"title": 'Отчет',
-               "run": get_all_run(), }
-
-    if request.method == 'POST':
-        index_id = rewrite_ReportIndex(request.POST.dict())  # перезапись индексов, получаем id текущего рейса
-        igirgi_data = request.POST['igirgi_data'].replace(',', '.').replace(' ', '') \
-            .replace('\r', '').replace('\n', '\t').split('\t')
-
-        if len(igirgi_data) < 3:  # фиксируем отсутсвие ручного ввода
-            igirgi_data = None
-
-        return work_with_file(request=request,
-                              run_id=request.POST.dict()['run'],
-                              index_id=index_id,
-                              igirgi_data=igirgi_data)
-
-    return render(request, 'report/index.html', {'context': context, })
+# def index(request):
+#     """Главная страница для генератора отчетов [Больше не используется]"""
+#
+#     context = {"title": 'Отчет',
+#                "run": get_all_run(), }
+#
+#     if request.method == 'POST':
+#         index_id = rewrite_ReportIndex(request.POST.dict())  # перезапись индексов, получаем id текущего рейса
+#         igirgi_data = request.POST['igirgi_data'].replace(',', '.').replace(' ', '') \
+#             .replace('\r', '').replace('\n', '\t').split('\t')
+#
+#         if len(igirgi_data) < 3:  # фиксируем отсутсвие ручного ввода
+#             igirgi_data = None
+#
+#         return work_with_file(request=request,
+#                               run_id=request.POST.dict()['run'],
+#                               index_id=index_id,
+#                               igirgi_data=igirgi_data)
+#
+#     return render(request, 'report/index.html', {'context': context, })
 
 
 # report/api/run_index

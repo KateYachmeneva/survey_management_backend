@@ -35,4 +35,5 @@ urlpatterns = [
     path('api/get_pad', get_pad_by_field, name='run_index'),
     path('api/wellbore/clone', views.clone_wellbore),
     path('api/well/summary', views.well_summary, name='add_summary'),
+    path('api/well/igirgi_drilling', views.edit_igirgi_drilling),
 ]
