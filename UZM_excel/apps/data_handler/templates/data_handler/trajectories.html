@@ -5,11 +5,12 @@
 {% load index %}
 {% load comment %}
 {% load id %}
+{% load floattags %}
 
 {%  block header %}
 <!--для скрола таблицы-->
 <link type="text/css" href="{% static 'css/data_handler/scroll.css' %}" rel="stylesheet" />
-
+<link type="text/css" href="{% static 'css/DragAndDropFile.css' %}" rel="stylesheet" />
 <!--для анимации кнопки загрузки-->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -28,52 +29,52 @@
     {% block top_title%}
     <div class="col-7">
         <div class="row">
-            <div class="col-2"><b>Поиск:</b></div>
-            <div class="col-8"><b>Выбрано:</b></div>
-            <div class="col-2"><b>Версия плана:</b></div>
-        </div>
-
-        <div class="row">
-            <div class="col-2"><input type="search" class="form-control form-control-sm" id="SearchInput"
-                       onkeyup="SearchFilter()" placeholder="Введите число..." style="width:9em"></div>
-
-            <div class="col-8">{{context.selected_obj}}</div>
-            <div class="col-2">{{context.plan_version}}</div>
+            <div class="upload-container" style="text-align:center;">
+                <input type="file" id="file_upload" onchange="uploadFile(this)"/>
+            </div>
         </div>
     </div>
     {% endblock %}
-    {% block top_btn%}
+    {% block top_btn %}
     <div class="col-5" style="text-align: right;">
-        <br>
-        {% if context.selected_id is not None %}
-        <!--    Кнопка отвечает за плановую траекторию    -->
-        {% if context.plan_ex == True %}
-        <button type="button" class="btn btn-secondary" data-toggle="modal" data-target="#data_Modal2" data-run="{{context.selected_obj}}">
-            Заменить план
-        </button>
-        <!--    Кнопка отвечает за отправку отчёта    -->
-        <button id='btn_send' type="button" class="btn btn-primary" onclick="Send_mail()">
-            <i id='fa_send' class="fa fa-spinner fa-spin" hidden></i>Отправить отчет
-        </button>
-        {% else %}
-        <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#data_Modal2" data-run="{{context.selected_obj}}">
-            Добавить план
-        </button>
-        <!--    Кнопка отвечает за отправку отчёта    -->
-        <a class="tooltip-test" title="Для генерации отчёта необходимо добавить плановую траекторию.">
-        <button  type="button" class="btn btn-primary" disabled>
-            Отправить отчет </button><a>
-        {% endif %}
+        <div class="row justify-content-end">
+            <div class="col-auto"><b>Выбрано:</b> {{context.selected_obj}}</div>
+            <div class="col-auto"><b>Версия плана:</b> {{context.plan_version}}</div>
+        </div>
+        <div style="margin-top:5px;">
+            <button type="button" class="btn btn-secondary" data-toggle="modal" data-target="#data_Modal3" data-run="{{context.selected_obj}}">
+                Настройки импорта
+            </button>
+            {% if context.selected_id is not None %}
+            <!--    Кнопка отвечает за плановую траекторию    -->
+            {% if context.plan_ex == True %}
+            <button type="button" class="btn btn-secondary" data-toggle="modal" data-target="#data_Modal2" data-run="{{context.selected_obj}}">
+                Заменить план
+            </button>
+            <!--    Кнопка отвечает за отправку отчёта    -->
+            <button id='btn_send' type="button" class="btn btn-primary" onclick="Send_mail()">
+                <i id='fa_send' class="fa fa-spinner fa-spin" hidden></i>Отправить отчет
+            </button>
+            {% else %}
+            <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#data_Modal2" data-run="{{context.selected_obj}}">
+                Добавить план
+            </button>
+            <!--    Кнопка отвечает за отправку отчёта    -->
+            <a class="tooltip-test" title="Для генерации отчёта необходимо добавить плановую траекторию.">
+            <button  type="button" class="btn btn-primary" disabled>
+                Отправить отчет </button></a>
+            {% endif %}
 
-        <!--    Кнопка отвечает за редактирование значений траектории    -->
-        <a href="{% url 'edit_traj' %}?run_id={{context.selected_id}} " style="text-decoration: none;color: #000;">
-            <button type="button" class="btn btn-secondary" aria-controls="dtDynamicVerticalScrollExample">
-            Редактировать</button></a>
+            <!--    Кнопка отвечает за редактирование значений траектории    -->
+            <a href="{% url 'edit_traj' %}?run_id={{context.selected_id}} " style="text-decoration: none;color: #000;">
+                <button type="button" class="btn btn-secondary" aria-controls="dtDynamicVerticalScrollExample">
+                Редактировать</button></a>
 
 
-        {% else %}
-        Выберите рейс в меню слева
-        {% endif %}
+            {% else %}
+            Выберите рейс в меню слева
+            {% endif %}
+        </div>
     </div>
     {% endblock %}
 </div>
@@ -150,9 +151,9 @@
                     <tbody>
                     {% for meas in context.nnb_data%}
                     <tr>
-                        <td id="nnb_depth{{ forloop.counter0 }}" scope="col">{{meas.depth}}</td>
-                        <td id="nnb_cor{{ forloop.counter0 }}" scope="col">{{meas.corner}}</td>
-                        <td id="nnb_azimut{{ forloop.counter0 }}" scope="col">{{meas.azimut}}</td>
+                        <td id="nnb_depth{{ forloop.counter0 }}" scope="col">{{meas.depth|formatted_float}}</td>
+                        <td id="nnb_cor{{ forloop.counter0 }}" scope="col">{{meas.corner|formatted_float}}</td>
+                        <td id="nnb_azimut{{ forloop.counter0 }}" scope="col">{{meas.azimut|formatted_float}}</td>
                     </tr>
                     {% endfor %}
                     </tbody>
@@ -165,9 +166,9 @@
                     <tbody>
                     {% for meas in context.igirgi_data%}
                     <tr>
-                        <td id="igirgi_depth{{ forloop.counter0 }}" scope="col">{{meas.depth}}</td>
-                        <td id="igirgi_cor{{ forloop.counter0 }}" scope="col">{{meas.corner}}</td>
-                        <td id="igirgi_azimut{{ forloop.counter0 }}" scope="col">{{meas.azimut}}</td>
+                        <td id="igirgi_depth{{ forloop.counter0 }}" scope="col">{{meas.depth|formatted_float}}</td>
+                        <td id="igirgi_cor{{ forloop.counter0 }}" scope="col">{{meas.corner|formatted_float}}</td>
+                        <td id="igirgi_azimut{{ forloop.counter0 }}" scope="col">{{meas.azimut|formatted_float}}</td>
                     </tr>
                     {% endfor %}
                     </tbody>
@@ -183,9 +184,9 @@
                     <tr>
                         <td id="delta_cor{{ forloop.counter0 }}" name="delta1"></td>
                         <td id="delta_azimut{{ forloop.counter0 }}" name="delta2"></td>
-                        <td name="waste1">{{ context.waste_hor|index:ind }}</td>
-                        <td name="waste2">{{ context.waste_vert|index:ind }}</td>
-                        <td name="waste3">{{ context.waste_common|index:ind }}</td>
+                        <td name="waste1">{{ context.waste_hor|index:ind|formatted_float }}</td>
+                        <td name="waste2">{{ context.waste_vert|index:ind|formatted_float }}</td>
+                        <td name="waste3">{{ context.waste_common|index:ind|formatted_float }}</td>
                         <td style="width: 340px; padding: 0em;">
                             <textarea style="width: 100%; height: 26px; padding: 0em; border: none;"
                                       onchange="put_comm({{ context.nnb_data|id:forloop.counter0 }}, this.value);">{{ context.nnb_data|comment:forloop.counter0 }}</textarea>
@@ -260,8 +261,6 @@
                             <textarea class="form-control" id="azimut-text" rows="15" name="data-azimut"></textarea>
                         </div>
                     </div>
-
-
             </div>
             <div class="modal-footer">
                 <button type="submit" class="btn btn-primary">Добавить</button>
@@ -341,10 +340,86 @@
     </div>
 </div>
 
+<!-- Модальное окно для настройки импорта траектории ННБ -->
+<div class="modal fade" id="data_Modal3" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Настройки импорта траектории ННБ</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form  method="post" id="nnb_index" enctype="multipart/form-data">
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="run-name" class="col-form-label">Рейс:</label>
+                        <input type="text" class="form-control" id="run_name3_visible" disabled>
+                        <input type="text" class="form-control" name="run" id="run_name3_form" hidden>
+                    </div>
+                    <div class="form-group row">
+                        <div class="form-group col-md-6">
+                            <div style="vertical-align: baseline;">
+                                <div class="form-group">
+                                    <a class="tooltip-test" title="Буквенный индекс колонки с глубинами. Пример: 'A'">
+                                        <label class="col-form-label">Глубина:</label></a>
+                                    <input type="text" class="form-control" name="nnb_depth">
+                                </div>
+                                <div class="form-group">
+                                    <a class="tooltip-test" title="Буквенный индекс колонки с зенитным углом. Пример: 'A'">
+                                        <label class="col-form-label">Угол:</label></a>
+                                    <input type="text" class="form-control" name="nnb_corner">
+                                </div>
+                                <div class="form-group">
+                                    <a class="tooltip-test" title="Буквенный индекс колонки с азимутальным углом. Пример: 'A'">
+                                        <label class="col-form-label">Азимут:</label></a>
+                                    <input type="text" class="form-control" name="nnb_azimut">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group col-md-6">
+                            <div class="form-group">
+                                <a class="tooltip-test" title="Числовой индекс строки, с которой начинается считывание. Пример: '32'">
+                                <label class="col-form-label">Строка:</label></a>
+                                <input type="text" class="form-control" name="nnb_str">
+                            </div>
+                            <div class="form-group">
+                                <a class="tooltip-test" title="Текстовое наименование страницы с данными. Пример: 'Planned WGR'">
+                                <label class="col-form-label">Лист:</label></a>
+                                <input type="text" class="form-control" name="nnb_list_name">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" onclick="send_nnb_index();" class="btn btn-primary">Сохранить</button>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal" id="btn3-cls">Закрыть</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
 
 {% endblock%}
 
 <script>
+<!--  Функция для загрузки файла перетаскиванием  -->
+function uploadFile(input_obj){
+    var data = new FormData()
+    data.append('run_id', sessionStorage.getItem("run_id"))
+    data.append('type', "nnb")
+    data.append('file',input_obj.files[0])
+
+    fetch('http://'+window.location.hostname+':'+window.location.port+'/report/api/upload_file',
+     {method: 'POST', body: data})
+    .then(response=>response.json())
+    .then(data=>{console.log(data);
+                 location.reload();})
+    input_obj.value= "";
+}
+
+
 <!-- Отправка отчёта -->
 function Send_mail() {
     console.log('Отправляем сообщение');
@@ -387,46 +462,6 @@ function Send_mail() {
 
     document.getElementById("fa_send").hidden = true;
     })
-
-}
-
-<!-- Функция поиска -->
-function SearchFilter() {
-  // Объявление переменных
-  var input, filter, tables, tr, td, i, txtValue;
-  input = document.getElementById("SearchInput");
-  filter = input.value.toUpperCase();
-  tables = document.getElementsByName("table-data");
-  tr1 = tables[0].getElementsByTagName("tr");
-  tr2 = tables[1].getElementsByTagName("tr");
-  tr3 = tables[2].getElementsByTagName("tr");
-
-  // Цикл по всем строкам таблицы и сокрытие данных, что не подходят под поиск
-  for (i = 0; i < tr1.length; i++) {
-    td = tr1[i].getElementsByTagName("td")[0];
-    if (td) {
-      txtValue = td.textContent || td.innerText;
-      if (txtValue.toUpperCase().indexOf(filter) > -1) {
-        tr1[i].style.display = "";
-        tr3[i].style.display = "";
-      } else {
-        tr1[i].style.display = "none";
-        tr3[i].style.display = "none";
-      }
-    }
-  }
-  // Цикл по всем строкам таблицы и сокрытие данных, что не подходят под поиск
-  for (i = 0; i < tr2.length; i++) {
-    td = tr2[i].getElementsByTagName("td")[0];
-    if (td) {
-      txtValue = td.textContent || td.innerText;
-      if (txtValue.toUpperCase().indexOf(filter) > -1) {
-        tr2[i].style.display = "";
-      } else {
-        tr2[i].style.display = "none";
-      }
-    }
-  }
 }
 
 <!--Функция для модального окна под добавление замеров-->
@@ -466,6 +501,39 @@ $('#data_Modal2').on('show.bs.modal', function (event) {
   document.getElementById('run_name').value = run_name;
 })
 
+<!--Функция для модального окна под загрузку траектории ННБ-->
+$('#data_Modal3').on('show.bs.modal', function (event) {
+  var button = $(event.relatedTarget)
+
+  var params = new FormData();
+  params.set('run_id', {{context.selected_id}});
+  fetch('http://'+window.location.hostname+':'+window.location.port+'/report/api/run_index', { method: 'POST', body: params })
+         .then(response=>response.json()).
+         then(data=>{
+         document.getElementsByName('nnb_depth')[0].value=data.nnb_static_depth;
+         document.getElementsByName('nnb_corner')[0].value=data.nnb_static_corner;
+         document.getElementsByName('nnb_azimut')[0].value=data.nnb_static_azimut;
+         document.getElementsByName('nnb_str')[0].value=data.nnb_static_read;
+         document.getElementsByName('nnb_list_name')[0].value=data.nnb_static_list_name;
+         });
+
+  var run_name = button.data('run')
+  var modal = $(this)
+  document.getElementById('run_name3_visible').value = run_name;
+  document.getElementById('run_name3_form').value = {{context.selected_id}};
+})
+
+<!--Функция на отправку формы с индексами под чтения файла с траекторией ННБ-->
+function send_nnb_index(){
+    var params = new FormData(document.getElementById('nnb_index'));
+    fetch('http://'+window.location.hostname+':'+window.location.port+'/report/api/update_index', { method: 'POST', body: params })
+         .then(response=>response.json()).
+         then(data=>{
+         console.log('Можем читать файл');
+         document.getElementById('btn3-cls').click();
+         });
+}
+
 <!-- Загрзка страницы / Расчет углов-->
 window.addEventListener('load', () => {
     <!--  Разность углов  -->
@@ -479,8 +547,10 @@ window.addEventListener('load', () => {
 
     <!--  Разность азимутов  -->
     document.getElementsByName('delta2').forEach(function(element, ind){
-        element.innerHTML = (parseFloat(document.getElementById('igirgi_azimut'+ind).innerHTML.replace(",", "."))-
+        let dif = (parseFloat(document.getElementById('igirgi_azimut'+ind).innerHTML.replace(",", "."))-
         parseFloat(document.getElementById('nnb_azimut'+ind).innerHTML.replace(",", "."))).toFixed(2);
+        if(dif>300){dif=(dif-360).toFixed(2);};
+        element.innerHTML = dif;
         })
 });
 

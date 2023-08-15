@@ -34,7 +34,6 @@ class WellByClient(APIView):
 
 class RunByWell(APIView):
     """Получаем список рейсов по id скважины"""
-
     def get(self, request, well_id):
         runs = Run.objects.filter(section__wellbore__well_name__id=well_id)
         return Response(RunSerializer(runs, many=True).data)

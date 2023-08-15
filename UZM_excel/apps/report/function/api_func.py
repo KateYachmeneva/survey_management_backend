@@ -40,7 +40,7 @@ def get_index(request) -> JsonResponse:
                 'plan_azimut': report_index.plan_azimut,
                 'plan_list_name': report_index.plan_list_name,
                 "plan_str": report_index.plan_str,
-                'nnb_dynamic_read': report_index.nnb_dynamic_read,
+                'nnb_dynamic_read': report_index.nnb_dynamic_read,  # read номер строки с которой начинаем считывание
                 'nnb_static_read': report_index.nnb_static_read, })
         except:
             pass

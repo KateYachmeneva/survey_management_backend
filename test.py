@@ -1,31 +1,10 @@
-# import openpyxl
-# from openpyxl import Workbook, load_workbook
-# import lasio
-#
-# path = 'C:\\Users\\a_dovidenkov\\Downloads\\SKN_22005_Run500_Gx_Gy_Gz_Bx_By_Bz.xlsx'
-#
-# excel_file = openpyxl.load_workbook(path, data_only=True)
-# excel_sheet = excel_file.worksheets[0]
-#
-# data = []
-# colum_id = 2
-# for row_id in range(int(3), excel_sheet.max_row + 1000):
-#     cell = excel_sheet.cell(row_id, colum_id)
-#     if cell.value is not None:
-#         data.append(cell.value)
-# print(data)
+import re
 
-import smtplib as smtp
+text = ('Талипов Руслан Дамирович <TalipovRD@skn.rosneft.ru>; Шарипов Булат Рифгатович <SharipovBR@skn.rosneft.ru>;'
+        ' Григорьев Алексей Сергеевич <AS_Grigorev6@skn.rosneft.ru>; SM_SEVKOM <SM_SEVKOM@igirgi.su>;'
+        ' #СевКомНефтегаз, ООО: ОГСБС <GSB@skn.rosneft.ru>; ')
 
-login = 'ant.dovidenkov9458@gmail.com'
-password = 'GodWarrior87'
+text2 = 'Группа ГИС <Group.GIS@igirgi.su>; Довиденков Антон Леонидович <a_dovidenkov@igirgi.su>; Зарипова Лиана Фанисовна <Ly_Zaripova@igirgi.su>; Михайлова Татьяна Алексеевна <T_Mihaylova@igirgi.su>; Бойчук Диана Юрьевна <d_boychuk@igirgi.su>; Журавлева Карина Константиновна <k_zhuravleva@igirgi.su>'
 
-server = smtp.SMTP('smtp.gmail.com', 587)
-server.starttls()
-server.login(login, password)
-
-subject = 'какая-нибудь тема письма. может быть пустой'
-text = 'основной текст письма. тоже можно оставить пустым'
-
-server.sendmail(login, 'DovidenkovAL@igirgi.rosneft.ru', f'Subject:{subject}\n{text}')
+print(''.join(str(s)+"; " for s in re.findall('<(\S*)>', text2)))
 

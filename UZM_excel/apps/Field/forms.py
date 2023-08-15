@@ -1,3 +1,5 @@
+import re
+
 from django.forms import ModelForm, widgets
 
 from . import models
@@ -41,6 +43,16 @@ class AddWellForm(ModelForm):
             'latitude': widgets.TextInput(),
             'longtitude': widgets.TextInput(),
         }
+
+    def mail_replace(self) -> None:
+        """Облегчает вставку почты из Outlook"""
+        _mutable = self.data._mutable
+        self.data._mutable = True
+        if '<' in self.data['mail_To']:
+            self.data['mail_To'] = ''.join(str(s)+"; " for s in re.findall('<(\S*)>', self.data['mail_To']))
+        if '<' in self.data['mail_Cc']:
+            self.data['mail_Cc'] = ''.join(str(s) + "; " for s in re.findall('<(\S*)>', self.data['mail_Cc']))
+        self.data._mutable = _mutable
 
     def transform(self):
         """ [Доп. функционал] [Не используется] Преобразуем значения долготы и широты в десятичные значения """

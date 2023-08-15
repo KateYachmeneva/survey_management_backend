@@ -1,4 +1,7 @@
+import os
+
 from django.core.files.storage import FileSystemStorage
+from django.http import HttpResponse
 from django.shortcuts import render, redirect
 from pytest import console_main
 from Field.models import Well, Run, Wellbore, Section
@@ -115,7 +118,7 @@ def edit_traj(request):
                 obj = StaticNNBData.objects.get(id=key[0])
             else:
                 obj = IgirgiStatic.objects.get(id=key[0])
-            print(items[1])  # - все 3 числа замеров
+            print(items[1])  #- все 3 числа замеров
             if items[1][0] == '' or items[1][1] == '' or items[1][2] == '':
                 obj.delete()
             else:
@@ -159,6 +162,7 @@ def param(request):
 
     if request.method == 'POST':
         context['form'] = AddWellForm(request.POST, instance=run.section.wellbore.well_name)
+        context['form'].mail_replace()
         if context['form'].is_valid():
             context['form'].save()
         else:
@@ -196,6 +200,17 @@ def plan(request):
             work_with_plan(request, run)
 
     return render(request, 'data_handler/plan.html', {'context': context, })
+
+
+def proj(request):
+    """ Страница с проекциями из отчёта [В будущем сюда можно добавить ее масштабирование]"""
+    context = {'title': 'Проекция',
+               "tree": get_tree(),
+               "active": 'proj', }
+    if request.GET.get('run_id') is not None:
+        run = Run.objects.get(id=request.GET.get('run_id'))
+        context['selected_obj'] = run.section.wellbore
+    return render(request, 'data_handler/proj.html', {'context': context, })
 
 
 # TODO вытащить в сервисы

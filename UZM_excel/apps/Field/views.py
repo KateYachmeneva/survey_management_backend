@@ -18,7 +18,8 @@ def add_contractor_nnb(request):
     context = {"title": 'Подрядчик',
                "form": form,
                "method": "add_contractor_nnb",
-               "data": ContractorNNBSerializer_Add(ContractorNNB.objects.all(), many=True).data}
+               "data": sorted(ContractorNNBSerializer_Add(ContractorNNB.objects.all(), many=True).data,
+                              key=lambda x: x['Подрядчики по ННБ'])}
     return render(request, 'Field/addModal.html', {'context': context, })
 
 
@@ -32,7 +33,8 @@ def add_contractor_drill(request):
     context = {"title": 'Подрядчик',
                "form": form,
                "method": "add_contractor_drill",
-               "data": ContractorDrillSerializer_Add(ContractorDrill.objects.all(), many=True).data}
+               "data": sorted(ContractorDrillSerializer_Add(ContractorDrill.objects.all(), many=True).data,
+                              key=lambda x: x['Подрядчики по бурению'])}
     return render(request, 'Field/addModal.html', {'context': context, })
 
 
@@ -46,7 +48,7 @@ def add_field(request):
     context = {"title": 'Месторождение',
                "form": form,
                "method": "add_field",
-               "data": serializer.FieldnameSerializer(Field.objects.all(), many=True).data}
+               "data": sorted(serializer.FieldnameSerializer(Field.objects.all(), many=True).data, key=lambda x: x['ДО'])}
     return render(request, 'Field/addModal.html', {'context': context, })
 
 
@@ -60,15 +62,16 @@ def add_pad(request):
     context = {"title": 'Куст',
                "form": form,
                "method": "add_pad",
-               "data": serializer.PadnameSerializer(Pad.objects.all(), many=True).data}
+               "data": sorted(serializer.PadnameSerializer(Pad.objects.all(), many=True).data, key=lambda x: x['Месторождение'])}
     return render(request, 'Field/addModal.html', {'context': context, })
 
 
 def add_well(request):
     form = AddWellForm(request.POST)
-    form.base_fields['mail_To'].help_text = 'Введите адреса черех ";"'
-    form.base_fields['mail_Cc'].help_text = 'Введите адреса черех ";"'
+    form.base_fields['mail_To'].help_text = 'Введите адреса через ";"'
+    form.base_fields['mail_Cc'].help_text = 'Введите адреса через ";"'
     if request.method == 'POST':
+        form.mail_replace()
         if form.is_valid():
             form.save()
         return redirect(add_wellbore)
@@ -86,12 +89,15 @@ def add_wellbore(request):
     if request.method == 'POST':
         if form.is_valid():
             form.save()
-        return redirect(add_section)
+            return redirect(add_section)
+        else:
+            print(form.errors.as_data())  # here you print errors to terminal
 
     context = {"title": 'Ствол',
                "form": form,
-               "method": "add_wellbore"}
-    return render(request, 'Field/addModal.html', {'context': context, })
+               "method": "add_wellbore",
+               "search": Well.objects.all()}
+    return render(request, 'Field/addWellbore.html', {'context': context, })
 
 
 def add_section(request):
@@ -99,12 +105,15 @@ def add_section(request):
     if request.method == 'POST':
         if form.is_valid():
             form.save()
-        return redirect(add_run)
+            return redirect(add_run)
+        else:
+            print(form.errors.as_data())  # here you print errors to terminal
 
     context = {"title": 'Секция',
                "form": form,
-               "method": "add_section"}
-    return render(request, 'Field/addModal.html', {'context': context, })
+               "method": "add_section",
+               "search": Wellbore.objects.all()}
+    return render(request, 'Field/addSection.html', {'context': context, })
 
 
 def add_run(request):
@@ -113,12 +122,15 @@ def add_run(request):
     if request.method == 'POST':
         if form.is_valid():
             form.save()
-        return redirect('empty_page')
+            return redirect('empty_page')
+        else:
+            print(form.errors.as_data())  # here you print errors to terminal
 
     context = {"title": 'Рейс',
                "form": form,
-               "method": "add_run"}
-    return render(request, 'Field/addModal.html', {'context': context, })
+               "method": "add_run",
+               "search": Section.objects.all()}
+    return render(request, 'Field/addRun.html', {'context': context, })
 
 
 def clone_wellbore(request):

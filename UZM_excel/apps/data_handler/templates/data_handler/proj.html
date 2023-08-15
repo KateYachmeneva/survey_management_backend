@@ -1,0 +1,44 @@
+{% extends 'data_handler/index.html' %}
+{% load static %}
+{% load index %}
+
+<!-- Шапка страницы -->
+{%  block header %}
+{% endblock %}
+
+
+<!-- Основная информация -->
+{% block data %}
+<h6><b>Выбрано:</b> {{context.selected_obj}}</h6>
+<div class="row" style="margin-top:1%">
+    <div id="img" class="row d-flex justify-content-center"></div>
+
+</div>
+
+
+<script>
+    window.addEventListener('load', () => {
+    var params = new FormData();
+    params.set('wellbore_id', sessionStorage.getItem("wellbore_id"));
+
+    fetch('http://'+window.location.hostname+':'+window.location.port+'/report/api/graph',
+     { method: 'POST', body: params })
+         .then(response=>response.blob()).
+         then(data=>{
+         const imageUrl = URL.createObjectURL(data);
+         const imageElement = document.createElement("img");
+         imageElement.src = imageUrl;
+         imageElement.style.width = "1200px";
+         imageElement.style.height = "1200px";
+         const container = document.getElementById("img");
+         container.appendChild(imageElement);
+         });
+    })
+</script>
+{% endblock %}
+
+
+<!-- НИЖНИИ КНОПКИ -->
+{% block bottom_button%}
+{% endblock%}
+

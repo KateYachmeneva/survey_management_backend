@@ -125,7 +125,7 @@ data_name = {'igirgi_file': 'Статические замеры ИГИРГИ',
              }
 
 
-def get_graphics(all_data: dict, well: object) -> dict:
+def get_graphics(all_data: dict, wellbore: object) -> dict:
     """
     Строит график, сохраняет его в /Report_out/1.png
     На выходе словарь с данными для записи в эксель и наименование при отходах
@@ -138,6 +138,8 @@ def get_graphics(all_data: dict, well: object) -> dict:
             -igirgi_delta_x
             -igirgi_TVD
     """
+    well = wellbore.well_name
+
     # для траектории
     RKB = (84 if well.RKB is None else well.RKB)
     VSaz = (1 if well.VSaz is None else well.VSaz)
@@ -287,10 +289,10 @@ def get_graphics(all_data: dict, well: object) -> dict:
         waste_word['ver'] = ('выше' if text_data["Отход по вертикали"] > 0 else 'ниже')
 
     # сохраняем изображение
-    plt.savefig(file_dir + f'/Report_out/{well}.png')
+    plt.savefig(file_dir + f'/Report_out/{wellbore}.png')
 
     # вставка текста на изображение
-    image = Image.open(file_dir + f'/Report_out/{well}.png')
+    image = Image.open(file_dir + f'/Report_out/{wellbore}.png')
     font = ImageFont.truetype("arial.ttf", 25)
     drawer = ImageDraw.Draw(image)
     drawer.text((180, 820),
@@ -300,7 +302,7 @@ def get_graphics(all_data: dict, well: object) -> dict:
                 f'Общий отход: {format(text_data["Общий отход"], ".2f")} м\n'
                 f'Абсолютная отметка: {format(text_data["Абсолютная отметка"], ".2f")} м\n',
                 font=font, fill='black')
-    image.save(file_dir + f'/Report_out/{well}.png')
+    image.save(file_dir + f'/Report_out/{wellbore}.png')
 
     # для отображения в письме добавляем ()
     waste_word["hor"] = ('(' + waste_word["hor"] + ')' if waste_word["hor"] != '' else waste_word["hor"])

@@ -39,6 +39,13 @@ body{ overflow: hidden; }
           <a href="{% url 'traj' %}" class="nav-link" style="font-size:large">Траектории</a>
           {% endif %}
         </li>
+          <li class="nav-item">
+              {% if context.active == 'proj'%}
+              <a href="{% url 'proj' %}" class="nav-link active" style="font-size:large">Проекции</a>
+              {% else %}
+              <a href="{% url 'proj' %}" class="nav-link" style="font-size:large">Проекции</a>
+              {% endif %}
+          </li>
       </ul>
   </div>
 </nav>

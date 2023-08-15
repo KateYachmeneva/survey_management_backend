@@ -81,11 +81,12 @@ def write_data_in_Excel(all_data: dict, filename: str, short_type: int, Run: obj
 
     На выходе получаем имя файла, которое отдаем на выдачу и параметры отходов
     """
-    Well = Run.section.wellbore.well_name
+    well = Run.section.wellbore.well_name
+    wellbore = Run.section.wellbore
     # построение графика
-    other_data, waste_word = get_graphics(all_data, Well)  # other_data - тут лежат TVD, угол, азимут
+    other_data, waste_word = get_graphics(all_data, wellbore)  # other_data - тут лежат TVD, угол, азимут
 
-    Field = Well.pad_name.field
+    Field = well.pad_name.field
     report_type = {'шаблон': 'единый'}
     if Field.field_name == 'Северо-Комсомольское':  # используем шаблон с картографическим азимутом
         filename = 'Северо-Комсомольское_отчёт.xlsx'
@@ -131,10 +132,10 @@ def write_data_in_Excel(all_data: dict, filename: str, short_type: int, Run: obj
     #         j += 1
 
     # добавляем график
-    grafic = Image(file_dir + f'\\Report_out\\{Well}.png')
+    grafic = Image(file_dir + f'\\Report_out\\{wellbore}.png')
     excel_file['Проекции'].add_image(grafic, 'A1')
 
-    report_name = get_excel_name(Well,
+    report_name = get_excel_name(well,
                                  last_depth=all_data['Статические замеры ИГИРГИ']['Глубина'][-1],
                                  departure_ver=ver,
                                  departure_horiz=hor, )
@@ -186,7 +187,7 @@ def nnb_dynamic(excel: openpyxl.workbook.workbook.Workbook, data: dict) -> NoRet
 def write_data(excel: openpyxl.workbook.workbook.Workbook,
                nnb: dict, igirgi: dict, other: dict,
                Run: object, report_type: dict) -> float:
-    """Первая страница запись (Данные)
+    """ Первая страница запись (Данные)
         Возвращаем последние посчитанные отходы на для названия файла
     """
     Well = Run.section.wellbore.well_name
@@ -226,7 +227,8 @@ def write_data(excel: openpyxl.workbook.workbook.Workbook,
         excel_sheet.cell(row=row, column=6).value = round(meas[3], 2)  # ННБ зенитный угол
         excel_sheet.cell(row=row, column=7).value = round(meas[4], 2)  # ННБ азимут
         excel_sheet.cell(row=row, column=8).value = round(meas[1] - meas[3], 2)  # разница зенитный угол
-        excel_sheet.cell(row=row, column=9).value = round(meas[2] - meas[4], 2)  # разница азимут
+        dif_Az = meas[2] - meas[4]  # разница азимут
+        excel_sheet.cell(row=row, column=9).value = round((dif_Az if dif_Az <= 300 else dif_Az - 360), 2)
         # пошли отходы
         Ex = (Well.EX if Well.EX is not None else 0)
         Ny = (Well.NY if Well.NY is not None else 0)
@@ -284,7 +286,8 @@ def sevcom_data(excel_sheet: openpyxl.workbook.workbook.Workbook,
         excel_sheet.cell(row=row, column=7).value = round(meas[3], 2)  # ННБ зенитный угол
         excel_sheet.cell(row=row, column=8).value = round(meas[4], 2)  # ННБ азимут
         excel_sheet.cell(row=row, column=9).value = round(meas[1] - meas[3], 2)  # разница зенитный угол
-        excel_sheet.cell(row=row, column=10).value = round(meas[2] - meas[4], 2)  # разница азимут
+        dif_Az = meas[2] - meas[4]  # разница азимут
+        excel_sheet.cell(row=row, column=9).value = round((dif_Az if dif_Az <= 300 else dif_Az - 360), 2)
         # пошли отходы
         Ex = (Well.EX if Well.EX is not None else 0)
         Ny = (Well.NY if Well.NY is not None else 0)
@@ -336,7 +339,8 @@ def samotlor_data(excel_sheet: openpyxl.workbook.workbook.Workbook,
         excel_sheet.cell(row=row, column=6).value = round(meas[3], 2)  # ННБ зенитный угол
         excel_sheet.cell(row=row, column=7).value = round(meas[4], 2)  # ННБ азимут
         excel_sheet.cell(row=row, column=8).value = round(meas[1] - meas[3], 2)  # разница зенитный угол
-        excel_sheet.cell(row=row, column=9).value = round(meas[2] - meas[4], 2)  # разница азимут
+        dif_Az = meas[2] - meas[4]  # разница азимут
+        excel_sheet.cell(row=row, column=9).value = round((dif_Az if dif_Az <= 300 else dif_Az - 360), 2)
 
         # пошли отходы
         Ex = (Well.EX if Well.EX is not None else 0)

@@ -210,7 +210,7 @@ def reader(key: str, value: str, run_index_id: int) -> dict:
                'Имя файла': value, }
         static = excel_open(var)
         # если мы не задавали параметры для считывания динамических замеров значит их нет
-        if colum_name.nnb_dynamic_list_name != '' or colum_name.nnb_dynamic_read is not None:
+        if colum_name.nnb_dynamic_list_name != '' and colum_name.nnb_dynamic_read is not None:
             var = {'Глубина': colum_name.nnb_dynamic_depth,
                    'Угол': colum_name.nnb_dynamic_corner,
                    'Азимут': colum_name.nnb_dynamic_azimut,
@@ -358,7 +358,7 @@ def dynamic_from_interpolis(static: dict, row: dict):
 
 def getx_From_static(data: list, part: int = 5) -> np.array:
     """
-    Для функции интерполяции ищим значения глубины из которых нужно найти угол
+    Для функции интерполяции ищем значения глубины из которых нужно найти угол
     """
     count = 1
     result = []
@@ -370,18 +370,6 @@ def getx_From_static(data: list, part: int = 5) -> np.array:
                 result.append(i + j * dx)
     return np.array(result)
 
-
-# def new_thread(func):
-#     """
-#     Попытка сделать декоратор с многопоточностью
-#     """
-#     def wrapper(*arg, **kwargs):
-#         thread = threading.Thread(target=func, args=(*arg,), kwargs={**kwargs})
-#         print(thread.info)
-#         thread.start()
-#         return thread
-#
-#     return wrapper
 
 def bd_Write_data(all_data: dict, run_id: int) -> NoReturn:
     """
@@ -432,6 +420,8 @@ def bd_Write_data(all_data: dict, run_id: int) -> NoReturn:
         updat_obj = []
 
 
+# Работа с файлом плановой траектории!
+
 def bd_Write_plan(data_dict: dict, run_id: int, plan_version: str = None) -> NoReturn:
     """Записываем считанные данные плана в бд с припиской версии
     """
@@ -452,23 +442,18 @@ def bd_Write_plan(data_dict: dict, run_id: int, plan_version: str = None) -> NoR
 def work_with_plan(request: dict, run: object) -> bool:
     """Чтение и сохранение палновой траектории"""
     fs = FileSystemStorage(location=file_dir + '/Report_input')
-
     plan_file = request.FILES['plan_file']  # сохранение файла плана
     path = fs.save('plan_' + plan_file.name, plan_file)
-
     plan_index(run, request.POST)  # перезапись индексов
-
     data = reader('plan_file', path, ReportIndex.objects.get(run=run).id)  # берём данные с плана
-
     # удаляем старый план
     plan_delete(run)
-
     bd_Write_plan(data, run.id, request.POST['plan_version'])  # сохраняем в бд
     return True
 
 
 def plan_delete(run):
-    """Удаляем все замеры с ствола, к которому привязан переданный рейс"""
+    """Удаляем все замеры со ствола, к которому привязан переданный рейс"""
     runs = Run.objects.filter(section__wellbore__well_name=run.section.wellbore.well_name)
     Plan.objects.filter(run__in=runs).delete()
 
@@ -482,3 +467,31 @@ def plan_index(run, new_index):
     index_model.plan_list_name = new_index["plan_list_name"]
     index_model.plan_str = new_index["plan_str"]
     index_model.save()
+
+
+# Работа с фалом траектории ННБ
+
+def work_with_nnb(request: dict, run: object) -> bool:
+    """ Читаем значения из файла внутри request """
+    fs = FileSystemStorage(location=file_dir + '/Report_input')
+    nnb_file = request.FILES['file']
+    path = fs.save('nnb_' + nnb_file.name, nnb_file)
+    data = reader('nnb_file', path, ReportIndex.objects.get(run=run).id)  # берём данные с плана
+    bd_Write_static_nnb(data['Статические'], run)
+    return True
+
+
+def bd_Write_static_nnb(data_dict: dict, run: object) -> NoReturn:
+    """Записываем считанные данные траектории ннб в бд
+    """
+    updat_obj = []
+    model = StaticNNBData
+
+    for meas in list(zip(data_dict['Глубина'], data_dict['Угол'], data_dict['Азимут'])):
+        # print(meas)
+        db_meas = model.objects.get_or_create(depth=meas[0], run=run)
+        updat_obj.append(db_meas[0])
+        db_meas[0].corner = meas[1]
+        db_meas[0].azimut = meas[2]
+    model.objects.bulk_update(updat_obj, ['corner', 'azimut'])
+
