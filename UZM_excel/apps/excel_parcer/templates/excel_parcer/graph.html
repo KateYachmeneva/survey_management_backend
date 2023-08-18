@@ -29,7 +29,6 @@
   <label class = "status">{{context.selected.well_name.get_status}}</label></div>
 <div class="container">
   <div class="container-form" >  
-  <div class="chart-header"> График соотношения показаний осевого и поперечных акселерометров </div>
   <canvas id="grafica1" width="50" height="15"></canvas>
   <form id ="form">
   <label>Глубина, м </label>
@@ -56,8 +55,7 @@
 </div>
 </form></div>
 <div class="container-form" > 
-  <div class="chart-header"> График напряженности гравитационного поля </div>
-<canvas id="grafica2" width="50" height="15"></canvas> 
+  <canvas id="grafica2" width="50" height="15"></canvas> 
 <form id ="formGtotal">
   <label>Глубина, м </label>
   <div class="mb-3">
@@ -67,8 +65,8 @@
 </div>
 <label>Gtotal,G</label>
 <div class="mb-3">
-<label>Минимальное значение: <input id="minGtotal" type="number" step="0.01"></label>
-<label>Максимальное значение: <input id="maxGtotal" type="number" step="0.01"></label>
+<label>Минимальное значение: <input id="minGtotal" type="number" step="0.001"></label>
+<label>Максимальное значение: <input id="maxGtotal" type="number" step="0.001"></label>
 <label>Шаг: <input id="stepGtotal" type="number" step="0.001"></label>
 </div>   
 <div class="container-btn" >   
@@ -78,8 +76,7 @@
 </form>
 </div>
 <div class="container-form" >
-  <div class="chart-header"> График соотношений показаний осевых и поперечных магнитометров </div>
-  <canvas id="grafica3" width="50" height="15"></canvas>
+   <canvas id="grafica3" width="50" height="15"></canvas>
   <form id ="formB">
     <label>Глубина, м </label>
     <div class="mb-3">
@@ -106,7 +103,6 @@
   </form>
 </div>
 <div class="container-form" > 
-  <div class="chart-header"> График напряженности геомагнитного поля </div>
   <canvas id="grafica4" width="50" height="15"></canvas>
   <form id ="formBt">
     <label>Глубина, м </label>
@@ -128,7 +124,6 @@
   </form>
 </div>
 <div class="container-form" >
-  <div class="chart-header"> HSTF</div>
 <canvas id="grafica5" width="50" height="15"></canvas>
 <form id ="formHSTF">
   <label>Глубина, м </label>
@@ -144,7 +139,6 @@
 </form>
 </div>
 <div class="container-form" >
-  <div class="chart-header"> График магнитного наклонения </div>
   <canvas id="grafica6" width="50" height="15"></canvas> 
   <form id ="formDip">
     <label>Глубина, м </label>
@@ -318,6 +312,13 @@ form.addEventListener('submit',(e) => {
       ],
     },
     options: {
+      title: {
+            display: true,
+            text: 'График соотношения показаний осевого и поперечных акселерометров',
+            position: 'top',
+            fontSize: 16,
+            padding: 20,
+        },
       scales: {
         yAxes: [{
           id: 'A',
@@ -366,7 +367,7 @@ form.addEventListener('submit',(e) => {
       },
       zoom: {
         enabled: true,
-        mode: 'xy',
+        mode: 'y',
       },
     },
   });
@@ -441,6 +442,13 @@ formGtotal.addEventListener('submit',(e) => {
       ],
     },
     options: {
+      title: {
+            display: true,
+            text: 'График напряженности гравитационного поля',
+            position: 'top',
+            fontSize: 16,
+            padding: 20,
+        },
       scales: {
         yAxes: [{
           id: 'A',
@@ -476,7 +484,7 @@ formGtotal.addEventListener('submit',(e) => {
       },
       zoom: {
         enabled: true,
-        mode: 'xy',
+        mode: 'y',
       },
     },
   });
@@ -544,6 +552,13 @@ formB.addEventListener('submit',(e) => {
       ],
     },
     options: {
+      title: {
+            display: true,
+            text: 'График соотношений показаний осевых и поперечных магнитометров',
+            position: 'top',
+            fontSize: 16,
+            padding: 20,
+        },
       scales: {
         yAxes: [{
           id: 'A',
@@ -592,7 +607,7 @@ formB.addEventListener('submit',(e) => {
       },
       zoom: {
         enabled: true,
-        mode: 'xy',
+        mode: 'y',
       },
     },
   });
@@ -676,6 +691,13 @@ formBt.addEventListener('submit',(e) => {
       ],
     },
     options: {
+      title: {
+            display: true,
+            text: 'График напряженности геомагнитного поля',
+            position: 'top',
+            fontSize: 16,
+            padding: 20,
+        },
       scales: {
         yAxes: [{
           id: 'A',
@@ -711,7 +733,7 @@ formBt.addEventListener('submit',(e) => {
       },
       zoom: {
         enabled: true,
-        mode: 'xy',
+        mode: 'y',
       },
     },
   });
@@ -747,7 +769,7 @@ formHSTF.addEventListener('submit',(e) => {
           data: depthHSTF,
           showLine: false,
           fill: false,
-          borderColor: 'rgba(253, 233, 16)',
+          borderColor: 'rgba(0,0,255)',
           borderWidth: 3,
           position: 'left',
           },
@@ -790,6 +812,13 @@ formHSTF.addEventListener('submit',(e) => {
       ],
     },
     options: {
+      title: {
+            display: true,
+            text: 'HSTF',
+            position: 'top',
+            fontSize: 16,
+            padding: 20,
+        },
       plugins: {
             legend: false,
             },
@@ -831,7 +860,7 @@ formHSTF.addEventListener('submit',(e) => {
       },
       zoom: {
         enabled: true,
-        mode: 'xy',
+        mode: 'x',
       },
     },
 });
@@ -875,7 +904,7 @@ formDip.addEventListener('submit',(e) => {
           data: depthDipraw,
           showLine: true,
           fill: false,
-          borderColor: 'rgba(253, 233, 16',
+          borderColor: 'rgba(253, 233, 16)',
         },
         {
           
@@ -914,6 +943,13 @@ formDip.addEventListener('submit',(e) => {
       ],
     },
     options: {
+      title: {
+            display: true,
+            text: 'График магнитного наклонения',
+            position: 'top',
+            fontSize: 16,
+            padding: 20
+        },
       scales: {
         yAxes: [{
           ticks: {
@@ -948,7 +984,7 @@ formDip.addEventListener('submit',(e) => {
       },
       zoom: {
         enabled: true,
-        mode: 'xy',
+        mode: 'y',
       },
     },
   });
@@ -980,6 +1016,13 @@ new Chart(grafica1,
       ],
     },
     options: {
+      title: {
+            display: true,
+            text: 'График соотношения показаний осевого и поперечных акселерометров',
+            position: 'top',
+            fontSize: 16,
+            padding: 20
+        },
       scales: {
         yAxes: [{
           id: 'A',
@@ -1012,9 +1055,9 @@ new Chart(grafica1,
       },
       zoom: {
         enabled: true,
-        mode: 'xy',
+        mode: 'y',
       },
-    },
+     },
   });
 const Gref = Math.max(...getYmaxValue(depthGref));;
 const Gmax = Gref + 0.003;
@@ -1074,6 +1117,13 @@ new Chart(grafica2,
       ],
     },
     options: {
+      title: {
+            display: true,
+            text: 'График напряженности гравитационного поля',
+            position: 'top',
+            fontSize: 16,
+            padding: 20,
+        },
       scales: {
         yAxes: [{
           id: 'A',
@@ -1101,7 +1151,7 @@ new Chart(grafica2,
       },
       zoom: {
         enabled: true,
-        mode: 'xy',
+        mode: 'y',
       },
     },
   });
@@ -1130,6 +1180,13 @@ new Chart(grafica3,
       ],
     },
     options: {
+      title: {
+            display: true,
+            text: 'График соотношений показаний осевых и поперечных магнитометров',
+            position: 'top',
+            fontSize: 16,
+            padding: 20,
+        },
       scales: {
         yAxes: [{
           id: 'A',
@@ -1168,7 +1225,7 @@ new Chart(grafica3,
       },
       zoom: {
         enabled: true,
-        mode: 'xy',
+        mode: 'y',
       },
     },
   });
@@ -1239,6 +1296,13 @@ const depthBmin = [{ x: fDepthB, y: Bmin },
       ],
     },
     options: {
+      title: {
+            display: true,
+            text: 'График напряженности геомагнитного поля',
+            position: 'top',
+            fontSize: 16,
+            padding: 20,
+        },
       scales: {
         yAxes: [{
           id: 'A',
@@ -1263,7 +1327,7 @@ const depthBmin = [{ x: fDepthB, y: Bmin },
       },
       zoom: {
         enabled: true,
-        mode: 'xy',
+        mode: 'y',
       },
     },
   });
@@ -1339,6 +1403,13 @@ new Chart(grafica5,
       ],
     },
     options: {
+      title: {
+            display: true,
+            text: 'HSTF',
+            position: 'top',
+            fontSize: 16,
+            padding: 20,
+        },
       plugins: {
             legend: false,
             },
@@ -1376,7 +1447,7 @@ new Chart(grafica5,
       },
       zoom: {
         enabled: true,
-        mode: 'xy',
+        mode: 'x',
       },
     },
   });
@@ -1452,6 +1523,13 @@ new Chart(grafica6,
       ],
     },
     options: {
+      title: {
+            display: true,
+            text: 'График магнитного наклонения',
+            position: 'top',
+            fontSize: 16,
+            padding: 20,
+        },
       scales: {
         yAxes: [{
            id: 'A',
@@ -1476,7 +1554,7 @@ new Chart(grafica6,
       },
       zoom: {
         enabled: true,
-        mode: 'xy',
+        mode: 'y',
       },
     },
   });
