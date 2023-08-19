@@ -3,37 +3,655 @@
 {% load index %}
 
 <!-- Шапка страницы -->
-{%  block header %}
+{% block header %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.bundle.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/chartjs-plugin-zoom/0.6.6/chartjs-plugin-zoom.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@latest/dist/Chart.min.js"></script>
 {% endblock %}
 
 
 <!-- Основная информация -->
 {% block data %}
-<h6><b>Выбрано:</b> {{context.selected_obj}}</h6>
-<div class="row" style="margin-top:1%">
-    <div id="img" class="row d-flex justify-content-center"></div>
+<link type="text/css" href="{% static 'css/data_handler/chart.css' %}" rel="stylesheet">
+  <center>
+  <div class = "container-projections" > 
+   <div class = "container-square" > 
+     <canvas id="grafica1" width="100" height="100" ></canvas> 
+     <form id ="formH">
+      <label class="mb-3">Запад/Восток</label>
+      <div class="mb-3">
+    <label>Мин: <input id="minEV" type="number" step="1"></label>
+    <label>Макс: <input id="maxEV" type="number" step="1"></label>
+    <label>Шаг: <input id="stepEV" type="number" step="1"></label>
+      </div>
+    <label class="mb-3">Юг/Север</label>
+      <div class="mb-3">
+    <label>Мин: <input id="minNS" type="number" step="1"></label>
+    <label>Макс: <input id="maxNS" type="number" step="1"></label>
+    <label>Шаг: <input id="stepNS" type="number" step="1"></label>
+      </div>   
+      <div class="containeк_btn_proj" >   
+    <button type="submit" id="sbtnHor">Submit</button>
+    <button type="submit" id="undoHor">Undo</button>
+      </div>
+    </form>
+   </div>
+     <div class = "container-square" > 
+     <canvas id="grafica2" width="100" height="100" ></canvas> 
+     <form id ="formV">
+      <label class="mb-3">Вертикальная секция </label>
+      <div class="mb-3 ">
+    <label >Мин: <input id="minVsect" type="number" step="1"></label>
+    <label>Макс: <input id="maxVsect" type="number" step="1"></label>
+    <label>Шаг: <input id="stepVsect" type="number" step="1"></label>
+       </div>
+    <label class="mb-3">Абсолютная отметка</label>
+       <div class="mb-3">
+    <label>Мин: <input id="minTVDSS" type="number" step="1"></label>
+    <label>Макс: <input id="maxTVDSS" type="number" step="1"></label>
+    <label>Шаг: <input id="stepTVDSS" type="number" step="1"></label>
+      </div> 
+      <div class="containeк_btn_proj" >   
+      <button type="submit" id="sbtnVer">Submit</button>
+      <button type="submit" id="undoVer">Undo</button>
+      </div>
+    </div>   
+     </form>
+   </div>
+   </div>
+   
+</center>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/hammer.js/2.0.8/hammer.min.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.bundle.min.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/chartjs-plugin-zoom/0.6.6/chartjs-plugin-zoom.js"></script>
+<script type="text/javascript" >
 
-</div>
+//Получаем фейковые массивы для отрисовки горизонтальной проекции
+// plannedTraj, igirgiTraj, nnbTraj -плановая траетория, траектория ИгиРГИ , траектория ННБ соответственно
+
+//x -  запад/восток , y - север/юг
 
 
-<script>
-    window.addEventListener('load', () => {
-    var params = new FormData();
-    params.set('wellbore_id', sessionStorage.getItem("wellbore_id"));
+const plannedTraj = [
+{	x:	0	,	y:	0	}	,
+{	x:	0.0777893457583964	,	y:	-0.0620095530385749	}	,
+{	x:	0.24799992982609	,	y:	-0.167390290084724	}	,
+{	x:	0.43995735137494	,	y:	-0.253197613566198	}	,
+{	x:	0.69427836268633	,	y:	-0.344406492457747	}	,
+{	x:	1.15390784087651	,	y:	-0.47537712523442	}	,
+{	x:	1.96913663090364	,	y:	-0.601958594974007	}	,
+{	x:	3.18302866179558	,	y:	-0.663411541793395	}	,
+{	x:	4.77286208142062	,	y:	-0.691311187136802	}	,
+{	x:	6.72699742238234	,	y:	-0.69636264606094	}	,
+{	x:	9.01108444488103	,	y:	-0.596783840756576	}	,
+{	x:	11.5613188021036	,	y:	-0.261045838592667	}	,
+{	x:	14.3415233917246	,	y:	0.37708772912174	}	,
+{	x:	17.3417073577986	,	y:	1.23269267519883	}	,
+{	x:	20.570394978232	,	y:	2.19837930254027	}	,
+{	x:	24.0059267235539	,	y:	3.31438286233682	}	,
+{	x:	27.6029236259669	,	y:	4.67456779887807	}	,
+{	x:	31.3384152740903	,	y:	6.34073493856714	}	,
+{	x:	35.187310893584	,	y:	8.32868009455219	}	,
+{	x:	39.1015921581521	,	y:	10.6001785440181	}	,
+{	x:	43.0714605232465	,	y:	13.1236052978165	}	,
+{	x:	47.1646327525224	,	y:	15.822473690547	}	,
+{	x:	51.437693836054	,	y:	18.531987458596	}	,
+{	x:	55.9039005634083	,	y:	21.0812344995052	}	,
+{	x:	60.4684249463521	,	y:	23.3911564926696	}	,
+{	x:	65.0139271899382	,	y:	25.5400410346976	}	,
+{	x:	69.5158778398381	,	y:	27.6502933205123	}	,
+{	x:	73.9790545009207	,	y:	29.7557419891644	}	,
+{	x:	78.3937814035828	,	y:	31.8533327441825	}	,
+{	x:	82.7613150004882	,	y:	33.945430957712	    }	,
+{	x:	87.0968883581222	,	y:	36.0157524761292	}	,
+{	x:	91.3966041091097	,	y:	38.0757859579826	}	,
+];
+const igirgiTraj = [
+{	x:	0	,	y:	0	}	,
+{	x:	0.0777893457583964	,	y:	-0.0620095530385749	}	,
+{	x:	0.24799992982609	,	y:	-0.167390290084724	}	,
+{	x:	0.43995735137494	,	y:	-0.253197613566198	}	,
+{	x:	0.69427836268633	,	y:	-0.344406492457747	}	,
+{	x:	1.15390784087651	,	y:	-0.47537712523442	}	,
+{	x:	1.96913663090364	,	y:	-0.601958594974007	}	,
+{	x:	3.18302866179558	,	y:	-0.663411541793395	}	,
+{	x:	4.77286208142062	,	y:	-0.691311187136802	}	,
+{	x:	6.72699742238234	,	y:	-0.69636264606094	}	,
+{	x:	9.01108444488103	,	y:	-0.596783840756576	}	,
+{	x:	11.5613188021036	,	y:	-0.261045838592667	}	,
+{	x:	14.3415233917246	,	y:	0.37708772912174	}	,
+{	x:	17.3417073577986	,	y:	1.23269267519883	}	,
+{	x:	20.570394978232	,	  y:	2.29837930254027	}	,
+{	x:	24.0059267235539	,	y:	3.31438286233682	}	,
+{	x:	27.6029236259669	,	y:	4.77456779887807	}	,
+{	x:	31.3384152740903	,	y:	6.44073493856714	}	,
+{	x:	35.187310893584	,	y:	8.37868009455219	}	,
+{	x:	39.1015921581521	,	y:	10.7001785440181	}	,
+{	x:	43.0714605232465	,	y:	13.2236052978165	}	,
+{	x:	47.1646327525224	,	y:	15.222473690547	}	,
+{	x:	51.437693836054	,	y:	18.231987458596	}	,
+{	x:	55.9039005634083	,	y:	21.1812344995052	}	,
+{	x:	60.4684249463521	,	y:	23.4911564926696	}	,
+{	x:	65.0139271899382	,	y:	25.6400410346976	}	,
+{	x:	69.5158778398381	,	y:	27.7502933205123	}	,
+{	x:	73.9790545009207	,	y:	29.8557419891644	}	,
+{	x:	78.3937814035828	,	y:	31.9533327441825	}	,
+{	x:	82.7613150004882	,	y:	33.145430957712	    }	,
+{	x:	87.0968883581222	,	y:	36.2157524761292	}	,
+{	x:	91.3966041091097	,	y:	38.2757859579826	}	,
+];
+const nnbTraj = [
+{	x:	0	,	y:	0	}	,
+{	x:	0.0777893457583964	,	y:	-0.0520095530385749	}	,
+{	x:	0.24799992982609	,	y:	-0.157390290084724	}	,
+{	x:	0.43995735137494	,	y:	-0.243197613566198	}	,
+{	x:	0.69427836268633	,	y:	-0.334406492457747	}	,
+{	x:	1.15390784087651	,	y:	-0.46537712523442	}	,
+{	x:	1.96913663090364	,	y:	-0.501958594974007	}	,
+{	x:	3.18302866179558	,	y:	-0.563411541793395	}	,
+{	x:	4.77286208142062	,	y:	-0.591311187136802	}	,
+{	x:	6.72699742238234	,	y:	-0.59636264606094	}	,
+{	x:	9.01108444488103	,	y:	-0.496783840756576	}	,
+{	x:	11.5613188021036	,	y:	-0.161045838592667	}	,
+{	x:	14.3415233917246	,	y:	0.27708772912174	}	,
+{	x:	17.3417073577986	,	y:	1.13269267519883	}	,
+{	x:	20.570394978232	,	  y:	2.19837930254027	}	,
+{	x:	24.0059267235539	,	y:	3.21438286233682	}	,
+{	x:	27.6029236259669	,	y:	4.67456779887807	}	,
+{	x:	31.3384152740903	,	y:	6.34073493856714	}	,
+{	x:	35.187310893584	,	y:	8.27868009455219	}	,
+{	x:	39.1015921581521	,	y:	10.6001785440181	}	,
+{	x:	43.0714605232465	,	y:	13.1236052978165	}	,
+{	x:	47.1646327525224	,	y:	15.122473690547	}	,
+{	x:	51.437693836054	,	y:	18.131987458596	}	,
+{	x:	55.9039005634083	,	y:	21.0812344995052	}	,
+{	x:	60.4684249463521	,	y:	23.3911564926696	}	,
+{	x:	65.0139271899382	,	y:	25.5400410346976	}	,
+{	x:	69.5158778398381	,	y:	27.6502933205123	}	,
+{	x:	73.9790545009207	,	y:	29.7557419891644	}	,
+{	x:	78.3937814035828	,	y:	31.8533327441825	}	,
+{	x:	82.7613150004882	,	y:	33.045430957712	    }	,
+{	x:	87.0968883581222	,	y:	36.1157524761292	}	,
+{	x:	91.3966041091097	,	y:	38.1757859579826	}	,
+];
 
-    fetch('http://'+window.location.hostname+':'+window.location.port+'/report/api/graph',
-     { method: 'POST', body: params })
-         .then(response=>response.blob()).
-         then(data=>{
-         const imageUrl = URL.createObjectURL(data);
-         const imageElement = document.createElement("img");
-         imageElement.src = imageUrl;
-         imageElement.style.width = "1200px";
-         imageElement.style.height = "1200px";
-         const container = document.getElementById("img");
-         container.appendChild(imageElement);
-         });
-    })
+// создаем фейковые массивы для отрисовки вертикальной проекции
+// x-TVD(вертикальная секция)  y -TVDSS (абсолютная отметка)
+
+const plannedTrajV = [
+{	x:	325.25997212862	,	y:	61.04	}	,
+{	x:	328.924634206175	,	y:	51.0406597882712	}	,
+{	x:	332.552833023612	,	y:	41.0426731860974	}	,
+{	x:	336.163996218393	,	y:	31.0448848156817	}	,
+{	x:	339.787722091215	,	y:	21.0485869957353	}	,
+{	x:	343.445311766878	,	y:	11.060409257554	}	,
+{	x:	347.136204362841	,	y:	1.0952330535414	}	,
+{	x:	350.836509136047	,	y:	-8.82997843751749	}	,
+{	x:	354.504105818088	,	y:	-18.7021723547244	}	,
+{	x:	358.105472216084	,	y:	-28.5087937457469	}	,
+{	x:	361.654193683003	,	y:	-38.2434059621326	}	,
+{	x:	365.172215039352	,	y:	-47.9062846446308	}	,
+{	x:	368.64978303811	,	y:	-57.4901512430219	}	,
+{	x:	372.076730060518	,	y:	-66.9907353920227	}	,
+{	x:	375.479490437593	,	y:	-76.4054437457444	}	,
+{	x:	378.879085791723	,	y:	-85.7298719785313	}	,
+{	x:	382.284431507593	,	y:	-94.9603757026422	}	,
+{	x:	385.71362222218	,	y:	-104.084985411392	}	,
+{	x:	389.148527450404	,	y:	-113.097422831638	}	,
+{	x:	392.57843500646	,	y:	-122.014413437719	}	,
+{	x:	396.024725480789	,	y:	-130.838571728002	}	,
+{	x:	399.489793300615	,	y:	-139.553953969914	}	,
+{	x:	402.971052583238	,	y:	-148.179231569475	}	,
+{	x:	406.444774810395	,	y:	-156.755148938462	}	,
+{	x:	409.898854839391	,	y:	-165.34725822084	}	,
+{	x:	413.357946403265	,	y:	-173.991320667058	}	,
+{	x:	416.825053572277	,	y:	-182.667671524799	}	,
+{	x:	420.297576120021	,	y:	-191.365199548183	}	,
+{	x:	423.770775884096	,	y:	-200.089296453024	}	,
+{	x:	427.226314921562	,	y:	-208.838448575499	}	,
+{	x:	430.662674768377	,	y:	-217.608644813383	}	,
+{	x:	434.081991623549	,	y:	-226.398898267515	}	,
+];
+const igirgiTrajV = [
+{	x:	325.25997212862	,	y:	61.04	}	,
+{	x:	328.924634206175	,	y:	51.1406597882712	}	,
+{	x:	332.552833023612	,	y:	41.0426731860974	}	,
+{	x:	336.163996218393	,	y:	31.1448848156817	}	,
+{	x:	339.787722091215	,	y:	21.1485869957353	}	,
+{	x:	343.445311766878	,	y:	11.060409257554	}	,
+{	x:	347.136204362841	,	y:	1.0152330535414	}	,
+{	x:	350.836509136047	,	y:	-8.82997843751749	}	,
+{	x:	354.504105818088	,	y:	-18.7021723547244	}	,
+{	x:	358.105472216084	,	y:	-28.5087937457469	}	,
+{	x:	361.654193683003	,	y:	-38.2434059621326	}	,
+{	x:	365.172215039352	,	y:	-47.9062846446308	}	,
+{	x:	368.64978303811	,	y:	-57.4901512430219	}	,
+{	x:	372.076730060518	,	y:	-66.9907353920227	}	,
+{	x:	375.479490437593	,	y:	-76.4054437457444	}	,
+{	x:	378.879085791723	,	y:	-85.7298719785313	}	,
+{	x:	382.284431507593	,	y:	-94.9603757026422	}	,
+{	x:	385.71362222218	,	y:	-104.084985411392	}	,
+{	x:	389.048527450404	,	y:	-113.097422831638	}	,
+{	x:	392.57843500646	,	y:	-122.014413437719	}	,
+{	x:	396.024725480789	,	y:	-130.838571728002	}	,
+{	x:	399.489793300615	,	y:	-139.553953969914	}	,
+{	x:	402.971052583238	,	y:	-148.179231569475	}	,
+{	x:	406.404774810395	,	y:	-156.855148938462	}	,
+{	x:	409.898854839391	,	y:	-165.34725822084	}	,
+{	x:	413.357946403265	,	y:	-173.991320667058	}	,
+{	x:	416.825053572277	,	y:	-182.667671524799	}	,
+{	x:	420.297576120021	,	y:	-191.465199548183	}	,
+{	x:	423.770775884096	,	y:	-200.089296453024	}	,
+{	x:	427.226314921562	,	y:	-208.938448575499	}	,
+{	x:	430.662674768377	,	y:	-217.808644813383	}	,
+{	x:	434.081991623549	,	y:	-226.399898267515	}	,
+{	x:	437.081991623549	,	y:	-229.399898267515	}	,
+
+];
+const nnbTrajV = [
+{	x:	325.25997212862	,	y:	61.04	}	,
+{	x:	328.924634206175	,	y:	51.1406597882712	}	,
+{	x:	332.552833023612	,	y:	41.0426731860974	}	,
+{	x:	336.163996218393	,	y:	31.1448848156817	}	,
+{	x:	339.787722091215	,	y:	21.1485869957353	}	,
+{	x:	343.445311766878	,	y:	11.060409257554	}	,
+{	x:	347.136204362841	,	y:	1.0152330535414	}	,
+{	x:	350.836509136047	,	y:	-8.82997843751749	}	,
+{	x:	354.504105818088	,	y:	-18.7021723547244	}	,
+{	x:	358.105472216084	,	y:	-28.5087937457469	}	,
+{	x:	361.654193683003	,	y:	-38.2434059621326	}	,
+{	x:	365.172215039352	,	y:	-47.9062846446308	}	,
+{	x:	368.64978303811	,	y:	-57.4901512430219	}	,
+{	x:	372.076730060518	,	y:	-66.9907353920227	}	,
+{	x:	375.479490437593	,	y:	-76.4054437457444	}	,
+{	x:	378.879085791723	,	y:	-85.7298719785313	}	,
+{	x:	382.284431507593	,	y:	-94.9603757026422	}	,
+{	x:	385.71362222218	,	y:	-104.084985411392	}	,
+{	x:	389.048527450404	,	y:	-113.097422831638	}	,
+{	x:	392.57843500646	,	y:	-122.014413437719	}	,
+{	x:	396.024725480789	,	y:	-130.838571728002	}	,
+{	x:	399.489793300615	,	y:	-139.553953969914	}	,
+{	x:	402.971052583238	,	y:	-148.179231569475	}	,
+{	x:	406.404774810395	,	y:	-156.655148938462	}	,
+{	x:	409.898854839391	,	y:	-163.34725822084	}	,
+{	x:	413.357946403265	,	y:	-173.991320667058	}	,
+{	x:	416.825053572277	,	y:	-182.667671524799	}	,
+{	x:	420.297576120021	,	y:	-190.465199548183	}	,
+{	x:	423.770775884096	,	y:	-200.089296453024	}	,
+{	x:	427.226314921562	,	y:	-207.938448575499	}	,
+{	x:	430.662674768377	,	y:	-215.808644813383	}	,
+{	x:	434.081991623549	,	y:	-224.399898267515	}	,
+];
+
+// Получение ссылки на элемент canvas в DOM
+const grafica1 = document.querySelector('#grafica1');
+const grafica2 = document.querySelector('#grafica2');
+
+//Получаем ссылкии на кнопки в DOM
+
+let formH = document.getElementById('formH');
+let formV = document.getElementById('formV');
+
+let undoVer = document.getElementById('undoVer');
+let undoHor = document.getElementById('undoHor');
+
+//обработка отправки формы горизонтальной проекции
+//нужно будет забрать значения для маштабирования(пользователь ввел их в форме: minEV;maxEV;stepEV;minNS;maxNS;stepNS)
+let reload = (cl) =>{
+  cl.addEventListener('click',(e) =>{
+  e.preventDefault();
+  location.reload();
+});
+}
+reload(undoVer);
+reload(undoHor);
+
+formH.addEventListener('submit',(e) => {
+  e.preventDefault();
+ //получаем значение полей ввода
+  minEV = Number((formH.querySelector('[id="minEV"]')).value),
+  maxEV = Number((formH.querySelector('[id="maxEV"]')).value),
+  stepEV = Number((formH.querySelector('[id="stepEV"]')).value),
+
+  minNS = Number((formH.querySelector('[id="minNS"]')).value),
+  maxNS = Number((formH.querySelector('[id="maxNS"]')).value),
+  stepNS = Number((formH.querySelector('[id="stepNS"]')).value),
+
+  
+  // заменяем график
+  c = document.createElement('canvas');
+  c.setAttribute("id", "grafica3");
+  c.setAttribute("width", "100");
+  c.setAttribute("height", "100");
+  grafica1.replaceWith(c);
+  grafica3 = document.querySelector('#grafica3'); 
+
+  
+  new Chart(grafica3,
+  {
+    type: 'scatter', // Тип графики
+    data: {
+      datasets: [
+        {
+          label: 'План',
+          yAxisID: 'A',
+          data: nnbTraj,
+          showLine: true,
+          fill: false,
+          borderColor: 'rgba(10,95,56)',
+        },
+        {
+          label: 'ИГиРГИ',
+          yAxesID: 'B',
+          data: igirgiTraj,
+          showLine: true,
+          fill: false,
+          borderColor: 'rgba(255,168,18)',
+        },
+        {
+          label: 'HHБ',
+          yAxesID: 'C',
+          data: plannedTraj,
+          showLine: true,
+          fill: false,
+          borderColor: 'rgba(0,71,171)',
+        },
+      ],
+    },
+    options: {
+      title: {
+            display: true,
+            text: 'Горизонтальная проекция',
+            position: 'top',
+            fontSize: 16,
+            padding: 20,
+        },
+      scales: {
+        yAxes: [{
+          id: 'A',
+          scaleLabel: {
+            display: true,
+            labelString: 'Юг/Север',
+          },
+          type: 'linear',
+          position: 'left',
+          ticks: {
+            max: maxNS,
+            min: minNS,
+            stepSize: stepNS,
+          },
+          },
+        ],
+        // for zooming
+        xAxes: [{
+          ticks: {
+            min:minEV,
+            max:maxEV,
+            stepSize: stepEV,
+            autoSkip: false,
+            },
+          scaleLabel: {
+            display: true,
+            labelString: 'Запад/Восток',
+          },
+        }],
+      },
+      pan: {
+        enabled: true,
+        mode: 'xy',
+      },
+      zoom: {
+        enabled: true,
+        mode: 'xy',
+      },
+    },
+  });
+})
+
+//обработка отправки формы вертикальной проекции
+//нужно будет забрать значения для маштабирования(пользователь ввел их в форме: minTVDSS;maxTVDSS;stepTVDSS;minVsect;maxVsect;stepVsect)
+
+formV.addEventListener('submit',(e) => {
+ 
+  e.preventDefault();
+ //получаем значение полей ввода
+  minTVDSS = Number((formV.querySelector('[id="minTVDSS"]')).value),
+  maxTVDSS = Number((formV.querySelector('[id="maxTVDSS"]')).value),
+  stepTVDSS = Number((formV.querySelector('[id="stepTVDSS"]')).value),
+
+  minVsect = Number((formV.querySelector('[id="minVsect"]')).value),
+  maxVsect = Number((formV.querySelector('[id="maxVsect"]')).value),
+  stepVsect = Number((formV.querySelector('[id="stepVsect"]')).value),
+
+  
+  // заменяем график
+  c = document.createElement('canvas');
+  c.setAttribute("id", "grafica4");
+  c.setAttribute("width", "100");
+  c.setAttribute("height", "100");
+  grafica2.replaceWith(c);
+  grafica4 = document.querySelector('#grafica4'); 
+
+  
+  new Chart(grafica4,
+  {
+    type: 'scatter', // Тип графики
+    data: {
+      datasets: [
+        {
+          label: 'План',
+          yAxisID: 'A',
+          data: plannedTrajV,
+          showLine: true,
+          fill: false,
+          borderColor: 'rgba(10,95,56)',
+        },
+        {
+          label: 'ИГиРГИ',
+          yAxesID: 'B',
+          data: igirgiTrajV,
+          showLine: true,
+          fill: false,
+          borderColor: 'rgba(255,168,18)',
+        },
+        {
+          label: 'ННБ',
+          yAxesID: 'B',
+          data: nnbTrajV,
+          showLine: true,
+          fill: false,
+          borderColor: 'rgba(0,71,171)',
+        },
+      ],
+    },
+    options: {
+      title: {
+            display: true,
+            text: 'Вертикальная проекция',
+            position: 'top',
+            fontSize: 14,
+            padding: 20,
+        },
+      scales: {
+        yAxes: [{
+          id: 'A',
+          scaleLabel: {
+            display: true,
+            labelString: 'Абсолютная отметка',
+          },
+          type: 'linear',
+          position: 'left',
+          ticks: {
+            max: maxTVDSS,
+            min: minTVDSS,
+            stepSize: stepTVDSS,
+          },
+          },
+        ],
+        // for zooming
+        xAxes: [{
+          ticks: {
+            min:minVsect,
+            max:maxVsect,
+            stepSize: stepVsect,
+            autoSkip: false,
+            },
+          scaleLabel: {
+            display: true,
+            labelString: 'Вертикальная секция',
+          },
+        }],
+      },
+      pan: {
+        enabled: true,
+        mode: 'xy',
+      },
+      zoom: {
+        enabled: true,
+        mode: 'xy',
+      },
+    },
+  });
+})
+
+new Chart(grafica1,
+  {
+    type: 'scatter', // Тип графики
+    data: {
+      datasets: [
+        {
+          label: 'План',
+          yAxisID: 'A',
+          data: nnbTraj,
+          showLine: true,
+          fill: false,
+          borderColor: 'rgba(10,95,56)',
+        },
+        {
+          label: 'ИГиРГИ',
+          yAxesID: 'A',
+          data: igirgiTraj,
+          showLine: true,
+          fill: false,
+          borderColor: 'rgba(255,168,18)',
+        },
+        {
+          label: 'HHБ',
+          yAxesID: 'A',
+          data: plannedTraj,
+          showLine: true,
+          fill: false,
+          borderColor: 'rgba(0,71,171)',
+        },
+      ],
+    },
+    options: {
+      title: {
+            display: true,
+            text: 'Горизонтальная проекция',
+            position: 'top',
+            fontSize: 16,
+            padding: 20,
+        },
+      scales: {
+        yAxes: [{
+          id: 'A',
+          scaleLabel: {
+            display: true,
+            labelString: 'Юг/Север',
+          },
+          type: 'linear',
+          position: 'left',
+          },
+        ],
+        // for zooming
+        xAxes: [{
+          scaleLabel: {
+            display: true,
+            labelString: 'Запад/Восток',
+          },
+        }],
+      },
+      pan: {
+        enabled: true,
+        mode: 'xy',
+      },
+      zoom: {
+        enabled: true,
+        mode: 'xy',
+      },
+    },
+  });
+
+  new Chart(grafica2,
+  {
+    type: 'scatter', // Тип графики
+    data: {
+      datasets: [
+        {
+          label: 'План',
+          yAxisID: 'A',
+          data: plannedTrajV,
+          showLine: true,
+          fill: false,
+          borderColor: 'rgba(10,95,56)',
+        },
+        {
+          label: 'ИГиРГИ',
+          yAxesID: 'B',
+          data: igirgiTrajV,
+          showLine: true,
+          fill: false,
+          borderColor: 'rgba(255,168,18)',
+        },
+        {
+          label: 'ННБ',
+          yAxesID: 'B',
+          data: nnbTrajV,
+          showLine: true,
+          fill: false,
+          borderColor: 'rgba(0,71,171)',
+        },
+      ],
+    },
+    options: {
+      title: {
+            display: true,
+            text: 'Вертикальная проекция',
+            position: 'top',
+            fontSize: 14,
+            padding: 20,
+        },
+      scales: {
+        yAxes: [{
+          id: 'A',
+          scaleLabel: {
+            display: true,
+            labelString: 'Абсолютная отметка',
+          },
+          type: 'linear',
+          position: 'left',
+          },
+        ],
+        // for zooming
+        xAxes: [{
+          scaleLabel: {
+            display: true,
+            labelString: 'Вертикальная секция',
+          },
+        }],
+      },
+      pan: {
+        enabled: true,
+        mode: 'xy',
+      },
+      zoom: {
+        enabled: true,
+        mode: 'xy',
+      },
+    },
+  });
+  
 </script>
 {% endblock %}
 
