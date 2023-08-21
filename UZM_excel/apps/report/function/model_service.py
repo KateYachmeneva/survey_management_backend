@@ -228,3 +228,4 @@ def NNBToIgirgi():
 
     for war in warning_list:
         print(f"В рейсе:{war['Рейс']} Глубина:{war['Глубина']}; Текст:{war['Текст']};")
+    return len(warning_list)

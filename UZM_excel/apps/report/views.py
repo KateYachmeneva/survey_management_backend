@@ -166,4 +166,5 @@ def uploadFile(request):
 
 
 def comment_copy(request):
-    NNBToIgirgi()
+    num = NNBToIgirgi()
+    return JsonResponse({"Не было найдено комментариев:": f"{num}"})
