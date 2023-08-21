@@ -14,9 +14,9 @@
 {% block data %}
 <link type="text/css" href="{% static 'css/data_handler/chart.css' %}" rel="stylesheet">
   <center>
-  <div class = "container-projections" > 
-   <div class = "container-square" > 
-     <canvas id="grafica1" width="100" height="100" ></canvas> 
+  <div class = "container-projections" >
+   <div class = "container-square" >
+     <canvas id="grafica1" width="1000" height="1000" ></canvas>
      <form id ="formH">
       <label class="mb-3">Запад/Восток</label>
       <div class="mb-3">
@@ -29,15 +29,15 @@
     <label>Мин: <input id="minNS" type="number" step="1"></label>
     <label>Макс: <input id="maxNS" type="number" step="1"></label>
     <label>Шаг: <input id="stepNS" type="number" step="1"></label>
-      </div>   
-      <div class="containeк_btn_proj" >   
+      </div>
+      <div class="containeк_btn_proj" >
     <button type="submit" id="sbtnHor">Submit</button>
     <button type="submit" id="undoHor">Undo</button>
       </div>
     </form>
    </div>
-     <div class = "container-square" > 
-     <canvas id="grafica2" width="100" height="100" ></canvas> 
+     <div class = "container-square" >
+     <canvas id="grafica2" width="1000" height="1000" ></canvas>
      <form id ="formV">
       <label class="mb-3">Вертикальная секция </label>
       <div class="mb-3 ">
@@ -50,21 +50,20 @@
     <label>Мин: <input id="minTVDSS" type="number" step="1"></label>
     <label>Макс: <input id="maxTVDSS" type="number" step="1"></label>
     <label>Шаг: <input id="stepTVDSS" type="number" step="1"></label>
-      </div> 
-      <div class="containeк_btn_proj" >   
+      </div>
+      <div class="containeк_btn_proj" >
       <button type="submit" id="sbtnVer">Submit</button>
       <button type="submit" id="undoVer">Undo</button>
       </div>
-    </div>   
      </form>
+     </div>
    </div>
-   </div>
-   
+
 </center>
 <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/hammer.js/2.0.8/hammer.min.js"></script>
 <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.bundle.min.js"></script>
 <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/chartjs-plugin-zoom/0.6.6/chartjs-plugin-zoom.js"></script>
-<script type="text/javascript" >
+<script type="text/javascript">
 
 //Получаем фейковые массивы для отрисовки горизонтальной проекции
 // plannedTraj, igirgiTraj, nnbTraj -плановая траетория, траектория ИгиРГИ , траектория ННБ соответственно
@@ -87,15 +86,15 @@ const plannedTraj = [
 {	x:	11.5613188021036	,	y:	-0.261045838592667	}	,
 {	x:	14.3415233917246	,	y:	0.37708772912174	}	,
 {	x:	17.3417073577986	,	y:	1.23269267519883	}	,
-{	x:	20.570394978232	,	y:	2.19837930254027	}	,
+{	x:	20.570394978232	    ,	y:	2.19837930254027	}	,
 {	x:	24.0059267235539	,	y:	3.31438286233682	}	,
 {	x:	27.6029236259669	,	y:	4.67456779887807	}	,
 {	x:	31.3384152740903	,	y:	6.34073493856714	}	,
-{	x:	35.187310893584	,	y:	8.32868009455219	}	,
+{	x:	35.187310893584	    ,	y:	8.32868009455219	}	,
 {	x:	39.1015921581521	,	y:	10.6001785440181	}	,
 {	x:	43.0714605232465	,	y:	13.1236052978165	}	,
 {	x:	47.1646327525224	,	y:	15.822473690547	}	,
-{	x:	51.437693836054	,	y:	18.531987458596	}	,
+{	x:	51.437693836054	    ,	y:	18.531987458596	}	,
 {	x:	55.9039005634083	,	y:	21.0812344995052	}	,
 {	x:	60.4684249463521	,	y:	23.3911564926696	}	,
 {	x:	65.0139271899382	,	y:	25.5400410346976	}	,
@@ -317,16 +316,16 @@ formH.addEventListener('submit',(e) => {
   maxNS = Number((formH.querySelector('[id="maxNS"]')).value),
   stepNS = Number((formH.querySelector('[id="stepNS"]')).value),
 
-  
+
   // заменяем график
   c = document.createElement('canvas');
   c.setAttribute("id", "grafica3");
   c.setAttribute("width", "100");
   c.setAttribute("height", "100");
   grafica1.replaceWith(c);
-  grafica3 = document.querySelector('#grafica3'); 
+  grafica3 = document.querySelector('#grafica3');
 
-  
+
   new Chart(grafica3,
   {
     type: 'scatter', // Тип графики
@@ -412,7 +411,7 @@ formH.addEventListener('submit',(e) => {
 //нужно будет забрать значения для маштабирования(пользователь ввел их в форме: minTVDSS;maxTVDSS;stepTVDSS;minVsect;maxVsect;stepVsect)
 
 formV.addEventListener('submit',(e) => {
- 
+
   e.preventDefault();
  //получаем значение полей ввода
   minTVDSS = Number((formV.querySelector('[id="minTVDSS"]')).value),
@@ -423,16 +422,16 @@ formV.addEventListener('submit',(e) => {
   maxVsect = Number((formV.querySelector('[id="maxVsect"]')).value),
   stepVsect = Number((formV.querySelector('[id="stepVsect"]')).value),
 
-  
+
   // заменяем график
   c = document.createElement('canvas');
   c.setAttribute("id", "grafica4");
   c.setAttribute("width", "100");
   c.setAttribute("height", "100");
   grafica2.replaceWith(c);
-  grafica4 = document.querySelector('#grafica4'); 
+  grafica4 = document.querySelector('#grafica4');
 
-  
+
   new Chart(grafica4,
   {
     type: 'scatter', // Тип графики
@@ -651,7 +650,6 @@ new Chart(grafica1,
       },
     },
   });
-  
 </script>
 {% endblock %}
 

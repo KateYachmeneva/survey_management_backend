@@ -2,7 +2,7 @@ from math import sqrt
 from typing import Union, Iterable, NoReturn
 
 from ..models import *
-from django.db.models import Max
+from django.db.models import Max, QuerySet
 from .graffic import *
 from Field.models import Run
 
@@ -10,10 +10,9 @@ from Field.models import Run
 def get_data(runs: Union[object, Iterable[object]]) -> dict:
     """
     Функция для перезаписи даты в работу, опираясь на данные из бд.
-    (Если у нас  в БД лежит план траектории то необязательно он должен быть в форме со страницы)
+    (Если у нас в БД лежит план траектории то необязательно он должен быть в форме со страницы)
     """
-
-    if len(runs) == 0:  # передали не массив рейсов а один рейс
+    if len(runs) == 0:  # передали не массив рейсов, а один рейс
         run = runs
         data = {'Статические замеры ИГИРГИ': IgirgiStatic.objects.filter(run=run),
                 'Динамические замеры ННБ': DynamicNNBData.objects.filter(run=run),
@@ -21,6 +20,8 @@ def get_data(runs: Union[object, Iterable[object]]) -> dict:
                 'Плановая траектория': Plan.objects.filter(run=run),
                 'Динамические замеры ИГИРГИ': IgirgiDynamic.objects.filter(run=run),
                 }
+        if run.section.wellbore.igirgi_drilling:
+            data['Плановая траектория'] = InterpPlan.objects.filter(run=run)
     else:
         data = {'Статические замеры ИГИРГИ': IgirgiStatic.objects.filter(run__in=runs),
                 'Динамические замеры ННБ': DynamicNNBData.objects.filter(run__in=runs),
@@ -28,24 +29,26 @@ def get_data(runs: Union[object, Iterable[object]]) -> dict:
                 'Плановая траектория': Plan.objects.filter(run__in=runs),
                 'Динамические замеры ИГИРГИ': IgirgiDynamic.objects.filter(run__in=runs),
                 }
+        if runs[0].section.wellbore.igirgi_drilling:
+            data['Плановая траектория'] = InterpPlan.objects.filter(run__in=runs)
 
     del_key = list()
-    # преобразуем queryset в словарь с листами (3 отдельных массива - Глубина,Угол,Азимут)
+    # преобразуем queryset в словарь с листами (3 отдельных массива - Глубина, Угол, Азимут)
     for key, queryset in data.items():
         if len(queryset) != 0:
             meas_lists = {'Глубина': list(),
                           'Угол': list(),
                           'Азимут': list(),
                           }
-            if key == 'Статические замеры ННБ':
+            if key == 'Статические замеры ИГИРГИ':
                 meas_lists['Комментарий'] = list()
-                meas_lists['Рейс'] = list()  # для самотлорского
+                meas_lists['Рейс'] = list()
 
             for meas in queryset:
                 meas_lists['Глубина'].append(meas.depth)
                 meas_lists['Угол'].append(meas.corner)
                 meas_lists['Азимут'].append(meas.azimut)
-                if key == 'Статические замеры ННБ':
+                if key == 'Статические замеры ИГИРГИ':
                     meas_lists['Рейс'].append(meas.run.run_number)
                     meas_lists['Комментарий'].append(meas.comment)
             data[key] = meas_lists
@@ -60,6 +63,9 @@ def get_data(runs: Union[object, Iterable[object]]) -> dict:
         data['Статические замеры ИГИРГИ']['Глубина'] = [0, *data['Статические замеры ИГИРГИ']['Глубина']]
         data['Статические замеры ИГИРГИ']['Угол'] = [0, *data['Статические замеры ИГИРГИ']['Угол']]
         data['Статические замеры ИГИРГИ']['Азимут'] = [0, *data['Статические замеры ИГИРГИ']['Азимут']]
+        data['Статические замеры ИГИРГИ']['Комментарий'] = ['', *data['Статические замеры ИГИРГИ']['Комментарий']]
+        data['Статические замеры ИГИРГИ']['Рейс'] = [data['Статические замеры ИГИРГИ']['Рейс'][0],
+                                                     *data['Статические замеры ИГИРГИ']['Рейс']]
 
     if data['Плановая траектория']['Глубина'][0] != 0:
         data['Плановая траектория']['Глубина'] = [0, *data['Плановая траектория']['Глубина']]
@@ -70,9 +76,6 @@ def get_data(runs: Union[object, Iterable[object]]) -> dict:
         data['Статические замеры ННБ']['Глубина'] = [0, *data['Статические замеры ННБ']['Глубина']]
         data['Статические замеры ННБ']['Угол'] = [0, *data['Статические замеры ННБ']['Угол']]
         data['Статические замеры ННБ']['Азимут'] = [0, *data['Статические замеры ННБ']['Азимут']]
-        data['Статические замеры ННБ']['Комментарий'] = ['', *data['Статические замеры ННБ']['Комментарий']]
-        data['Статические замеры ННБ']['Рейс'] = [data['Статические замеры ННБ']['Рейс'][0],
-                                                  *data['Статические замеры ННБ']['Рейс']]
 
     return data
 
@@ -82,14 +85,18 @@ def last_depth(Wellbore: object):
     return IgirgiStatic.objects.filter(run__section__wellbore=Wellbore).aggregate(Max('depth'))['depth__max']
 
 
-def waste(Wellbore: object, full: int = 0):
+def waste(wellbore: object, full: int = 0):
     """ Формируем отходы по последней точке
     Если full то выдает весь массив отходов"""
-    nnb = StaticNNBData.objects.filter(run__section__wellbore=Wellbore).order_by('depth')
-    igirgi = IgirgiStatic.objects.filter(run__section__wellbore=Wellbore).order_by('depth')
+    if wellbore.igirgi_drilling:  # если бурим по траектории ИГиРГИ то используем план вместо траектории ннб
+        nnb = InterpPlan.objects.filter(run__section__wellbore=wellbore).order_by('depth')
+    else:
+        nnb = StaticNNBData.objects.filter(run__section__wellbore=wellbore).order_by('depth')
 
-    RKB = (84 if Wellbore.well_name.RKB is None else Wellbore.well_name.RKB)
-    VSaz = (1 if Wellbore.well_name.VSaz is None else Wellbore.well_name.VSaz)
+    igirgi = IgirgiStatic.objects.filter(run__section__wellbore=wellbore).order_by('depth')
+
+    RKB = (84 if wellbore.well_name.RKB is None else wellbore.well_name.RKB)
+    VSaz = (1 if wellbore.well_name.VSaz is None else wellbore.well_name.VSaz)
     data = {'Угол': list(), 'Азимут': list(), 'Глубина': list()}
 
     for meas in nnb:
@@ -115,8 +122,8 @@ def waste(Wellbore: object, full: int = 0):
                                                                               VSaz=VSaz)
 
     # пошли отходы
-    Ex = (Wellbore.well_name.EX if Wellbore.well_name.EX is not None else 0)
-    Ny = (Wellbore.well_name.NY if Wellbore.well_name.NY is not None else 0)
+    Ex = (wellbore.well_name.EX if wellbore.well_name.EX is not None else 0)
+    Ny = (wellbore.well_name.NY if wellbore.well_name.NY is not None else 0)
 
     if full == 1:
         horiz = list()
@@ -160,3 +167,65 @@ def clone_wellbore_traj(old_wellbore: object, new_wellbore: object) -> str:
     IgirgiStatic.objects.bulk_create(igirgi_list)
     StaticNNBData.objects.bulk_create(nnb_list)
     return 'Ok'
+
+
+def intr_plan(run: object) -> QuerySet:
+    """
+    Провести интерполяцию плана по замерам ИГиРГИ
+    Возвращает траекторию ИГиРГИ и интерполированный план
+    """
+    new_Indx = list()
+    depth = list()
+    azimut = list()
+    corner = list()
+    run_id = list()
+
+    runs = Run.objects.filter(section__wellbore=run.section.wellbore)
+    reference = IgirgiStatic.objects.filter(run__in=runs)
+    old_interp = InterpPlan.objects.filter(run__in=runs)
+    # записали все не интерполированные значения
+    for ref in reference:
+        if ref.depth not in [i.depth for i in old_interp]:
+            new_Indx.append(ref.depth)
+            run_id.append(ref.run.id)
+    if len(new_Indx) != 0:
+        for plan in Plan.objects.filter(run__in=runs):
+            depth.append(plan.depth)
+            azimut.append(plan.azimut)
+            corner.append(plan.corner)
+
+        for interp in zip(new_Indx, np.interp(new_Indx, depth, azimut), np.interp(new_Indx, depth, corner), run_id):
+            InterpPlan.objects.create(depth=interp[0], azimut=round(interp[1], 2), corner=round(interp[2], 2),
+                                      run_id=interp[3])
+        old_interp = InterpPlan.objects.filter(run__in=runs)
+    return reference, old_interp
+
+
+from tqdm import tqdm
+
+
+def NNBToIgirgi():
+    """Переписывает комментарии из траектории ннб в игирги"""
+    IgirgiStatic.objects.all()
+    count = 0
+    max_l = len(StaticNNBData.objects.all())
+    warning_list = list()
+    pbar = tqdm(total=max_l)
+
+    for meas in StaticNNBData.objects.all():
+        count += 1
+        pbar.update(count)
+        if meas.comment != '' or meas.comment is not None:
+            try:
+                obj = IgirgiStatic.objects.get(run_id=meas.run, depth=meas.depth)
+                obj.comment = meas.comment
+                obj.save()
+            except Exception as e:
+                warning = {'Рейс': meas.run,
+                           'Глубина': meas.depth,
+                           'Текст': meas.comment, }
+                if warning['Текст'] != 'None' and warning['Текст'] != '' and warning['Текст'] is not None:
+                    warning_list.append(warning)
+
+    for war in warning_list:
+        print(f"В рейсе:{war['Рейс']} Глубина:{war['Глубина']}; Текст:{war['Текст']};")

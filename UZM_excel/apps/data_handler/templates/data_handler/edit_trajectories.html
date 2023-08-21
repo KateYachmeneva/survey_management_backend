@@ -48,7 +48,7 @@ th  {
         <br>
         <button type="button" onclick="delete_meas()" class="btn btn-danger"> Удалить
         </button><span class="position-related translate-middle badge rounded-pill bg-primary" id="delete_count"></span>
-        <a href="{% url 'traj'%}?run_id={{context.selected_id}}" style="text-decoration: none;color: #000;">
+        <a href="{% url 'traj'%}?run_id={{context.selected_obj.id}}" style="text-decoration: none;color: #000;">
         <button type="button" class="btn btn-secondary">Назад </button></a>
     </div>
     {% endblock %}
@@ -64,7 +64,8 @@ th  {
         <table class="table table-light table-sm table-bordered table-hover" style="">
             <thead class="thead-dark">
             <tr>
-                <th scope="col" colspan="4">Данные ННБ</th>
+                <th scope="col" colspan="4">{% if context.selected_obj.section.wellbore.igirgi_drilling %} Данные плана
+                            {% else %}Данные ННБ{% endif %}</th>
             </tr>
             <tr >
                 <th>
@@ -128,6 +129,7 @@ th  {
             <tr>
                 <td>
                     <input type="checkbox"  style="width:50%;height:50%" onmouseover="if(isMouseDown){this.click();}"
+                           {% if context.selected_obj.section.wellbore.igirgi_drilling %}{% else %} {% endif %}
                            class="meas_igirgi" name="igirgi{{meas.id}}" value="{{meas.id}}">
                 </td>
                 <td style="width:32%"><input id="di{{meas.id}}" type="number" value="{{meas.depth |formatted_float  }}"  onchange="getName({{meas.id}},'igi')" step="0.01" style="text-align: center;padding:0em; Border: none; outline: none;width:100%;height:100%;"></td>
@@ -247,6 +249,11 @@ th  {
     <!-- Удаляем выбранные замеры-->
     function delete_meas(){
         var params = new FormData(document.getElementById('form_edit'));
+        {% if context.selected_obj.section.wellbore.igirgi_drilling %}
+        params.set('type', 'plan');
+        {% else %}
+        params.set('type', 'nnb');
+        {% endif %}
         fetch('http://'+window.location.hostname+':'+window.location.port+'/report/api/meas_del',
          { method: 'POST', body: params })
          .then(response=>response.json()).

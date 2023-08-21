@@ -21,10 +21,14 @@ class Letter:
     def __init__(self, Wellbore: object):
         """ Передаем экземпляр скважины по которой отправляем отчёт """
         self.data_body = BodyData(Wellbore)
-        self.subject = 'test'  # тема письма Будет заполянться в js функции при выдаче файла (нужны отходы с отчета)
-        self.mailto = (Wellbore.well_name.mail_To.replace('\r\n', ' ') if Wellbore.well_name.mail_To != '' else 'None')  # кому отправить
-        self.cc = (Wellbore.well_name.mail_Cc.replace('\r\n', ' ') if Wellbore.well_name.mail_Cc != '' else 'None')  # копия
+        self.subject = 'test'  # тема письма будет заполняться в js функции при выдаче файла (нужны отходы с отчета)
+        self.mailto = (Wellbore.well_name.mail_To.replace('\r\n',
+                                                          ' ') if Wellbore.well_name.mail_To != '' else 'None')  # кому отправить
+        self.cc = (
+            Wellbore.well_name.mail_Cc.replace('\r\n', ' ') if Wellbore.well_name.mail_Cc != '' else 'None')  # копия
         # тело письма
+        self.warning = 'Бурение ведётся по траектории ИГиРГИ.%0D%0A' if Wellbore.igirgi_drilling else ''
+        self.text_part = 'от плановой траектории' if Wellbore.igirgi_drilling else 'от траектории подрядчика ННБ'
         self.body = 'Это тело письма'  # get_body() - перезаписывает все переменные ниже
         self.comm_waste = "Это строка с общими отходами"
         self.hor_waste = 'Это строка с горизонтальными отходами'
@@ -38,8 +42,9 @@ class Letter:
         self.body = f"Контроль качества инклинометрии во время бурения:%0D%0A %0D%0A" \
                     f"Месторождение: {self.data_body.field}%0D%0A" \
                     f"Куст: {self.data_body.pad}%0D%0A" \
-                    f"Скважина: {self.data_body.well}%0D%0A %0D%0A" \
-                    f"Общий отход на точку замера {self.data_body.depth} м от траектории подрядчика ННБ составляет "
+                    f"Скважина: {self.data_body.well}%0D%0A" \
+                    f"{self.warning}"\
+                    f"%0D%0AОбщий отход на точку замера {self.data_body.depth} м {self.text_part} составляет "
         self.comm_waste = f" {self.data_body.departure} м;%0D%0A %0D%0A"
         self.hor_waste = f"По горизонтали : {self.data_body.horiz}"
         self.ver_waste = f"; %0D%0A %0D%0AПо вертикали : {self.data_body.vert}"

@@ -1,13 +1,14 @@
 import os
 import time
 
+from PIL import Image
 from django.http import JsonResponse, FileResponse, HttpResponse
 from django.shortcuts import render, redirect
 
 # Create your views here.
 from .function.api_func import get_index
 from .function.graffic import get_graphics
-from .function.model_service import get_data, clone_wellbore_traj
+from .function.model_service import get_data, clone_wellbore_traj, NNBToIgirgi
 from .function.work_with_Excel import write_data_in_Excel
 from .function.work_with_data import rewrite_ReportIndex, work_with_file, plan_delete, work_with_nnb
 from Field.models import get_all_run, Run, Wellbore
@@ -48,14 +49,14 @@ def run_index(request):
 def update_index(request):
     """Функция для fetch запроса ля обнавления индексов под считывание файлов"""
     if request.method == 'POST':
-        # print(request.POST.dict())
-        obj = ReportIndex.objects.get(run=request.POST['run'])
-        obj.nnb_static_depth = request.POST['nnb_depth']
-        obj.nnb_static_corner = request.POST['nnb_corner']
-        obj.nnb_static_azimut = request.POST['nnb_azimut']
-        obj.nnb_static_list_name = request.POST['nnb_list_name']
-        obj.nnb_static_read = request.POST['nnb_str']
-        obj.save()
+        print(request.POST.dict())
+        obj = ReportIndex.objects.get_or_create(run=Run.objects.get(id=request.POST['run']))
+        obj[0].nnb_static_depth = request.POST['nnb_depth']
+        obj[0].nnb_static_corner = request.POST['nnb_corner']
+        obj[0].nnb_static_azimut = request.POST['nnb_azimut']
+        obj[0].nnb_static_list_name = request.POST['nnb_list_name']
+        obj[0].nnb_static_read = request.POST['nnb_str']
+        obj[0].save()
         return JsonResponse({'status': 'ok'})
     return JsonResponse({'Warning_Text': 'нужно обращение к post методу'})
 
@@ -101,7 +102,7 @@ def plan_del(request):
 # report/api/traj_comm
 def put_comment(request):
     """Обновить/создать комментарий у замера ННБ"""
-    meas = StaticNNBData.objects.get(id=request.POST['id'])
+    meas = IgirgiStatic.objects.get(id=request.POST['id'])
     meas.comment = request.POST['comment']
     meas.save()
     return JsonResponse({'status': 'ok'})
@@ -112,9 +113,16 @@ def traj_del(request):
     """ По fetch запросу с клиента удаляем замеры траектории по id"""
     for key, value in request.POST.dict().items():
         if 'igirgi' in key:
-            IgirgiStatic.objects.get(id=value).delete()
+            igirgi_meas = IgirgiStatic.objects.get(id=value)
+            try:
+                InterpPlan.objects.get(run=igirgi_meas.run, depth=igirgi_meas.depth).delete()
+            finally:
+                igirgi_meas.delete()
         elif 'nnb' in key:
-            StaticNNBData.objects.get(id=value).delete()
+            if request.POST.get('type') == 'plan':
+                InterpPlan.objects.get(id=value).delete()
+            else:
+                StaticNNBData.objects.get(id=value).delete()
         else:
             continue
     return JsonResponse({'status': 'ok'})
@@ -124,7 +132,7 @@ def traj_del(request):
 def get_graph(request):
     """ Вывод картинки с вертикальной/горизонтальной проекциями """
     wellbor_id = request.POST.get('wellbore_id')
-    if wellbor_id is None:
+    if wellbor_id is None or wellbor_id == 'null':
         return JsonResponse({'status': 'Укажите id скважины в параметре wellbore_id.'})
     wellbore = Wellbore.objects.get(id=wellbor_id)
     try:
@@ -155,3 +163,7 @@ def uploadFile(request):
         work_with_nnb(request, run)
 
     return JsonResponse({'status': 'ok'})
+
+
+def comment_copy(request):
+    NNBToIgirgi()

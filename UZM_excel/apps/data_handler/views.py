@@ -6,7 +6,7 @@ from django.shortcuts import render, redirect
 from pytest import console_main
 from Field.models import Well, Run, Wellbore, Section
 from excel_parcer.models import Data
-from report.models import StaticNNBData, IgirgiStatic, Plan
+from report.models import StaticNNBData, IgirgiStatic, Plan, InterpPlan
 from report.function.work_with_data import work_with_plan
 from Field.views_api import get_tree
 from .function.context_editer import *
@@ -14,6 +14,8 @@ from .function.mail import *
 from report.function.model_service import waste
 
 from Field.forms import AddWellForm
+
+from report.function.model_service import intr_plan
 
 
 def index(request):
@@ -41,29 +43,41 @@ def traj(request):
             except:  # если не нашли рейс возвращаем пустую страницу
                 return render(request, 'data_handler/trajectories.html', {'context': context, })
 
-            context['selected_obj'] = str(run)  # для отображения текущей модели на странице (текст)
-            context['selected_id'] = run_id  # для перенаправления по id на редактирование
+            context['selected_obj'] = run  # для отображения текущей модели на странице (текст)
+
+            # Ищем план, формируем контекст для письма
+            runs = Run.objects.filter(section__wellbore=run.section.wellbore)
+            plan_data = Plan.objects.filter(run__in=runs)
+            context["plan_ex"] = (True if len(plan_data) != 0 else False)
+            context["plan_version"] = (plan_data[0].plan_version if context["plan_ex"] else '-')
+            context['letter'] = Letter(run.section.wellbore)
 
             # Замеры
             context["igirgi_data"] = IgirgiStatic.objects.filter(run=run_id)
-            context["nnb_data"] = StaticNNBData.objects.filter(run=run_id)
+            # БУРИМ ПО ПЛАНОВОЙ ТРАЕКТОРИИ
+            if run.section.wellbore.igirgi_drilling:
+                if context["plan_ex"]:
+                    intr_plan(run)
+                    context["nnb_data"] = InterpPlan.objects.filter(run=run_id)
+                else:
+                    return render(request, 'data_handler/trajectories.html', {'context': context, })
+            else:
+                context["nnb_data"] = StaticNNBData.objects.filter(run=run_id)
+
             # Отходы
             context["waste_hor"], context["waste_vert"], context["waste_common"] = waste(run.section.wellbore, 1)
             # Индексы отходов (Какие отходы выводить)
             context["waste_index"] = list()
             for ind, data in enumerate(IgirgiStatic.objects.filter(
                     run__section__wellbore=run.section.wellbore).order_by('depth')):
-                if data in context['igirgi_data'] and ind < len(StaticNNBData.objects.filter(
-                        run__section__wellbore=run.section.wellbore).order_by('depth')):
-                    context["waste_index"].append(ind)
-
-            # Ищем план, формируем контекст для письма
-            runs = Run.objects.filter(section__wellbore=run.section.wellbore)
-            plan_data = Plan.objects.filter(run__in=runs)
-            context["plan_ex"] = (True if len(plan_data) != 0 else False)
-            context["plan_version"] = (Plan.objects.filter(run__in=runs)[0].plan_version if context["plan_ex"] else
-                                       '-')
-            context['letter'] = Letter(run.section.wellbore)
+                if run.section.wellbore.igirgi_drilling:
+                    if data in context['igirgi_data'] and ind < len(InterpPlan.objects.filter(
+                            run__section__wellbore=run.section.wellbore).order_by('depth')):
+                        context["waste_index"].append(ind)
+                else:
+                    if data in context['igirgi_data'] and ind < len(StaticNNBData.objects.filter(
+                            run__section__wellbore=run.section.wellbore).order_by('depth')):
+                        context["waste_index"].append(ind)
 
     if request.method == 'POST':
         run = Run.objects.get(id=request.GET.get('run_id'))
@@ -91,7 +105,7 @@ def traj(request):
                     new_obj[0].azimut = meas[2]
                     new_obj[0].save()
 
-        return redirect(request.META.get('HTTP_REFERER'))  # вернуть на ту же страницу где и были
+        return redirect(request.META.get('HTTP_REFERER'))  # вернуть на ту же страницу, где и были
     return render(request, 'data_handler/trajectories.html', {'context': context, })
 
 
@@ -105,20 +119,25 @@ def edit_traj(request):
     run_id = request.GET.get('run_id')
     run = Run.objects.get(id=request.GET.get('run_id'))
     context['title'] = run.section.wellbore.well_name.get_title()
-    context['selected_obj'] = str(Run.objects.get(id=run_id))
-    context['selected_id'] = run_id
+    context['selected_obj'] = run
     context["igirgi_data"] = IgirgiStatic.objects.filter(run=run_id)
-    context["nnb_data"] = StaticNNBData.objects.filter(run=run_id)
+    if run.section.wellbore.igirgi_drilling:
+        context["nnb_data"] = InterpPlan.objects.filter(run=run_id)
+    else:
+        context["nnb_data"] = StaticNNBData.objects.filter(run=run_id)
 
     if request.method == 'POST':
         for items in request.POST.lists():
             key = str(items[0]).split(' ')
             print(key)
             if 'nnb' in key:
-                obj = StaticNNBData.objects.get(id=key[0])
+                if run.section.wellbore.igirgi_drilling:
+                    obj = InterpPlan.objects.get(id=key[0])
+                else:
+                    obj = StaticNNBData.objects.get(id=key[0])
             else:
                 obj = IgirgiStatic.objects.get(id=key[0])
-            print(items[1])  #- все 3 числа замеров
+            print(items[1])  # - все 3 числа замеров
             if items[1][0] == '' or items[1][1] == '' or items[1][2] == '':
                 obj.delete()
             else:
