@@ -4,7 +4,9 @@ from typing import NoReturn
 
 import openpyxl
 from openpyxl.drawing.image import Image
+from openpyxl.reader.excel import load_workbook
 from openpyxl.styles import PatternFill
+from xls2xlsx import XLS2XLSX
 
 from .graffic import get_graphics
 
@@ -21,7 +23,6 @@ def cell_copy(sheet, *, row: int, col: str) -> list:
                 data_List.append(0)
             else:
                 try:
-                    # print(float(column.value))
                     data_List.append(float(column.value))
                 except Exception as e:
                     break
@@ -33,7 +34,7 @@ def excel_open(column: dict) -> dict:
         Чтение excel файлов на основе переданных параметров - column - это словарь с колонками и данными о файле
             На входе:
                 'Глубина'  - имя столбца с глубиной
-                'Угол'     - имя столбца с угом
+                'Угол'     - имя столбца с углом
                 'Азимут'   - имя столбца с азимутом (опционально)
                 'Имя файла'- имя файла для считывания из папки UZM_excel\Files\Report_input
                 'Строка'   - строка с которой считываем данные
@@ -46,16 +47,13 @@ def excel_open(column: dict) -> dict:
     result = {}
     filename = column['Имя файла']
 
+    path = file_dir + '\\Report_input\\' + filename
     try:
-        file_folder = file_dir + '\\Report_input\\' + filename
-        excel_file = openpyxl.load_workbook(file_folder, data_only=True)
-        excel_sheet = excel_file[column['Лист']]
-    except Exception:
-        print(Exception)
-        print(f'Ошибка при работе с файлом: {filename}\n'
-              f'в папке: {file_folder}\n'
-              f'Данные на входе: {column}\n'
-              f'Открывал лист с именем: {column["Лист"]}')
+        excel = load_workbook(path, data_only=True)
+    except:
+        x2x = XLS2XLSX(path)
+        excel = x2x.to_xlsx()
+    excel_sheet = excel[column['Лист']]
 
     for key, value in column.items():
         if key == "Лист" or key == 'Строка':
@@ -63,7 +61,7 @@ def excel_open(column: dict) -> dict:
         else:
             result[key] = cell_copy(excel_sheet, row=int(column['Строка']), col=value)
 
-    excel_file.close()
+    excel.close()
     return result
 
 
@@ -99,8 +97,10 @@ def write_data_in_Excel(all_data: dict, filename: str, short_type: int, Run: obj
     excel_file = openpyxl.load_workbook(file_folder)
     # print(all_data['Статические замеры ННБ'])  для отладки
     # print(all_data['Статические замеры ИГИРГИ'])
+    second_data = all_data['Статические замеры ННБ'] if not wellbore.igirgi_drilling else all_data['Плановая траектория']
+    # если бурим по траектории ИГиРГИ заменяем замеры ннб на план
     hor, ver, common = write_data(excel_file,  # горизонтальные, вертикальные, общие отходы
-                                  all_data['Статические замеры ННБ'],
+                                  second_data,
                                   all_data['Статические замеры ИГИРГИ'],
                                   other_data,
                                   Run,
@@ -209,7 +209,7 @@ def write_data(excel: openpyxl.workbook.workbook.Workbook,
     # запись в ячейки
     for meas in zip(igirgi['Глубина'], igirgi['Угол'], igirgi['Азимут'], nnb['Угол'], nnb['Азимут'],
                     other['igirgi_TVDSS'], other['igirgi_delta_x'], other['igirgi_delta_y'], other['igirgi_TVD'],
-                    other['nnb_delta_x'], other['nnb_delta_y'], other['nnb_TVD'], nnb['Комментарий']):
+                    other['nnb_delta_x'], other['nnb_delta_y'], other['nnb_TVD'], igirgi['Комментарий']):
         if count == 0:
             count += 1
             continue
@@ -228,7 +228,9 @@ def write_data(excel: openpyxl.workbook.workbook.Workbook,
         excel_sheet.cell(row=row, column=7).value = round(meas[4], 2)  # ННБ азимут
         excel_sheet.cell(row=row, column=8).value = round(meas[1] - meas[3], 2)  # разница зенитный угол
         dif_Az = meas[2] - meas[4]  # разница азимут
-        excel_sheet.cell(row=row, column=9).value = round((dif_Az if dif_Az <= 300 else dif_Az - 360), 2)
+        dif_Az = dif_Az if dif_Az <= 300 else dif_Az - 360
+        dif_Az = dif_Az if dif_Az >= -300 else dif_Az + 360
+        excel_sheet.cell(row=row, column=9).value = round(dif_Az, 2)
         # пошли отходы
         Ex = (Well.EX if Well.EX is not None else 0)
         Ny = (Well.NY if Well.NY is not None else 0)
@@ -246,8 +248,7 @@ def write_data(excel: openpyxl.workbook.workbook.Workbook,
                  (meas[11] - meas[8]) ** 2), 2)
 
         excel_sheet.cell(row=row, column=13).value = meas[12]
-
-        if row == (17 + len(igirgi['Глубина']) - 1):  # забираем последнии значения отходов
+        if row == (17 + len(igirgi['Глубина']) - 1):  # забираем последние значения отходов
             return round(sqrt((X_nnb - X_igirgi) ** 2 + (Y_nnb - Y_igigri) ** 2), 2), round(meas[11] - meas[8], 2), \
                 round(sqrt((X_nnb - X_igirgi) ** 2 + (Y_nnb - Y_igigri) ** 2 + (meas[11] - meas[8]) ** 2), 2)
         row += 1
@@ -262,7 +263,7 @@ def sevcom_data(excel_sheet: openpyxl.workbook.workbook.Workbook,
     # запись в ячейки
     for meas in zip(igirgi['Глубина'], igirgi['Угол'], igirgi['Азимут'], nnb['Угол'], nnb['Азимут'],
                     other['igirgi_TVDSS'], other['igirgi_delta_x'], other['igirgi_delta_y'], other['igirgi_TVD'],
-                    other['nnb_delta_x'], other['nnb_delta_y'], other['nnb_TVD'], nnb['Комментарий']):
+                    other['nnb_delta_x'], other['nnb_delta_y'], other['nnb_TVD'], igirgi['Комментарий']):
         if count == 0:
             count += 1
             continue
@@ -287,7 +288,9 @@ def sevcom_data(excel_sheet: openpyxl.workbook.workbook.Workbook,
         excel_sheet.cell(row=row, column=8).value = round(meas[4], 2)  # ННБ азимут
         excel_sheet.cell(row=row, column=9).value = round(meas[1] - meas[3], 2)  # разница зенитный угол
         dif_Az = meas[2] - meas[4]  # разница азимут
-        excel_sheet.cell(row=row, column=9).value = round((dif_Az if dif_Az <= 300 else dif_Az - 360), 2)
+        dif_Az = dif_Az if dif_Az <= 300 else dif_Az - 360
+        dif_Az = dif_Az if dif_Az >= -300 else dif_Az + 360
+        excel_sheet.cell(row=row, column=9).value = round(dif_Az, 2)
         # пошли отходы
         Ex = (Well.EX if Well.EX is not None else 0)
         Ny = (Well.NY if Well.NY is not None else 0)
@@ -306,7 +309,7 @@ def sevcom_data(excel_sheet: openpyxl.workbook.workbook.Workbook,
 
         excel_sheet.cell(row=row, column=14).value = meas[12]
 
-        if row == (17 + len(igirgi['Глубина']) - 1):  # забираем последнии значения отходов
+        if row == (17 + len(igirgi['Глубина']) - 1):  # забираем последние значения отходов
             return round(sqrt((X_nnb - X_igirgi) ** 2 + (Y_nnb - Y_igigri) ** 2), 2), round(meas[11] - meas[8], 2), \
                 round(sqrt((X_nnb - X_igirgi) ** 2 + (Y_nnb - Y_igigri) ** 2 + (meas[11] - meas[8]) ** 2), 2)
         row += 1
@@ -321,7 +324,7 @@ def samotlor_data(excel_sheet: openpyxl.workbook.workbook.Workbook,
     # запись в ячейки
     for meas in zip(igirgi['Глубина'], igirgi['Угол'], igirgi['Азимут'], nnb['Угол'], nnb['Азимут'],
                     other['igirgi_TVDSS'], other['igirgi_delta_x'], other['igirgi_delta_y'], other['igirgi_TVD'],
-                    other['nnb_delta_x'], other['nnb_delta_y'], other['nnb_TVD'], nnb['Комментарий'], nnb['Рейс']):
+                    other['nnb_delta_x'], other['nnb_delta_y'], other['nnb_TVD'], igirgi['Комментарий'], igirgi['Рейс']):
         if count == 0:
             count += 1
             continue
@@ -340,7 +343,9 @@ def samotlor_data(excel_sheet: openpyxl.workbook.workbook.Workbook,
         excel_sheet.cell(row=row, column=7).value = round(meas[4], 2)  # ННБ азимут
         excel_sheet.cell(row=row, column=8).value = round(meas[1] - meas[3], 2)  # разница зенитный угол
         dif_Az = meas[2] - meas[4]  # разница азимут
-        excel_sheet.cell(row=row, column=9).value = round((dif_Az if dif_Az <= 300 else dif_Az - 360), 2)
+        dif_Az = dif_Az if dif_Az <= 300 else dif_Az - 360
+        dif_Az = dif_Az if dif_Az >= -300 else dif_Az + 360
+        excel_sheet.cell(row=row, column=9).value = round(dif_Az, 2)
 
         # пошли отходы
         Ex = (Well.EX if Well.EX is not None else 0)
@@ -359,8 +364,9 @@ def samotlor_data(excel_sheet: openpyxl.workbook.workbook.Workbook,
                  (meas[11] - meas[8]) ** 2), 2)
 
         excel_sheet.cell(row=row, column=13).value = meas[12]
-
-        if row == (17 + len(igirgi['Глубина']) - 1):  # забираем последнии значения отходов
+        if row == (17 + len(igirgi['Глубина']) - 1):  # забираем последние значения отходов
+            # print(round(sqrt((X_nnb - X_igirgi) ** 2 + (Y_nnb - Y_igigri) ** 2), 2), round(meas[11] - meas[8], 2),
+            #       round(sqrt((X_nnb - X_igirgi) ** 2 + (Y_nnb - Y_igigri) ** 2 + (meas[11] - meas[8]) ** 2), 2))
             return round(sqrt((X_nnb - X_igirgi) ** 2 + (Y_nnb - Y_igigri) ** 2), 2), round(meas[11] - meas[8], 2), \
                 round(sqrt((X_nnb - X_igirgi) ** 2 + (Y_nnb - Y_igigri) ** 2 + (meas[11] - meas[8]) ** 2), 2)
         row += 1
@@ -371,6 +377,8 @@ def sevcom_hat(excel_sheet: openpyxl.workbook.workbook.Workbook.worksheets, Well
     excel_sheet['C16'].value = '-' if Well.north_direction is None else Well.get_north_direction()
     excel_sheet['H16'].value = '-' if Well.north_direction is None else Well.get_north_direction()
     excel_sheet['J16'].value = '-' if Well.north_direction is None else Well.get_north_direction()
+    if Well.wellbores.all()[0].igirgi_drilling:
+        excel_sheet['G14'].value = 'Плановая траектория'
 
 
 def samotlor_hat(excel_sheet: openpyxl.workbook.workbook.Workbook.worksheets, Well: object) -> NoReturn:
@@ -378,6 +386,8 @@ def samotlor_hat(excel_sheet: openpyxl.workbook.workbook.Workbook.worksheets, We
     excel_sheet['D16'].value = '-' if Well.north_direction is None else Well.get_north_direction()
     excel_sheet['G16'].value = '-' if Well.north_direction is None else Well.get_north_direction()
     excel_sheet['I16'].value = '-' if Well.north_direction is None else Well.get_north_direction()
+    if Well.wellbores.all()[0].igirgi_drilling:
+        excel_sheet['F14'].value = 'Плановая траектория'
 
 
 def table_hat(excel_sheet: openpyxl.workbook.workbook.Workbook.worksheets, Well: object) -> NoReturn:
@@ -385,6 +395,8 @@ def table_hat(excel_sheet: openpyxl.workbook.workbook.Workbook.worksheets, Well:
     excel_sheet['C16'].value = '-' if Well.north_direction is None else Well.get_north_direction()
     excel_sheet['G16'].value = '-' if Well.north_direction is None else Well.get_north_direction()
     excel_sheet['I16'].value = '-' if Well.north_direction is None else Well.get_north_direction()
+    if Well.wellbores.all()[0].igirgi_drilling:
+        excel_sheet['F14'].value = 'Плановая траектория'
 
 
 def write_hat(excel_sheet: openpyxl.workbook.workbook.Workbook.worksheets, Well: object) -> NoReturn:

@@ -172,6 +172,14 @@ def get_graphics(all_data: dict, wellbore: object) -> dict:
     ax1.plot(x1, y1, 'g', label='Плановая траектория')
     ax2.plot(x2, y2, 'g', label='Плановая траектория')
 
+    if wellbore.igirgi_drilling: # подмена отходов при бурении на основе плана
+        EW_nnb = x1[-1]  # EW для отходов
+        NS_nnb = y1[-1]  # NS для отходов
+        data_dict['nnb_TVD'] = copy.deepcopy(z)
+        data_dict['nnb_TVDSS'] = copy.deepcopy(y2)
+        data_dict['nnb_delta_y'] = copy.deepcopy(y1)
+        data_dict['nnb_delta_x'] = copy.deepcopy(x1)
+
     data = all_data['Статические замеры ННБ']
     x1, y1, x2, y2, z = get_graph_data(I=data['Угол'],
                                        A=data['Азимут'],
@@ -182,13 +190,13 @@ def get_graphics(all_data: dict, wellbore: object) -> dict:
     ax1.plot(x1, y1, 'b', label='Подрядчик по ННБ')
     ax2.plot(x2, y2, 'b', label='Подрядчик по ННБ')
 
-    EW_nnb = x1[-1]  # EW для отходов
-    NS_nnb = y1[-1]  # NS для отходов
-
-    data_dict['nnb_TVD'] = copy.deepcopy(z)
-    data_dict['nnb_TVDSS'] = copy.deepcopy(y2)
-    data_dict['nnb_delta_y'] = copy.deepcopy(y1)
-    data_dict['nnb_delta_x'] = copy.deepcopy(x1)
+    if not wellbore.igirgi_drilling:
+        EW_nnb = x1[-1]  # EW для отходов
+        NS_nnb = y1[-1]  # NS для отходов
+        data_dict['nnb_TVD'] = copy.deepcopy(z)
+        data_dict['nnb_TVDSS'] = copy.deepcopy(y2)
+        data_dict['nnb_delta_y'] = copy.deepcopy(y1)
+        data_dict['nnb_delta_x'] = copy.deepcopy(x1)
 
     data = all_data['Статические замеры ИГИРГИ']
     x1, y1, x2, y2, z = get_graph_data(I=data['Угол'],
@@ -203,8 +211,8 @@ def get_graphics(all_data: dict, wellbore: object) -> dict:
     EW_igirgi = x1[-1]  # EW для отходов
     NS_igirgi = y1[-1]  # NS для отходов
 
-    # for item in zip(x1, y1, x2, y2, z, data['Глубина']):
-    #     print(f"NS: {item[0]} | EW: {item[1]} | Vsect: {item[2]} | TVDSS: {item[3]} | TVD: {item[4]} | DEPTH: {item[5]}")
+    # for item in zip(x1, y1, x2, y2, z, data['Глубина']): print(f"NS: {item[0]} | EW: {item[1]} | Vsect: {item[2]} |
+    # TVDSS: {item[3]} | TVD: {item[4]} | DEPTH: {item[5]}")
 
     data_dict['igirgi_TVD'] = copy.deepcopy(z)
     data_dict['igirgi_TVDSS'] = copy.deepcopy(y2)
@@ -229,8 +237,8 @@ def get_graphics(all_data: dict, wellbore: object) -> dict:
                                            VSaz=VSaz)
         ax2.plot(x2, y2, '--', color='orange', label='IGIRGI_Din')
 
-    # собественные границы графиков
-    step = 6  # на грфике 6 шагов
+    # собственные границы графиков
+    step = 6  # на графике 6 шагов
     delta_x = (ext_dict['max_x'] - ext_dict['min_x'])
     delta_y = (ext_dict['max_y'] - ext_dict['min_y'])
 
@@ -243,7 +251,7 @@ def get_graphics(all_data: dict, wellbore: object) -> dict:
         ext_dict['min_x'] -= (delta_y - delta_x) / 2
         additional_delta = delta_y / (step * 2)
 
-    # создаем квадратную сетке
+    # создаем квадратную сетку
     ax1.set_xlim(ext_dict['min_x'] - additional_delta, ext_dict['max_x'] + additional_delta)
     ax1.set_ylim(ext_dict['min_y'] - additional_delta, ext_dict['max_y'] + additional_delta)
 

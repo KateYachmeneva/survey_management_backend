@@ -1,14 +1,23 @@
 from django.db import models
 from Field.models import Run
+
 """ модель из генератора отчетов зависит от модели из парсера
     нужно либо вынести модель с рейсами в apps  либо перенести ReportIndex
     в parcer
 """
+
+
 # Create your models here
+class Meas(models.Model):
+    """ Абстрактный класс замера"""
+    depth = models.FloatField('глубина')
+    corner = models.FloatField('угол', null=True)
+    azimut = models.FloatField('азимут', null=True)
+    run = models.ForeignKey(Run, on_delete=models.CASCADE, null=True)
 
-
-def get_run_by_id(run_id):
-    return Run.objects.get(id=run_id)
+    class Meta:
+        abstract = True
+        ordering = ['depth']
 
 
 class ReportIndex(models.Model):
@@ -36,9 +45,9 @@ class ReportIndex(models.Model):
     plan_list_name = models.CharField("Плановая траектория лист эксель", max_length=10, null=True)
     nnb_dynamic_read = models.IntegerField("Считываем динамические данные  от ННБ с этой строки", null=True)
     nnb_static_read = models.IntegerField("Считываем статические данные от ННБ с этой строки", null=True)
-    plan_str = models.IntegerField("Считываем данные плана с этой строки",  null=True)
+    plan_str = models.IntegerField("Считываем данные плана с этой строки", null=True)
     igirgi_str = models.IntegerField("Считываем данные статика ИГиРГИ с этой строки", null=True)
-    raw_str = models.IntegerField("Считываем сырые данные с этой строки",  null=True)
+    raw_str = models.IntegerField("Считываем сырые данные с этой строки", null=True)
 
     run = models.OneToOneField(Run, on_delete=models.CASCADE, unique=True)
 
@@ -71,7 +80,6 @@ class StaticNNBData(models.Model):
     corner = models.FloatField('угол', null=True)
     azimut = models.FloatField('азимут', null=True)
     run = models.ForeignKey(Run, on_delete=models.CASCADE, null=True)
-    comment = models.TextField('комментарий', null=True)
 
     def __str__(self):
         return f"Глубина {self.depth}"
@@ -89,6 +97,7 @@ class IgirgiStatic(models.Model):
     corner = models.FloatField('угол', null=True)
     azimut = models.FloatField('азимут', null=True)
     run = models.ForeignKey(Run, on_delete=models.CASCADE, null=True)
+    comment = models.TextField('комментарий', null=True)
 
     def __str__(self):
         return f"Глубина {self.depth}"
@@ -133,13 +142,9 @@ class Raw(models.Model):
         db_table = 'meas_raw'
 
 
-class Plan(models.Model):
+class Plan(Meas):
     """Плановые замеры ННБ"""
-    depth = models.FloatField('глубина')
-    corner = models.FloatField('угол', null=True)
-    azimut = models.FloatField('азимут', null=True)
     plan_version = models.CharField('версия плана', max_length=20, null=True)
-    run = models.ForeignKey(Run, on_delete=models.CASCADE, null=True)
 
     def __str__(self):
         return f"Глубина {self.depth}"
@@ -149,3 +154,19 @@ class Plan(models.Model):
         verbose_name = 'Замер плановой траектории'
         verbose_name_plural = 'Замеры плановой траектории'
         db_table = 'meas_plan'
+
+
+class InterpPlan(Meas):
+    """
+    План интерполированный по глубине замеров ИГиРГИ для бурения по траектории ИГиРГИ [замена траектории ННБ]
+    """
+
+    class Meta:
+        ordering = ['depth']
+        verbose_name = 'Замер интерполированной плановой траектории'
+        verbose_name_plural = 'Замеры интерполированной плановой траектории'
+        db_table = 'meas_intr_plan'
+
+
+def get_run_by_id(run_id):
+    return Run.objects.get(id=run_id)

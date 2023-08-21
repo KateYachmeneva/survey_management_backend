@@ -9,7 +9,8 @@ from django.db.models import QuerySet
 from django.http import FileResponse, HttpResponse, JsonResponse
 
 from .work_with_Excel import excel_open, write_data_in_Excel
-from ..models import ReportIndex, DynamicNNBData, Raw, IgirgiStatic, StaticNNBData, Plan, get_run_by_id, IgirgiDynamic
+from ..models import ReportIndex, DynamicNNBData, Raw, IgirgiStatic, StaticNNBData, Plan, get_run_by_id, IgirgiDynamic, \
+    InterpPlan
 from .model_service import get_data
 from Field.models import Run
 import lasio
@@ -445,17 +446,24 @@ def work_with_plan(request: dict, run: object) -> bool:
     plan_file = request.FILES['plan_file']  # сохранение файла плана
     path = fs.save('plan_' + plan_file.name, plan_file)
     plan_index(run, request.POST)  # перезапись индексов
+    print('Начали читать план')
     data = reader('plan_file', path, ReportIndex.objects.get(run=run).id)  # берём данные с плана
     # удаляем старый план
+    # print(data)
     plan_delete(run)
     bd_Write_plan(data, run.id, request.POST['plan_version'])  # сохраняем в бд
+    print('сохранили в бд')
     return True
 
 
 def plan_delete(run):
-    """Удаляем все замеры со ствола, к которому привязан переданный рейс"""
+    """
+    Удаляем все замеры со ствола, к которому привязан переданный рейс.
+    [Используется при загрузке нового плана/удалении старого]
+    """
     runs = Run.objects.filter(section__wellbore__well_name=run.section.wellbore.well_name)
     Plan.objects.filter(run__in=runs).delete()
+    InterpPlan.objects.filter(run__in=runs).delete()
 
 
 def plan_index(run, new_index):

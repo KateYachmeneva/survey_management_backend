@@ -42,10 +42,11 @@
             <div class="col-auto"><b>Версия плана:</b> {{context.plan_version}}</div>
         </div>
         <div style="margin-top:5px;">
+            {% if context.selected_obj.id is not None %}
+            <!--      Настройка импорта      -->
             <button type="button" class="btn btn-secondary" data-toggle="modal" data-target="#data_Modal3" data-run="{{context.selected_obj}}">
                 Настройки импорта
             </button>
-            {% if context.selected_id is not None %}
             <!--    Кнопка отвечает за плановую траекторию    -->
             {% if context.plan_ex == True %}
             <button type="button" class="btn btn-secondary" data-toggle="modal" data-target="#data_Modal2" data-run="{{context.selected_obj}}">
@@ -66,7 +67,7 @@
             {% endif %}
 
             <!--    Кнопка отвечает за редактирование значений траектории    -->
-            <a href="{% url 'edit_traj' %}?run_id={{context.selected_id}} " style="text-decoration: none;color: #000;">
+            <a href="{% url 'edit_traj' %}?run_id={{context.selected_obj.id}} " style="text-decoration: none;color: #000;">
                 <button type="button" class="btn btn-secondary" aria-controls="dtDynamicVerticalScrollExample">
                 Редактировать</button></a>
 
@@ -93,7 +94,8 @@
                 <table class="table table-light table-sm table-bordered table-hover" style="">
                     <thead class="thead-dark">
                     <tr>
-                        <th scope="col" colspan="3">Данные ННБ</th>
+                        <th scope="col" colspan="3">{% if context.selected_obj.section.wellbore.igirgi_drilling %} Данные плана
+                            {% else %}Данные ННБ{% endif %}</th>
                     </tr>
                     <tr >
                         <th scope="col" style="font-size:0.8em">Глубина</th>
@@ -189,7 +191,7 @@
                         <td name="waste3">{{ context.waste_common|index:ind|formatted_float }}</td>
                         <td style="width: 340px; padding: 0em;">
                             <textarea style="width: 100%; height: 26px; padding: 0em; border: none;"
-                                      onchange="put_comm({{ context.nnb_data|id:forloop.counter0 }}, this.value);">{{ context.nnb_data|comment:forloop.counter0 }}</textarea>
+                                      onchange="put_comm({{ context.igirgi_data|id:forloop.counter0 }}, this.value);">{{ context.igirgi_data|comment:forloop.counter0 }}</textarea>
                         </td>
                     </tr>
                     {% endfor %}
@@ -206,13 +208,16 @@
 {% block bottom_btn%}
 </form>
 
-{% if context.selected_id is not None %} <!-- Не отображать кнопки добавления без выбранного рейса-->
+{% if context.selected_obj is not None %} <!-- Не отображать кнопки добавления без выбранного рейса-->
 <div class="row" style="margin-top:0.5em;margin-right:0.1em;">
     <div class="col-3" style="text-align: center;">
+        {% if context.selected_obj.section.wellbore.igirgi_drilling %}   <!-- На месте ННБ план, план считается сам!-->
+        {% else %}
        <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#data_Modal1" style="width:100%"
                 data-whatever="ННБ" data-run="{{context.selected_obj}}">
             Добавить значения
         </button>
+        {% endif %}
 
     </div>
     <div class="col-3" style="text-align: center;">
@@ -426,7 +431,7 @@ function Send_mail() {
     document.getElementById("fa_send").hidden = false;
     <!--  Задаём в пост запрос номер рейса  -->
     var params = new FormData();
-    params.set('run_id', {{context.selected_id}});
+    params.set('run_id', {{context.selected_obj.id}});
 
 
     fetch('http://'+window.location.hostname+':'+window.location.port+'/report/api/file_name',
@@ -483,7 +488,7 @@ $('#data_Modal2').on('show.bs.modal', function (event) {
   var recipient = button.data('whatever')
 
   var params = new FormData();
-  params.set('run_id', {{context.selected_id}});
+  params.set('run_id', {{context.selected_obj.id}});
   fetch('http://'+window.location.hostname+':'+window.location.port+'/report/api/run_index', { method: 'POST', body: params })
          .then(response=>response.json()).
          then(data=>{
@@ -506,7 +511,7 @@ $('#data_Modal3').on('show.bs.modal', function (event) {
   var button = $(event.relatedTarget)
 
   var params = new FormData();
-  params.set('run_id', {{context.selected_id}});
+  params.set('run_id', {{context.selected_obj.id}});
   fetch('http://'+window.location.hostname+':'+window.location.port+'/report/api/run_index', { method: 'POST', body: params })
          .then(response=>response.json()).
          then(data=>{
@@ -520,7 +525,7 @@ $('#data_Modal3').on('show.bs.modal', function (event) {
   var run_name = button.data('run')
   var modal = $(this)
   document.getElementById('run_name3_visible').value = run_name;
-  document.getElementById('run_name3_form').value = {{context.selected_id}};
+  document.getElementById('run_name3_form').value = {{context.selected_obj.id}};
 })
 
 <!--Функция на отправку формы с индексами под чтения файла с траекторией ННБ-->
@@ -549,7 +554,12 @@ window.addEventListener('load', () => {
     document.getElementsByName('delta2').forEach(function(element, ind){
         let dif = (parseFloat(document.getElementById('igirgi_azimut'+ind).innerHTML.replace(",", "."))-
         parseFloat(document.getElementById('nnb_azimut'+ind).innerHTML.replace(",", "."))).toFixed(2);
-        if(dif>300){dif=(dif-360).toFixed(2);};
+        if(dif>300){
+        dif=(dif-360).toFixed(2);
+        };
+        if(dif<-300){
+        dif=(dif+360).toFixed(2);
+        };
         element.innerHTML = dif;
         })
 });
