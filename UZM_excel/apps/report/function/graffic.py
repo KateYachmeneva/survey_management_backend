@@ -14,7 +14,7 @@ file_dir = os.getcwd() + "\\Files"
 
 def getGorizontalAxes(Inc1, Inc2, Az1, Az2, deltaMD):
     """
-    Получаем шаг по X,Y,Z для горизонтальной проекции
+    Получаем шаг по X, Y, Z для горизонтальной проекции
     """
     dInc = math.radians(Inc2 - Inc1)
     dAzim = math.radians(Az2 - Az1)
@@ -126,13 +126,12 @@ data_name = {'igirgi_file': 'Статические замеры ИГИРГИ',
 
 
 # TODO получаем QueryDict и преобразовываем в словарь листов
-def single_data(data, wellbore: object) -> dict:
+def single_data_graph(data, wellbore: object) -> dict:
     """ Значения для графиков проекции одиночные (берём индивидуально под тип траектории)"""
     well = wellbore.well_name
     # для траектории
     RKB = (84 if well.RKB is None else well.RKB)
     VSaz = (1 if well.VSaz is None else well.VSaz)
-
     x1, y1, x2, y2, z = get_graph_data(I=data['Угол'],
                                        A=data['Азимут'],
                                        Depth=data['Глубина'],

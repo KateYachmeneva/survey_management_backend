@@ -11,7 +11,7 @@ from Field.models import Run
 
 
 class List(models.Model):
-    """Модель с заголовками"""
+    """Модель с заголовками [какая-то старая модель Егора, нужно разобраться]"""
     depth = models.TextField('Глубина', max_length=200)
     CX = models.TextField('GX', max_length=200)
     CY = models.TextField('GY', max_length=200)

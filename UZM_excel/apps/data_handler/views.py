@@ -6,7 +6,7 @@ from django.shortcuts import render, redirect
 from pytest import console_main
 from Field.models import Well, Run, Wellbore, Section
 from excel_parcer.models import Data
-from report.models import StaticNNBData, IgirgiStatic, Plan, InterpPlan
+from report.models import StaticNNBData, IgirgiStatic, Plan, InterpPlan, ProjectionParam
 from report.function.work_with_data import work_with_plan
 from Field.views_api import get_tree
 from .function.context_editer import *
@@ -16,6 +16,8 @@ from report.function.model_service import waste
 from Field.forms import AddWellForm
 
 from report.function.model_service import intr_plan
+from report.function.graffic import single_data_graph
+from report.function.model_service import get_single_traj
 
 
 def index(request):
@@ -225,10 +227,27 @@ def proj(request):
     """ Страница с проекциями из отчёта [В будущем сюда можно добавить ее масштабирование]"""
     context = {'title': 'Проекция',
                "tree": get_tree(),
-               "active": 'proj', }
+               "active": 'proj',
+               "data": {'staticIgirgi': {'hor': list(), 'ver': list()},
+                        'staticNNB': {'hor': list(), 'ver': list()},
+                        'plan': {'hor': list(), 'ver': list()}}
+               }
+
     if request.GET.get('run_id') is not None:
         run = Run.objects.get(id=request.GET.get('run_id'))
         context['selected_obj'] = run.section.wellbore
+        context['graph_param'] = ProjectionParam.objects.get_or_create(wellbore=context['selected_obj'])[0]
+        # данные для проекции
+        for key, vdict in context["data"].items():
+            dtraj = get_single_traj(key, context['selected_obj'])  # получаем траекторию в словаре
+            # получаем проекцию
+            x1, y1, x2, y2 = single_data_graph(dtraj, context['selected_obj'])
+            for meas in zip(x1, y1):
+                vdict['hor'].append({'x': meas[0], 'y': meas[1]})
+
+            for meas in zip(x2, y2):
+                vdict['ver'].append({'x': meas[0], 'y': meas[1]})
+
     return render(request, 'data_handler/proj.html', {'context': context, })
 
 

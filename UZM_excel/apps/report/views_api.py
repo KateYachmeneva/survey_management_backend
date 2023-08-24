@@ -1,0 +1,125 @@
+# Viewsets - все миксины с добавлением, удалением, редактированием, выбором
+from django.utils.decorators import method_decorator
+from drf_yasg import openapi
+from drf_yasg.utils import swagger_auto_schema
+from rest_framework import viewsets
+from .models import *
+from .serializer import *
+from django.http import JsonResponse
+from rest_framework import generics, viewsets, mixins
+from rest_framework.response import Response
+from rest_framework.views import APIView
+
+from Field.models import Wellbore
+
+
+class ProjectionParamView(APIView):
+    """ Представления для работы с моделью параметров проекции """
+
+    @swagger_auto_schema(tags=['Проекция'],
+                         operation_summary="Записать параметры для постройки проекции",
+                         request_body=openapi.Schema(
+                             type=openapi.TYPE_OBJECT,
+                             properties={
+                                 'hor_x_min': openapi.Schema(type=openapi.TYPE_NUMBER,
+                                                             description='горизонтальная проекция,'
+                                                                         ' X минимальное (Запад/Восток)'),
+                                 'hor_x_max': openapi.Schema(type=openapi.TYPE_NUMBER,
+                                                             description='горизонтальная проекция,'
+                                                                         ' X максимальное (Запад/Восток)'),
+                                 'hor_x_del': openapi.Schema(type=openapi.TYPE_NUMBER,
+                                                             description='горизонтальная проекция,'
+                                                                         ' X шаг (Запад/Восток)'),
+                                 'hor_y_min': openapi.Schema(type=openapi.TYPE_NUMBER,
+                                                             description='горизонтальная проекция,'
+                                                                         ' Y минимальное (Юг/Север)'),
+                                 'hor_y_max': openapi.Schema(type=openapi.TYPE_NUMBER,
+                                                             description='горизонтальная проекция,'
+                                                                         ' Y максимальное (Юг/Север)'),
+                                 'hor_y_del': openapi.Schema(type=openapi.TYPE_NUMBER,
+                                                             description='горизонтальная проекция,'
+                                                                         ' Y шаг (Юг/Север)'),
+                                 'ver_x_min': openapi.Schema(type=openapi.TYPE_NUMBER,
+                                                             description='вертикальная проекция,'
+                                                                         ' X минимальное (Вертикальная секция)'),
+                                 'ver_x_max': openapi.Schema(type=openapi.TYPE_NUMBER,
+                                                             description='вертикальная проекция,'
+                                                                         ' X максимальное (Вертикальная секция)'),
+                                 'ver_x_del': openapi.Schema(type=openapi.TYPE_NUMBER,
+                                                             description='вертикальная проекция,'
+                                                                         ' X шаг (Вертикальная секция)'),
+                                 'ver_y_min': openapi.Schema(type=openapi.TYPE_NUMBER,
+                                                             description='вертикальная проекция,'
+                                                                         ' Y минимальное (Абсолютная отметка)'),
+                                 'ver_y_max': openapi.Schema(type=openapi.TYPE_NUMBER,
+                                                             description='вертикальная проекция,'
+                                                                         ' Y максимальное (Абсолютная отметка)'),
+                                 'ver_y_del': openapi.Schema(type=openapi.TYPE_NUMBER,
+                                                             description='вертикальная проекция,'
+                                                                         ' Y шаг (Абсолютная отметка)'),
+
+                             }
+                         )
+                         )
+    def post(self, request, wellbore_id):
+        if wellbore_id is None:
+            return Response({'warning': 'Не указан id ствола! Укажите id в параметре wellbore_id.'})
+        else:
+            try:
+                w = Wellbore.objects.get(id=wellbore_id)
+            except Exception as e:
+                return Response({'warning': 'Ствол с указанным id не существует!'})
+            obj = ProjectionParam.objects.get_or_create(wellbore=w)
+
+        # проверка на наличие коэффициентов
+        hor = True
+        ver = True
+        print(request.POST.dict())
+        hor_x_min = request.POST.get('hor_x_min')
+        hor_x_max = request.POST.get('hor_x_max')
+        hor_x_del = request.POST.get('hor_x_del')
+        hor_y_min = request.POST.get('hor_y_min')
+        hor_y_max = request.POST.get('hor_y_max')
+        hor_y_del = request.POST.get('hor_y_del')
+
+        if None in (hor_x_min, hor_x_max, hor_x_del, hor_y_min, hor_y_max, hor_y_del):
+            hor = False
+        else:
+            obj[0].hor_x_min = hor_x_min
+            obj[0].hor_x_max = hor_x_max
+            obj[0].hor_x_del = hor_x_del
+            obj[0].hor_y_min = hor_y_min
+            obj[0].hor_y_max = hor_y_max
+            obj[0].hor_y_del = hor_y_del
+
+        ver_x_min = request.POST.get('ver_x_min')
+        ver_x_max = request.POST.get('ver_x_max')
+        ver_x_del = request.POST.get('ver_x_del')
+        ver_y_min = request.POST.get('ver_y_min')
+        ver_y_max = request.POST.get('ver_y_max')
+        ver_y_del = request.POST.get('ver_y_del')
+
+        if None in (ver_x_min, ver_x_max, ver_x_del, ver_y_min, ver_y_max, ver_y_del):
+            ver = False
+        else:
+            obj[0].ver_x_min = ver_x_min
+            obj[0].ver_x_max = ver_x_max
+            obj[0].ver_x_del = ver_x_del
+            obj[0].ver_y_min = ver_y_min
+            obj[0].ver_y_max = ver_y_max
+            obj[0].ver_y_del = ver_y_del
+
+        if not ver and not hor:
+            return Response({'warning': 'Не заполнены обязательные параметры!'})
+
+        obj[0].save()
+        return Response({'status': 'ок'})
+
+    @swagger_auto_schema(tags=['Проекция'],
+                         operation_summary="Получить параметры для постройки проекции по id ствола", )
+    def get(self, request, wellbore_id):
+        try:
+            params = ProjectionParam.objects.get(wellbore=wellbore_id)
+            return Response(ProjectionParamSerializer(params).data)
+        except:
+            return Response({'warning': 'Не удалось найти параметры по данному id ствола.'})

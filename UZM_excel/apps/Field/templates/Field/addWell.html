@@ -6,122 +6,44 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link type="text/css" href="{% static 'css/run/styles.css' %}" rel="stylesheet" />
     {% load crispy_forms_tags %}
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 {% endblock %}
 
 {% block data_field %}
-<div class="container__item">
-    <label class="container__label" >
-        ДО:
-    </label>
-    <select id="Do_name">
-        <option value="-" selected>---------</option>
-        {% for f in context.DO %}
-        <option value="{{f.id}}"> {{f}}</option>
-        {% endfor %}
-    </select>
-</div>
-<div class="container__item">
-    <label class="container__label">
-        Месторождение:
-    </label>
-    <select id="Field_name">
-        <option value="-" selected>---------</option>
-    </select>
-</div>
-
-<div class="container__item">
-    <label class="container__label">
-        Куст:
-    </label>
-    <select name="pad_name" required id="id_pad_name">
-        <option value="-" selected>---------</option>
-    </select>
-</div>
 
 <div id="main_form">
 {% for f in context.form %}
-
     <div class="container__item">
         {% if f.label == 'Куст' %}  <!-- пропускаем поле Куст (добавили его выше с фильтром) -->
+        <div class="form-group">
+            <label>Куст</label>
+            <select class="js-select2 form-control" name="pad_name" placeholder="Выберите куст">
+                <option value=""></option>
+                {% for element in context.search%}
+                <option value="{{element.id}}"> {{ element }} </option>
+                {% endfor %}
+            </select>
+        </div>
         {% else %}
         {{f|as_crispy_field}}
         {% endif %}
     </div>
-
-
 {% endfor %}
+
 </div>
 
 
 
 <script>
-   <!-- Выбрали Месторождение -->
-    document.getElementById("Field_name").addEventListener("change",function(e){
-         pad_select = document.getElementById("id_pad_name");
-         pad_select.innerHTML = '';
-         console.log("Selected " + e.target.value);
-         var params = new FormData();
-         params.set('field_id', e.target.value);
-
-         fetch('http://'+window.location.hostname+':'+window.location.port+'/main_data/api/get_pad',
-         { method: 'POST', body: params })
-         .then(response=>response.json()).
-         then(data=>{
-            console.log(data);
-            for (key in data){
-            let newOption = new Option(data[key], key)
-            pad_select.append(newOption);
-            }
-         });
-          });
-
-    <!-- Выбрали ДО -->
-    document.getElementById("Do_name").addEventListener("change",function(e){
-         field_select = document.getElementById("Field_name");
-         field_select.innerHTML = '';
-         if (e.target.value == "-"){
-         document.getElementById("id_pad_name").innerHTML = '';
-         return
-         }
-         console.log("Selected " + e.target.value);
-         var params = new FormData();
-         params.set('do_id', e.target.value);
-
-         fetch('http://'+window.location.hostname+':'+window.location.port+'/main_data/api/get_field',
-         { method: 'POST', body: params })
-         .then(response=>response.json()).
-         then(data=>{
-                        console.log(data);
-                        for (key in data){
-                                          let newOption = new Option(data[key], key)
-                                          field_select.append(newOption);
-                                          }
-
-                        <!--  Под месторождение сразу подтягиваем Куст -->
-                        document.getElementById("id_pad_name").innerHTML = '';
-                        var params = new FormData();
-                        params.set('field_id', Object.keys(data)[0]);
-                        fetch('http://'+window.location.hostname+':'+window.location.port+'/main_data/api/get_pad',
-                        { method: 'POST', body: params })
-                        .then(response=>response.json()).
-                        then(data=>{
-                           console.log(data);
-                           document.getElementById("id_pad_name").innerHTML = '';
-                              for (key in data){
-                                 let newOption = new Option(data[key], key)
-                                    document.getElementById("id_pad_name").append(newOption);
-                                       }
-                                       });
-
-
-         });
-
-
-
-          });
-
+   $(document).ready(function() {
+    	$('.js-select2').select2({
+    			placeholder: "Выберите куст",
+    					maximumSelectionLength: 2,
+    							language: "ru"
+    								});
+    								});
 </script>
-
 
 {% endblock%}
 

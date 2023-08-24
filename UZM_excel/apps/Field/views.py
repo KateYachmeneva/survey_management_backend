@@ -79,7 +79,7 @@ def add_well(request):
     context = {"title": 'Скважина',
                "form": form,
                "method": "add_well",
-               "DO": Client.objects.all()}
+               "search": Pad.objects.all()}
 
     return render(request, 'Field/addWell.html', {'context': context, })
 

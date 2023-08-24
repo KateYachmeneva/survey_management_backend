@@ -1,5 +1,5 @@
 from django.db import models
-from Field.models import Run
+from Field.models import Run, Wellbore
 
 """ модель из генератора отчетов зависит от модели из парсера
     нужно либо вынести модель с рейсами в apps  либо перенести ReportIndex
@@ -9,7 +9,7 @@ from Field.models import Run
 
 # Create your models here
 class Meas(models.Model):
-    """ Абстрактный класс замера"""
+    """ Абстрактный класс замера """
     depth = models.FloatField('глубина')
     corner = models.FloatField('угол', null=True)
     azimut = models.FloatField('азимут', null=True)
@@ -20,8 +20,35 @@ class Meas(models.Model):
         ordering = ['depth']
 
 
+class ProjectionParam(models.Model):
+    """Параметры для постройки графиков проекции [Отчёт]"""
+    hor_x_min = models.IntegerField('Минимальное значение по X (Запад/Восток)', null=True)
+    hor_x_max = models.IntegerField('Максимальное значение по X (Запад/Восток)', null=True)
+    hor_x_del = models.IntegerField('Шаг по X (Запад/Восток)', null=True)
+    hor_y_min = models.IntegerField('Минимальное значение по Y (Юг/Север)', null=True)
+    hor_y_max = models.IntegerField('Максимальное значение по Y (Юг/Север)', null=True)
+    hor_y_del = models.IntegerField('Шаг по Y (Юг/Север)', null=True)
+    ver_x_min = models.IntegerField('Минимальное значение по X (Вертикальная секция)', null=True)
+    ver_x_max = models.IntegerField('Максимальное значение по X (Вертикальная секция)', null=True)
+    ver_x_del = models.IntegerField('Шаг по X (Вертикальная секция)', null=True)
+    ver_y_min = models.IntegerField('Минимальное значение по Y (Абсолютная отметка)', null=True)
+    ver_y_max = models.IntegerField('Максимальное значение по Y (Абсолютная отметка)', null=True)
+    ver_y_del = models.IntegerField('Шаг по Y (Абсолютная отметка)', null=True)
+
+    wellbore = models.ForeignKey(Wellbore,
+                                 on_delete=models.CASCADE,
+                                 verbose_name='Параметры преокции',
+                                 related_name='proj_params',
+                                 )
+
+    class Meta:
+        verbose_name = 'Параметры для построения проекции'
+        verbose_name_plural = 'Параметры для построения проекции'
+        db_table = 'report_proj_graph'
+
+
 class ReportIndex(models.Model):
-    """Модель для запоминания полей в report форме"""
+    """ Модель для запоминания полей в report форме [для импорта файлов с замерами]"""
     raw_dynamic_depth = models.CharField("Сырые динамические глубина", max_length=10, null=True)
     raw_dynamic_corner = models.CharField("Сырые динамические угол", max_length=10, null=True)
     raw_dynamic_depth_excel = models.CharField("Сырые динамические глубина excel", max_length=10, null=True)
@@ -54,15 +81,11 @@ class ReportIndex(models.Model):
     class Meta:
         verbose_name = 'Индекс для формы'
         verbose_name_plural = 'Индексы для формы'
-        db_table = 'report_index'
+        db_table = 'report_trajectory_index'
 
 
-class DynamicNNBData(models.Model):
+class DynamicNNBData(Meas):
     """Динамические замеры ННБ"""
-    depth = models.FloatField('глубина')
-    corner = models.FloatField('угол', null=True)
-    azimut = models.FloatField('азимут', null=True)
-    run = models.ForeignKey(Run, on_delete=models.CASCADE, null=True)
 
     def __str__(self):
         return f"Глубина {self.depth}"
@@ -74,13 +97,8 @@ class DynamicNNBData(models.Model):
         db_table = 'meas_dynamic_NNB'
 
 
-class StaticNNBData(models.Model):
+class StaticNNBData(Meas):
     """Статические замеры ННБ"""
-    depth = models.FloatField('глубина')
-    corner = models.FloatField('угол', null=True)
-    azimut = models.FloatField('азимут', null=True)
-    comment = models.TextField('комментарий', null=True)
-    run = models.ForeignKey(Run, on_delete=models.CASCADE, null=True)
 
     def __str__(self):
         return f"Глубина {self.depth}"
@@ -92,12 +110,8 @@ class StaticNNBData(models.Model):
         db_table = 'meas_static_NNB'
 
 
-class IgirgiStatic(models.Model):
+class IgirgiStatic(Meas):
     """Статические замеры ИГИРГИ"""
-    depth = models.FloatField('глубина')
-    corner = models.FloatField('угол', null=True)
-    azimut = models.FloatField('азимут', null=True)
-    run = models.ForeignKey(Run, on_delete=models.CASCADE, null=True)
     comment = models.TextField('комментарий', null=True)
 
     def __str__(self):
@@ -110,12 +124,8 @@ class IgirgiStatic(models.Model):
         db_table = 'meas_static_igirgi'
 
 
-class IgirgiDynamic(models.Model):
+class IgirgiDynamic(Meas):
     """Динамические замеры ИГИРГИ"""
-    depth = models.FloatField('глубина')
-    corner = models.FloatField('угол', null=True)
-    azimut = models.FloatField('азимут', null=True)
-    run = models.ForeignKey(Run, on_delete=models.CASCADE, null=True)
 
     def __str__(self):
         return f"Глубина {self.depth}"
@@ -127,11 +137,8 @@ class IgirgiDynamic(models.Model):
         db_table = 'meas_dynamic_igirgi'
 
 
-class Raw(models.Model):
-    depth = models.FloatField('глубина')
-    corner = models.FloatField('угол', null=True)
-    azimut = models.FloatField('азимут', null=True)
-    run = models.ForeignKey(Run, on_delete=models.CASCADE, null=True)
+class Raw(Meas):
+    """Сырые данные полученные до обработки"""
 
     def __str__(self):
         return f"Глубина {self.depth}"
@@ -170,4 +177,5 @@ class InterpPlan(Meas):
 
 
 def get_run_by_id(run_id):
+    """Нужно будет убрать"""
     return Run.objects.get(id=run_id)

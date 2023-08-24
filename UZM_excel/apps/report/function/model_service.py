@@ -21,7 +21,7 @@ def get_data(runs: Union[object, Iterable[object]]) -> dict:
                 'Динамические замеры ИГИРГИ': IgirgiDynamic.objects.filter(run=run),
                 }
         if run.section.wellbore.igirgi_drilling:
-            data['Плановая траектория'] = InterpPlan.objects.filter(run=run)
+            data['Плановая траектория интерп'] = InterpPlan.objects.filter(run=run)
     else:
         data = {'Статические замеры ИГИРГИ': IgirgiStatic.objects.filter(run__in=runs),
                 'Динамические замеры ННБ': DynamicNNBData.objects.filter(run__in=runs),
@@ -30,7 +30,7 @@ def get_data(runs: Union[object, Iterable[object]]) -> dict:
                 'Динамические замеры ИГИРГИ': IgirgiDynamic.objects.filter(run__in=runs),
                 }
         if runs[0].section.wellbore.igirgi_drilling:
-            data['Плановая траектория'] = InterpPlan.objects.filter(run__in=runs)
+            data['Плановая траектория интерп'] = InterpPlan.objects.filter(run__in=runs)
 
     del_key = list()
     # преобразуем queryset в словарь с листами (3 отдельных массива - Глубина, Угол, Азимут)
@@ -76,6 +76,35 @@ def get_data(runs: Union[object, Iterable[object]]) -> dict:
         data['Статические замеры ННБ']['Глубина'] = [0, *data['Статические замеры ННБ']['Глубина']]
         data['Статические замеры ННБ']['Угол'] = [0, *data['Статические замеры ННБ']['Угол']]
         data['Статические замеры ННБ']['Азимут'] = [0, *data['Статические замеры ННБ']['Азимут']]
+
+    return data
+
+
+def get_single_traj(dtype: str, wellbore: object) -> dict:
+    """Делает то же самое что функция выше, но для одного типа замеров"""
+    runs = Run.objects.filter(section__wellbore=wellbore)
+
+    if dtype == 'staticIgirgi':
+        queryset = IgirgiStatic.objects.filter(run__in=runs)
+    if dtype == 'dynamicNNB':
+        queryset = DynamicNNBData.objects.filter(run__in=runs)
+    if dtype == 'staticNNB':
+        queryset = StaticNNBData.objects.filter(run__in=runs)
+    if dtype == 'plan':
+        if wellbore.igirgi_drilling:
+            queryset = InterpPlan.objects.filter(run__in=runs)
+        else:
+            queryset = Plan.objects.filter(run__in=runs)
+    if dtype == 'dynamicIgirgi':
+        queryset = IgirgiDynamic.objects.filter(run__in=runs)
+
+    data = {'Глубина': list(),
+            'Угол': list(),
+            'Азимут': list(), }
+    for meas in queryset:
+        data['Глубина'].append(meas.depth)
+        data['Угол'].append(meas.corner)
+        data['Азимут'].append(meas.azimut)
 
     return data
 
