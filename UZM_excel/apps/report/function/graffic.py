@@ -14,7 +14,7 @@ file_dir = os.getcwd() + "\\Files"
 
 def getGorizontalAxes(Inc1, Inc2, Az1, Az2, deltaMD):
     """
-    Получаем шаг по X,Y,Z для горизонтальной проекции
+    Получаем шаг по X, Y, Z для горизонтальной проекции
     """
     dInc = math.radians(Inc2 - Inc1)
     dAzim = math.radians(Az2 - Az1)
@@ -125,6 +125,21 @@ data_name = {'igirgi_file': 'Статические замеры ИГИРГИ',
              }
 
 
+# TODO получаем QueryDict и преобразовываем в словарь листов
+def single_data_graph(data, wellbore: object) -> dict:
+    """ Значения для графиков проекции одиночные (берём индивидуально под тип траектории)"""
+    well = wellbore.well_name
+    # для траектории
+    RKB = (84 if well.RKB is None else well.RKB)
+    VSaz = (1 if well.VSaz is None else well.VSaz)
+    x1, y1, x2, y2, z = get_graph_data(I=data['Угол'],
+                                       A=data['Азимут'],
+                                       Depth=data['Глубина'],
+                                       RKB=RKB,
+                                       VSaz=VSaz)
+    return x1, y1, x2, y2
+
+
 def get_graphics(all_data: dict, wellbore: object) -> dict:
     """
     Строит график, сохраняет его в /Report_out/1.png
@@ -172,7 +187,7 @@ def get_graphics(all_data: dict, wellbore: object) -> dict:
     ax1.plot(x1, y1, 'g', label='Плановая траектория')
     ax2.plot(x2, y2, 'g', label='Плановая траектория')
 
-    if wellbore.igirgi_drilling: # подмена отходов при бурении на основе плана
+    if wellbore.igirgi_drilling:  # подмена отходов при бурении на основе плана
         EW_nnb = x1[-1]  # EW для отходов
         NS_nnb = y1[-1]  # NS для отходов
         data_dict['nnb_TVD'] = copy.deepcopy(z)

@@ -97,7 +97,8 @@ def write_data_in_Excel(all_data: dict, filename: str, short_type: int, Run: obj
     excel_file = openpyxl.load_workbook(file_folder)
     # print(all_data['Статические замеры ННБ'])  для отладки
     # print(all_data['Статические замеры ИГИРГИ'])
-    second_data = all_data['Статические замеры ННБ'] if not wellbore.igirgi_drilling else all_data['Плановая траектория']
+    second_data = all_data['Статические замеры ННБ'] if not wellbore.igirgi_drilling else\
+        all_data['Плановая траектория интерп']
     # если бурим по траектории ИГиРГИ заменяем замеры ннб на план
     hor, ver, common = write_data(excel_file,  # горизонтальные, вертикальные, общие отходы
                                   second_data,

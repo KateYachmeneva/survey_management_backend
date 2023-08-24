@@ -32,8 +32,14 @@
 {% endblock %}
 
 {% block data %}
+<h3>{{context.selected_run}} | Активная фаза:
+    {% if context.selected_run.section.wellbore.well_name.status_drilling == 'ACTV'%}
+    <img src="{% static 'image/grey.png' %}" alt="Не в активной фазе" style="width: 25px; height: 25px;">
+    {% else %}
+    <img src="{% static 'image/orange.png' %}" alt="Не в активной фазе" style="width: 25px; height: 25px;">
+    {% endif %}</h3>
 <center>
-    <h3>{{context.selected_run}}</h3>
+
     <div class="container" style="max-width:None;">
         <div class="row">
             <div class="col-12">

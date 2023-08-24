@@ -86,35 +86,4 @@ target/
 
 
 ### Django ###
-*.log
-*.pot
-*.pyc
-__pycache__/
-local_settings.py
-*.pyc
-UZM_excel/__pycache__/urls.cpython-310.pyc
-UZM_excel/__pycache__/settings.cpython-310.pyc
-UZM_excel/apps/data_handler/__pycache__/urls.cpython-310.pyc
-*.pyc
-*.pyc
-UZM_excel/apps/data_handler/__pycache__/views.cpython-310.pyc
-UZM_excel/apps/excel_parcer/__pycache__/admin.cpython-310.pyc
-UZM_excel/apps/excel_parcer/__pycache__/models.cpython-310.pyc
-UZM_excel/apps/excel_parcer/__pycache__/urls.cpython-310.pyc
-UZM_excel/apps/excel_parcer/__pycache__/views.cpython-310.pyc
-*.pyc
-*.pyc
-*.pyc
-*.pyc
-*.pyc
-*.pyc
-*.pyc
-*.pyc
-*.pyc
-*.pyc
-*.pyc
-*.pyc
-UZM_excel/apps/report/__pycache__/admin.cpython-310.pyc
-UZM_excel/apps/report/__pycache__/models.cpython-310.pyc
-*.pyc
-UZM_excel/apps/report/__pycache__/views.cpython-310.pyc
+
