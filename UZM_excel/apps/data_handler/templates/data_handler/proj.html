@@ -472,42 +472,21 @@ document.getElementById('sbtnVer').click();
 
 <!--  Сохраняем параметры графика  -->
 function save_params(){
-    const horForm = new FormData(document.getElementById('formH'));
-    const verForm = new FormData(document.getElementById('formV'));
+    let params = new FormData(document.getElementById('formH'));
+    params.append("ver_x_min", document.getElementById('minVsect').value)
+    params.append("ver_x_max", document.getElementById('maxVsect').value)
+    params.append("ver_x_del", document.getElementById('stepVsect').value)
+    params.append("ver_y_min", document.getElementById('minTVDSS').value)
+    params.append("ver_y_max", document.getElementById('maxTVDSS').value)
+    params.append("ver_y_del", document.getElementById('stepTVDSS').value)
+
 
     fetch('http://'+window.location.hostname+':'+window.location.port+'/report/api/projection_param/'+sessionStorage.getItem('wellbore_id'),
-         { method: 'POST', body: horForm })
+         { method: 'POST', body: params })
          .then(response=>response.json()).
           then(data=>{
           console.log(data);
           });
-
-    fetch('http://'+window.location.hostname+':'+window.location.port+'/report/api/projection_param/'+sessionStorage.getItem('wellbore_id'),
-         { method: 'POST', body: verForm })
-         .then(response=>response.json()).
-          then(data=>{
-          console.log(data);
-          });
-
-<!--    -->
-<!--    &lt;!&ndash;  Проверка полей формы с параметрами для горизонтальной проекции  &ndash;&gt;-->
-<!--    for(let [name, value] of horForm){-->
-<!--        if(value==''){-->
-<!--        alert('Заполните все поля для горизонтальной проекции!');-->
-<!--        break;-->
-<!--        };-->
-<!--    }-->
-
-<!--    &lt;!&ndash;  Проверка полей формы с параметрами для вертикальной проекции  &ndash;&gt;-->
-<!--    for(let [name, value] of verForm){-->
-<!--        if(value==''){-->
-<!--        alert('Заполните все поля для вертикальной проекции!');-->
-<!--        break;-->
-<!--        };-->
-<!--    }-->
-
-
-
 
 }
 

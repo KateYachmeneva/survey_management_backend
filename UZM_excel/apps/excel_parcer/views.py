@@ -8,7 +8,7 @@ from django.http import JsonResponse, HttpResponse
 import re
 from Field.views_api import get_tree
 from Field.models import Well, Run, Wellbore, Run, get_all_run, Section, get_all_well
-from .models import Data, TelesystemIndex, Device
+from .models import Data, AxesFileIndex, Device
 
 
 def index(request):
@@ -68,7 +68,7 @@ def index(request):
             result = zip(manually_depth, manually_gx, manually_gy, manually_gz, manually_bx, manually_by, manually_bz)
             # print(list(result))
             if request.POST.get('device') != '-----' and request.POST.get('device') != '':
-                telesystem_ind = TelesystemIndex.objects.get(run_id=current_run)
+                telesystem_ind = AxesFileIndex.objects.get(run_id=current_run)
                 telesystem_ind.device = Device.objects.get(device_title=request.POST.get('device'))
                 telesystem_ind.save()
                 result2 = new_measurements(list(result), request.POST.get('device'))  # перобразованные данные
@@ -168,7 +168,7 @@ def settings(request):
                          'units': request.POST.get('inp_measurement'),
                          'string_index': request.POST.get('inp_import'),
                          'device': Device.objects.get(device_title=request.POST.get('device'))}
-        TelesystemIndex.objects.update_or_create(run=request.POST.get('run_id'), defaults=update_values)
+        AxesFileIndex.objects.update_or_create(run=request.POST.get('run_id'), defaults=update_values)
     return render(request, 'excel_parcer/settings.html', {'context': context, })
 
 
@@ -246,7 +246,7 @@ def uploadAxesFile(request):
             fs = FileSystemStorage()
             file_name = fs.save(doc.name, doc)
             current_run = Run.objects.get(id=request.POST.get('run_id'))
-            telesystem = TelesystemIndex.objects.get(run=current_run)
+            telesystem = AxesFileIndex.objects.get(run=current_run)
             result = parcing_manually("./media/" + file_name,
                                       telesystem.depth,
                                       telesystem.GX,
@@ -309,7 +309,7 @@ def get_run_index(request):
     """
     # print(request.POST.get('run_id'))
     if request.method == 'POST':
-        telesystem_tuple = TelesystemIndex.objects.get_or_create(run=Run.objects.get(id=request.POST.get('run_id')))
+        telesystem_tuple = AxesFileIndex.objects.get_or_create(run=Run.objects.get(id=request.POST.get('run_id')))
         telesystem_index = telesystem_tuple[0]
         try:
             return JsonResponse({

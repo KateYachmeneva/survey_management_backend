@@ -66,13 +66,13 @@ def parcing_manually(path, manually_depth, manually_gx, manually_gy, manually_gz
                 f.readline()  # считываем ненужные строки
             for raw in f.readlines():
                 raw_list = raw.replace('\n', '').replace('\t', ',').split(sep=',')
-                if len(raw_list) == 0:  # в строке отсутсвует разделитель
+                if len(raw_list) < 7:  # в строке отсутствует разделитель
                     continue
                 for d_index, n_index in enumerate(index_List):
                     try:
                         data[d_index].append(float(raw_list[int(n_index) - 1]))
                     except Exception as e:
-                        print(f'Ошибка индексов/неподдерживаемый формат txt (РАЗДЕЛИТЕЛЬ ,) файл с ошибкой: {path}')
+                        print(f'Ошибка индексов при считывании, файл: {path}')
                         print(e)
     elif 'sur' in re.findall(r".(sur)", path):
         index_List = [manually_bz, manually_by, manually_bx, manually_gz, manually_gy, manually_gx, manually_depth]
@@ -287,9 +287,13 @@ def write_to_bd(data: list[list], run: object) -> NoReturn:
     """
     update_obj = list()
     for rows in data:
-        if len(rows) < 7:  # проверка на наличие всех осей
-            continue
-        if rows[0] < 0:  # глубина не может быть отрицательной
+        try:
+            if len(rows) < 7:  # проверка на наличие всех осей
+                continue
+            if float(rows[0]) < 0:  # глубина не может быть отрицательной
+                continue
+        except Exception as e:
+            print(e)
             continue
         bd_data = Data.objects.get_or_create(depth=rows[0], run=run)
         update_obj.append(bd_data[0])

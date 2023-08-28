@@ -150,7 +150,7 @@ class Data(models.Model):
         return int(hstf)
 
 
-class TelesystemIndex(models.Model):
+class AxesFileIndex(models.Model):
     """Индексы под загружаемые файлы осей"""
     GX = models.CharField('GX', max_length=4)
     GY = models.CharField('GY', max_length=4)

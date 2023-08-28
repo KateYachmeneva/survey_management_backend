@@ -6,7 +6,8 @@ from rest_framework import routers
 
 
 urlpatterns = [
-    path('api/telesystem_coef/<int:run_id>', TelesystemCoefApiView.as_view()),
+    path('api/telesystem', DeviceListView.as_view({'get': 'list'})),
+    path('api/telesystem/<int:run_id>', DeviceCoefApiView.as_view()),
     path('api/meas/run/<int:run_id>/', DataByRunAPIView.as_view()),
     path('api/meas/<int:pk>/', DataViewSet.as_view({'get': 'retrieve', 'post': 'create', 'put': 'update',
                                                     'delete': 'destroy'})),

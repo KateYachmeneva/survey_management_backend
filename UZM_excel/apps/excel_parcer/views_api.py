@@ -1,8 +1,10 @@
 # Viewsets - все миксины с добавлением, удалением, редактированием, выбором
 from django.utils.decorators import method_decorator
+from django.views.generic import ListView
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework import viewsets
+from rest_framework.decorators import action
 
 from .function.functions import new_measurements, write_to_bd
 from .function.model_service import clone_wellbore_axes
@@ -16,14 +18,25 @@ from rest_framework.views import APIView
 from Field.models import Run
 
 
-class TelesystemCoefApiView(APIView):
-    """ Коэффициенты телесистемы """
+class DeviceListView(viewsets.ViewSet):
+    """ Получить все телесистемы с коэффициентами """
+    queryset = Device.objects.all()
+    serializer_class = DeviceSerializer
+
+    @swagger_auto_schema(tags=['Телесистема'], operation_summary="Получить все телесистемы", )
+    def list(self, request):
+        serializer = DeviceSerializer(self.queryset, many=True)
+        return Response(serializer.data)
+
+
+class DeviceCoefApiView(APIView):
+    """ Коэффициенты телесистемы по id рейса """
 
     @swagger_auto_schema(tags=['Телесистема'],
                          operation_summary="Получить коэффициенты телесистемы по id рейса", )
     def get(self, request, run_id):
         try:
-            d = TelesystemIndex.objects.get(run=run_id).device
+            d = AxesFileIndex.objects.get(run=run_id).device
             return JsonResponse({'device_title': d.device_title,
                                  'CX': d.CX,
                                  'CY': d.CY,
@@ -36,7 +49,7 @@ class TelesystemCoefApiView(APIView):
             return JsonResponse({'status': 'Коэффициенты не найдены'})
 
     @swagger_auto_schema(tags=['Телесистема'],
-                         operation_summary="Записать коэффициенты телесистемы",
+                         operation_summary="Записать новые коэффициенты по id рейса",
                          request_body=openapi.Schema(
                              type=openapi.TYPE_OBJECT,
                              properties={
@@ -57,7 +70,7 @@ class TelesystemCoefApiView(APIView):
             run = Run.objects.get(id=run_id)
         except:
             return JsonResponse({'status': f'Рейс с id {run_id} не найден'})
-        t = TelesystemIndex.objects.get_or_create(run=run)
+        t = AxesFileIndex.objects.get_or_create(run=run)
         if t[0].device is None:
             d = Device.objects.create(device_title=request.POST['device_title'],
                                       CX=request.POST['CX'],

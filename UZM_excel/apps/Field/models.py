@@ -111,6 +111,12 @@ class Pad(models.Model):
 class Well(models.Model):
     """Скважина"""
     well_name = models.CharField('Скважина', max_length=20)
+    pad_name = models.ForeignKey(
+        Pad,
+        on_delete=models.CASCADE,
+        verbose_name='Куст',
+        related_name='wells'
+    )
     active_from = models.FloatField('Глубина начала активной фазы, м', null=True, blank=True)
     WELL_STATUS_CHOICES = [
         ('PLAN', 'Планируется'),
@@ -143,12 +149,6 @@ class Well(models.Model):
         choices=choices.WELL_TYPE_CHOICES,
         null=True,
         blank=True
-    )
-    pad_name = models.ForeignKey(
-        Pad,
-        on_delete=models.CASCADE,
-        verbose_name='Куст',
-        related_name='wells'
     )
     RKB = models.FloatField('Альтитуда стола ротора, м', null=True, blank=True, default=84)
     VSaz = models.FloatField('Азимут вертикальной секции', null=True, blank=True, default=1,
@@ -280,6 +280,7 @@ class Wellbore(models.Model):
         choices=choices.WELLBORE_CHOICES,
     )
     igirgi_drilling = models.BooleanField('Бурение по траектории ИГиРГИ', default=False, blank=True)
+    current_depth = models.FloatField('Текущая глубина, м', null=True, blank=True)
 
     def get_choices(self):
         """Для выпадающих меню"""

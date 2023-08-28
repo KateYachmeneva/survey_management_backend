@@ -119,9 +119,23 @@ class FieldSerializer(serializers.ModelSerializer):
 
 
 class RunSerializer(serializers.ModelSerializer):
+    section_name = serializers.SerializerMethodField(read_only=True)
+
     class Meta:
         model = Run
         fields = '__all__'
+        extra_kwargs = {
+            'section_id': {'source': 'section', 'read_only': True},
+        }
+
+    def get_section_name(self, obj):
+        """Для section name"""
+        try:
+            obj.section
+            return str(obj.section.section)
+        except:
+            return 'None'
+
 
 
 class SectionSerializer(serializers.ModelSerializer):

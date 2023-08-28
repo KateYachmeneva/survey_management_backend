@@ -127,11 +127,12 @@
                 <table class="table table-light table-sm table-bordered table-hover" style="">
                     <thead class="thead-dark">
                     <tr>
-                        <th scope="col" colspan="2">Разница</th>
+                        <th scope="col" colspan="3">Разница</th>
                         <th scope="col" colspan="3">Отходы</th>
                         <th scope="col" style="width: 240px;" rowspan="2">Комментарии</th>
                     </tr>
                     <tr>
+                        <th scope="col" style="font-size:0.8em">∆Глубина</th>
                         <th scope="col" style="font-size:0.8em">∆Угол</th>
                         <th scope="col" style="font-size:0.8em">∆Азимут</th>
                         <th scope="col" style="font-size:0.8em">По горизонтали</th>
@@ -184,6 +185,7 @@
                     <tbody>
                     {% for ind in context.waste_index %}
                     <tr>
+                        <td id="delta_depth{{ forloop.counter0 }}" name="delta0"></td>
                         <td id="delta_cor{{ forloop.counter0 }}" name="delta1"></td>
                         <td id="delta_azimut{{ forloop.counter0 }}" name="delta2"></td>
                         <td name="waste1">{{ context.waste_hor|index:ind|formatted_float }}</td>
@@ -394,6 +396,14 @@
                                 <label class="col-form-label">Лист:</label></a>
                                 <input type="text" class="form-control" name="nnb_list_name">
                             </div>
+                            <div class="form-group">
+                                <a class="tooltip-test" title="При активном флаге последний замер из файла не загружается.">
+                                <label class="col-form-label">Настройки чтения</label></a>
+                                <div class="form-control">
+                                    <input class="form-check-input" type="checkbox" value="" id="proj">
+                                    <label class="form-check-label">Исключить проекцию на забой</label>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -539,8 +549,18 @@ function send_nnb_index(){
          });
 }
 
-<!-- Загрзка страницы / Расчет углов-->
+<!-- Загрзка страницы / Расчет разницы гулбина/углов/азимутов-->
 window.addEventListener('load', () => {
+
+    <!--  Разность глубин  -->
+    document.getElementsByName('delta0').forEach(function(element, ind){
+        let dif = (parseFloat(document.getElementById('igirgi_depth'+ind).innerHTML.replace(",", "."))-
+        parseFloat(document.getElementById('nnb_depth'+ind).innerHTML.replace(",", "."))).toFixed(2);
+        element.innerHTML = dif;
+        if(Math.abs(dif) > 0){
+            element.style.backgroundColor = '#facfcf';}
+        })
+
     <!--  Разность углов  -->
     document.getElementsByName('delta1').forEach(function(element, ind){
         let dif = (parseFloat(document.getElementById('igirgi_cor'+ind).innerHTML.replace(",", "."))-

@@ -1,5 +1,6 @@
 # Viewsets - все миксины с добавлением, удалением, редактированием, выбором
 from django.utils.decorators import method_decorator
+from django.views.decorators.csrf import csrf_exempt
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework import viewsets
@@ -69,12 +70,12 @@ class ProjectionParamView(APIView):
                 w = Wellbore.objects.get(id=wellbore_id)
             except Exception as e:
                 return Response({'warning': 'Ствол с указанным id не существует!'})
-            obj = ProjectionParam.objects.get_or_create(wellbore=w)
 
+        obj = ProjectionParam.objects.get_or_create(wellbore=w)
+        print(request.POST.dict())
         # проверка на наличие коэффициентов
         hor = True
         ver = True
-        print(request.POST.dict())
         hor_x_min = request.POST.get('hor_x_min')
         hor_x_max = request.POST.get('hor_x_max')
         hor_x_del = request.POST.get('hor_x_del')
@@ -82,7 +83,7 @@ class ProjectionParamView(APIView):
         hor_y_max = request.POST.get('hor_y_max')
         hor_y_del = request.POST.get('hor_y_del')
 
-        if None in (hor_x_min, hor_x_max, hor_x_del, hor_y_min, hor_y_max, hor_y_del):
+        if None or '' in (hor_x_min, hor_x_max, hor_x_del, hor_y_min, hor_y_max, hor_y_del):
             hor = False
         else:
             obj[0].hor_x_min = hor_x_min
@@ -99,7 +100,7 @@ class ProjectionParamView(APIView):
         ver_y_max = request.POST.get('ver_y_max')
         ver_y_del = request.POST.get('ver_y_del')
 
-        if None in (ver_x_min, ver_x_max, ver_x_del, ver_y_min, ver_y_max, ver_y_del):
+        if None or '' in (ver_x_min, ver_x_max, ver_x_del, ver_y_min, ver_y_max, ver_y_del):
             ver = False
         else:
             obj[0].ver_x_min = ver_x_min
@@ -112,6 +113,7 @@ class ProjectionParamView(APIView):
         if not ver and not hor:
             return Response({'warning': 'Не заполнены обязательные параметры!'})
 
+        print(obj)
         obj[0].save()
         return Response({'status': 'ок'})
 

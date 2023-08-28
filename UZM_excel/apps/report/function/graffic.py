@@ -9,6 +9,8 @@ import matplotlib
 import matplotlib.pyplot as plt
 import numpy as np
 
+from ..models import ProjectionParam
+
 file_dir = os.getcwd() + "\\Files"
 
 
@@ -188,6 +190,12 @@ def get_graphics(all_data: dict, wellbore: object) -> dict:
     ax2.plot(x2, y2, 'g', label='Плановая траектория')
 
     if wellbore.igirgi_drilling:  # подмена отходов при бурении на основе плана
+        data = all_data['Плановая траектория интерп']
+        x1, y1, x2, y2, z = get_graph_data(I=data['Угол'],
+                                           A=data['Азимут'],
+                                           Depth=data['Глубина'],
+                                           RKB=RKB,
+                                           VSaz=VSaz)
         EW_nnb = x1[-1]  # EW для отходов
         NS_nnb = y1[-1]  # NS для отходов
         data_dict['nnb_TVD'] = copy.deepcopy(z)
@@ -266,9 +274,31 @@ def get_graphics(all_data: dict, wellbore: object) -> dict:
         ext_dict['min_x'] -= (delta_y - delta_x) / 2
         additional_delta = delta_y / (step * 2)
 
-    # создаем квадратную сетку
-    ax1.set_xlim(ext_dict['min_x'] - additional_delta, ext_dict['max_x'] + additional_delta)
-    ax1.set_ylim(ext_dict['min_y'] - additional_delta, ext_dict['max_y'] + additional_delta)
+    # строим график по заданным границам, если они есть
+    try:
+        graph_param = ProjectionParam.objects.get(wellbore=wellbore)
+    except ProjectionParam.DoesNotExist:
+        graph_param = None
+
+    if graph_param is not None:
+        if None not in (graph_param.hor_x_min, graph_param.hor_x_max):
+            ax1.set_xlim(graph_param.hor_x_min, graph_param.hor_x_max)
+        else:
+            ax1.set_xlim(ext_dict['min_x'] - additional_delta, ext_dict['max_x'] + additional_delta)
+        if None not in (graph_param.hor_y_min, graph_param.hor_y_max):
+            ax1.set_ylim(graph_param.hor_y_min, graph_param.hor_y_max)
+        else:
+            ax1.set_ylim(ext_dict['min_y'] - additional_delta, ext_dict['max_y'] + additional_delta)
+
+        if None not in (graph_param.ver_x_min, graph_param.ver_x_max):
+            ax2.set_xlim(graph_param.ver_x_min, graph_param.ver_x_max)
+
+        if None not in (graph_param.ver_y_min, graph_param.ver_y_max):
+            ax2.set_ylim(graph_param.ver_y_min, graph_param.ver_y_max)
+    else:
+        # создаем квадратную сетку
+        ax1.set_xlim(ext_dict['min_x'] - additional_delta, ext_dict['max_x'] + additional_delta)
+        ax1.set_ylim(ext_dict['min_y'] - additional_delta, ext_dict['max_y'] + additional_delta)
 
     ax1.set_xlabel('Запад/Восток')
     ax1.set_ylabel('Юг/Север')
