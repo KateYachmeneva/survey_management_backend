@@ -35,7 +35,7 @@
     <div class="col-5" style="text-align: right;">
         {% block top_button%}
         <br>
-        {% if context.selected_run is not None %}
+        {% if context.selected_obj is not None %}
         <!--    Кнопка отвечает за загрузку плановой траектории    -->
         {% if context.plan_ex == True %}
         <button type="button" class="btn btn-secondary" data-toggle="modal" data-target="#data_Modal2" data-run="{{context.selected_obj}}">

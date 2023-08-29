@@ -1,10 +1,11 @@
 .scroll-table-body {
-	height: 37em;
-	width: 100%;
-	overflow-y: auto;
+	height: 32em;
+	width: 99%;
+	overflow-y: scroll;
 	overflow-x: hidden;
 }
 
+/* Для страницы с параметарми! */
 .scroll-body {  /*Скрол по аналогии с таблице для div*/
 	height: 44em;
 	width: 100%;
@@ -13,7 +14,7 @@
 }
 
 .scroll-table-head {
-	width: 99%;
+	width: 98%;
 }
 
 .scroll-table table {
@@ -34,8 +35,6 @@
 @media screen and (min-width: 2200px) {
     .scroll-table-body {
 	height: 47em;
-	width: 100%;
-	overflow-y: auto;
 	overflow-x: hidden;
     }
 
@@ -51,8 +50,6 @@
 @media screen and (min-width: 3200px) {
     .scroll-table-body {
 	height: 75em;
-	width: 100%;
-	overflow-y: auto;
 	overflow-x: hidden;
     }
 

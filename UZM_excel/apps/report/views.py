@@ -49,13 +49,14 @@ def run_index(request):
 def update_index(request):
     """Функция для fetch запроса ля обнавления индексов под считывание файлов"""
     if request.method == 'POST':
-        print(request.POST.dict())
+        # print(request.POST.dict())
         obj = ReportIndex.objects.get_or_create(run=Run.objects.get(id=request.POST['run']))
         obj[0].nnb_static_depth = request.POST['nnb_depth']
         obj[0].nnb_static_corner = request.POST['nnb_corner']
         obj[0].nnb_static_azimut = request.POST['nnb_azimut']
         obj[0].nnb_static_list_name = request.POST['nnb_list_name']
         obj[0].nnb_static_read = request.POST['nnb_str']
+        obj[0].nnb_static_exclude_proj = (True if request.POST.get('nnb_exclude_proj') is not None else False)
         obj[0].save()
         return JsonResponse({'status': 'ok'})
     return JsonResponse({'Warning_Text': 'нужно обращение к post методу'})
@@ -115,9 +116,11 @@ def traj_del(request):
         if 'igirgi' in key:
             igirgi_meas = IgirgiStatic.objects.get(id=value)
             try:
-                InterpPlan.objects.get(run=igirgi_meas.run, depth=igirgi_meas.depth).delete()
-            finally:
-                igirgi_meas.delete()
+                interp_plan = InterpPlan.objects.get(run=igirgi_meas.run, depth=igirgi_meas.depth)
+                interp_plan.delete()
+            except InterpPlan.DoesNotExist:
+                pass
+            igirgi_meas.delete()
         elif 'nnb' in key:
             if request.POST.get('type') == 'plan':
                 InterpPlan.objects.get(id=value).delete()

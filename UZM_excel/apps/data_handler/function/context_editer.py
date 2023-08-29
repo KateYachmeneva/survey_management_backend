@@ -1,6 +1,9 @@
 from typing import Type
 from multipledispatch import dispatch
 
+from report.models import IgirgiStatic, StaticNNBData
+
+
 # from Field.models import Run, Well
 #
 #
@@ -21,3 +24,5 @@ from multipledispatch import dispatch
 #         context['selected_field'] = well.pad_name.field.field_name
 #         context['selected_pad'] = well.pad_name.pad_name
 #         # context['selected_well'] = well.well_name
+
+

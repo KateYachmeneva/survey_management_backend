@@ -42,13 +42,13 @@ def traj(request):
             try:
                 run = Run.objects.get(id=run_id)
                 context['title'] = run.section.wellbore.well_name.get_title()
-            except:  # если не нашли рейс возвращаем пустую страницу
+            except Run.DoesNotExist:  # если не нашли рейс возвращаем пустую страницу
                 return render(request, 'data_handler/trajectories.html', {'context': context, })
 
             context['selected_obj'] = run  # для отображения текущей модели на странице (текст)
 
             # Ищем план, формируем контекст для письма
-            runs = Run.objects.filter(section__wellbore=run.section.wellbore)
+            runs = Run.objects.filter(section__wellbore=run.section.wellbore).order_by('run_number')
             plan_data = Plan.objects.filter(run__in=runs)
             context["plan_ex"] = (True if len(plan_data) != 0 else False)
             context["plan_version"] = (plan_data[0].plan_version if context["plan_ex"] else '-')
@@ -66,6 +66,13 @@ def traj(request):
             else:
                 context["nnb_data"] = StaticNNBData.objects.filter(run=run_id)
 
+            # Последний замер прошлого рейса (Ближайший замер)
+            for i, r in enumerate(runs):
+                if run == r and run != runs[0]:
+                    context["previous_igirgi_meas"] = IgirgiStatic.objects.filter(run=runs[i-1]).latest('depth')
+                    objs = InterpPlan if run.section.wellbore.igirgi_drilling else StaticNNBData
+                    context["previous_nnb_meas"] = objs.objects.filter(run=runs[i - 1]).latest('depth')
+
             # Отходы
             context["waste_hor"], context["waste_vert"], context["waste_common"] = waste(run.section.wellbore, 1)
             # Индексы отходов (Какие отходы выводить)
@@ -80,7 +87,7 @@ def traj(request):
                     if data in context['igirgi_data'] and ind < len(StaticNNBData.objects.filter(
                             run__section__wellbore=run.section.wellbore).order_by('depth')):
                         context["waste_index"].append(ind)
-
+            context["waste_index_0"] = context["waste_index"][0]-1 if (context["waste_index"][0]-1) > 0 else 0
     if request.method == 'POST':
         run = Run.objects.get(id=request.GET.get('run_id'))
         context['title'] = run.section.wellbore.well_name.get_title()

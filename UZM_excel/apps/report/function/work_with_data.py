@@ -485,11 +485,11 @@ def work_with_nnb(request: dict, run: object) -> bool:
     nnb_file = request.FILES['file']
     path = fs.save('nnb_' + nnb_file.name, nnb_file)
     data = reader('nnb_file', path, ReportIndex.objects.get(run=run).id)  # берём данные с плана
-    bd_Write_static_nnb(data['Статические'], run)
+    bd_Write_static_nnb(data['Статические'], run, ReportIndex.objects.get(run=run).nnb_static_exclude_proj)
     return True
 
 
-def bd_Write_static_nnb(data_dict: dict, run: object) -> NoReturn:
+def bd_Write_static_nnb(data_dict: dict, run: object, exclude_proj: bool = False) -> NoReturn:
     """Записываем считанные данные траектории ннб в бд
     """
     updat_obj = []
@@ -497,9 +497,12 @@ def bd_Write_static_nnb(data_dict: dict, run: object) -> NoReturn:
 
     for meas in list(zip(data_dict['Глубина'], data_dict['Угол'], data_dict['Азимут'])):
         # print(meas)
+        if exclude_proj and meas[0] == data_dict['Глубина'][-1]:  # не записываем последнмй замер
+            continue
         db_meas = model.objects.get_or_create(depth=meas[0], run=run)
         updat_obj.append(db_meas[0])
         db_meas[0].corner = meas[1]
         db_meas[0].azimut = meas[2]
+
     model.objects.bulk_update(updat_obj, ['corner', 'azimut'])
 

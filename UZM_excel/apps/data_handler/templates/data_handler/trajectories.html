@@ -103,6 +103,14 @@
                         <th scope="col" style="font-size:0.8em">Азимут</th>
                     </tr>
                     </thead>
+                    <tbody>
+                    <tr>
+                        <td scope="col" id="nnb_depth" >{{context.previous_nnb_meas.depth|formatted_float}}</td>
+                        <td scope="col" id="nnb_corner">{{context.previous_nnb_meas.corner|formatted_float}}</td>
+                        <td scope="col" id="nnb_azimut">{{context.previous_nnb_meas.azimut|formatted_float}}</td>
+                    </tr>
+                    </tbody>
+
                 </table>
             </div>
             {% endblock %}
@@ -119,6 +127,14 @@
                         <th scope="col" style="font-size:0.8em">Азимут</th>
                     </tr>
                     </thead>
+
+                    <tbody>
+                    <tr>
+                        <td scope="col" id="igirgi_depth" >{{context.previous_igirgi_meas.depth|formatted_float}}</td>
+                        <td scope="col" id="igirgi_corner">{{context.previous_igirgi_meas.corner|formatted_float}}</td>
+                        <td scope="col" id="igirgi_azimut">{{context.previous_igirgi_meas.azimut|formatted_float}}</td>
+                    </tr>
+                    </tbody>
                 </table>
             </div>
             {% endblock %}
@@ -140,6 +156,18 @@
                         <th scope="col" style="font-size:0.8em">Общий</th>
                     </tr>
                     </thead>
+
+                    <tbody>
+                    <tr>
+                        <td id="delta_depth" scope="col" style="width: 10em; text-align: center; vertical-align: middle; font-weight: normal;">X</td>
+                        <td id="delta_corner" scope="col" style="width: 10em; text-align: center; vertical-align: middle; font-weight: normal;">X</td>
+                        <td id="delta_azimut" scope="col" style="width: 10em; text-align: center; vertical-align: middle; font-weight: normal;">X</td>
+                        <th scope="col" style="width: 10em; text-align: center; vertical-align: middle; font-weight: normal;">{{ context.waste_hor|index:context.waste_index_0|formatted_float }}</td></th>
+                        <th scope="col" style="width: 10em; text-align: center; vertical-align: middle; font-weight: normal;">{{ context.waste_vert|index:context.waste_index_0|formatted_float }}</td></th>
+                        <th scope="col" style="width: 10em; text-align: center; vertical-align: middle; font-weight: normal;">{{ context.waste_common|index:context.waste_index_0|formatted_float }}</td></th>
+                        <th scope="col" style="width: 10em; text-align: center; vertical-align: middle; font-weight: normal;">Ближайший замер</th>
+                    </tr>
+                    </tbody>
                 </table>
             </div>
 
@@ -191,7 +219,7 @@
                         <td name="waste1">{{ context.waste_hor|index:ind|formatted_float }}</td>
                         <td name="waste2">{{ context.waste_vert|index:ind|formatted_float }}</td>
                         <td name="waste3">{{ context.waste_common|index:ind|formatted_float }}</td>
-                        <td style="width: 340px; padding: 0em;">
+                        <td style="width: 260px; padding: 0em;">
                             <textarea style="width: 100%; height: 26px; padding: 0em; border: none;"
                                       onchange="put_comm({{ context.igirgi_data|id:forloop.counter0 }}, this.value);">{{ context.igirgi_data|comment:forloop.counter0 }}</textarea>
                         </td>
@@ -277,7 +305,6 @@
         </div>
     </div>
 </div>
-
 
 <!-- Модальное окно для загрузки плановой траектории -->
 <div class="modal fade" id="data_Modal2" tabindex="-1" role="dialog">
@@ -398,9 +425,9 @@
                             </div>
                             <div class="form-group">
                                 <a class="tooltip-test" title="При активном флаге последний замер из файла не загружается.">
-                                <label class="col-form-label">Настройки чтения</label></a>
+                                <label class="col-form-label">Настройки:</label></a>
                                 <div class="form-control">
-                                    <input class="form-check-input" type="checkbox" value="" id="proj">
+                                    <input class="form-check-input" type="checkbox" name="nnb_exclude_proj">
                                     <label class="form-check-label">Исключить проекцию на забой</label>
                                 </div>
                             </div>
@@ -516,7 +543,7 @@ $('#data_Modal2').on('show.bs.modal', function (event) {
   document.getElementById('run_name').value = run_name;
 })
 
-<!--Функция для модального окна под загрузку траектории ННБ-->
+<!--Функция для модального окна под настройку импорта траектории ННБ-->
 $('#data_Modal3').on('show.bs.modal', function (event) {
   var button = $(event.relatedTarget)
 
@@ -525,11 +552,17 @@ $('#data_Modal3').on('show.bs.modal', function (event) {
   fetch('http://'+window.location.hostname+':'+window.location.port+'/report/api/run_index', { method: 'POST', body: params })
          .then(response=>response.json()).
          then(data=>{
+<!--         console.log(data);-->
          document.getElementsByName('nnb_depth')[0].value=data.nnb_static_depth;
          document.getElementsByName('nnb_corner')[0].value=data.nnb_static_corner;
          document.getElementsByName('nnb_azimut')[0].value=data.nnb_static_azimut;
          document.getElementsByName('nnb_str')[0].value=data.nnb_static_read;
          document.getElementsByName('nnb_list_name')[0].value=data.nnb_static_list_name;
+         if(data.nnb_static_exclude_proj == true){
+             document.getElementsByName('nnb_exclude_proj')[0].checked = true;
+             }else{
+             document.getElementsByName('nnb_exclude_proj')[0].checked = false;
+             }
          });
 
   var run_name = button.data('run')
@@ -552,11 +585,26 @@ function send_nnb_index(){
 <!-- Загрзка страницы / Расчет разницы гулбина/углов/азимутов-->
 window.addEventListener('load', () => {
 
+    <!--  Разность для нулевых  -->
+    let dif = document.getElementById('igirgi_depth').innerHTML - document.getElementById('nnb_depth').innerHTML;
+    if(Math.abs(dif) > 0){document.getElementById('delta_depth').style.backgroundColor = '#facfcf';}
+    document.getElementById('delta_depth').innerHTML = dif.toFixed(2);
+
+    dif = document.getElementById('igirgi_corner').innerHTML - document.getElementById('nnb_corner').innerHTML;
+    if(Math.abs(dif) > 0.1){
+            document.getElementById('delta_corner').style.backgroundColor = '#facfcf';}
+    document.getElementById('delta_corner').innerHTML = dif.toFixed(2);
+
+    dif = document.getElementById('igirgi_azimut').innerHTML - document.getElementById('nnb_azimut').innerHTML;
+    if(dif > 300){ dif = dif -  360;};
+    if(dif < -300){ dif = dif + 360;};
+    document.getElementById('delta_azimut').innerHTML = dif.toFixed(2);
+
     <!--  Разность глубин  -->
     document.getElementsByName('delta0').forEach(function(element, ind){
-        let dif = (parseFloat(document.getElementById('igirgi_depth'+ind).innerHTML.replace(",", "."))-
-        parseFloat(document.getElementById('nnb_depth'+ind).innerHTML.replace(",", "."))).toFixed(2);
-        element.innerHTML = dif;
+        let dif = parseFloat(document.getElementById('igirgi_depth'+ind).innerHTML.replace(",", "."))-
+        parseFloat(document.getElementById('nnb_depth'+ind).innerHTML.replace(",", "."));
+        element.innerHTML = dif.toFixed(2);
         if(Math.abs(dif) > 0){
             element.style.backgroundColor = '#facfcf';}
         })
@@ -572,15 +620,15 @@ window.addEventListener('load', () => {
 
     <!--  Разность азимутов  -->
     document.getElementsByName('delta2').forEach(function(element, ind){
-        let dif = (parseFloat(document.getElementById('igirgi_azimut'+ind).innerHTML.replace(",", "."))-
-        parseFloat(document.getElementById('nnb_azimut'+ind).innerHTML.replace(",", "."))).toFixed(2);
-        if(dif>300){
-        dif=(dif-360).toFixed(2);
-        };
-        if(dif<-300){
-        dif=(dif+360).toFixed(2);
-        };
-        element.innerHTML = dif;
+        let dif = parseFloat(document.getElementById('igirgi_azimut'+ind).innerHTML.replace(",", "."))-
+        parseFloat(document.getElementById('nnb_azimut'+ind).innerHTML.replace(",", "."));
+        if(dif > 300){
+            dif = dif -  360;
+            };
+        if(dif < -300){
+            dif = dif + 360;
+            };
+        element.innerHTML = dif.toFixed(2);
         })
 });
 

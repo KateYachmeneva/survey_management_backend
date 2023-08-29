@@ -30,6 +30,7 @@ def get_index(request) -> JsonResponse:
                 'nnb_dynamic_corner': report_index.nnb_dynamic_corner,
                 'nnb_dynamic_azimut': report_index.nnb_dynamic_azimut,
                 'nnb_dynamic_list_name': report_index.nnb_dynamic_list_name,
+                'nnb_static_exclude_proj': report_index.nnb_static_exclude_proj,
                 'igirgi_static_depth': report_index.igirgi_static_depth,
                 'igirgi_static_corner': report_index.igirgi_static_corner,
                 'igirgi_static_azimut': report_index.igirgi_static_azimut,

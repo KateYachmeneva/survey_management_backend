@@ -54,22 +54,28 @@ class ReportIndex(models.Model):
     raw_dynamic_depth_excel = models.CharField("Сырые динамические глубина excel", max_length=10, null=True)
     raw_dynamic_corner_excel = models.CharField("Сырые динамические угол excel", max_length=10, null=True)
     raw_dynamic_list_name = models.CharField("Сырые динамические лист эксель", max_length=10, null=True)
+
     nnb_static_depth = models.CharField("Статические от ННБ глубина", max_length=10, null=True)
     nnb_static_corner = models.CharField("Статические от ННБ угол", max_length=10, null=True)
     nnb_static_azimut = models.CharField("Статические от ННБ азимут", max_length=10, null=True)
     nnb_static_list_name = models.CharField("Статические от ННБ лист эксель", max_length=10, null=True)
+    nnb_static_exclude_proj = models.BooleanField("Флаг на исключение проекции", default=False)
+
     nnb_dynamic_depth = models.CharField("Динамические от ННБ глубина", max_length=10, null=True)
     nnb_dynamic_corner = models.CharField("Динамические от ННБ угол", max_length=10, null=True)
     nnb_dynamic_azimut = models.CharField("Динамические от ННБ азимут", max_length=10, null=True)
     nnb_dynamic_list_name = models.CharField("Динамические от ННБ лист эксель", max_length=10, null=True)
+
     igirgi_static_depth = models.CharField("Статические ИГиРГИ глубина", max_length=10, null=True)
     igirgi_static_corner = models.CharField("Статические ИГиРГИ угол", max_length=10, null=True)
     igirgi_static_azimut = models.CharField("Статические ИГиРГИ азимут", max_length=10, null=True)
     igirgi_list_name = models.CharField("Статические ИГиРГИ лист эксель", max_length=10, null=True)
+
     plan_depth = models.CharField("Плановая траектория глубина", max_length=10, null=True)
     plan_corner = models.CharField("Плановая траектория угол", max_length=10, null=True)
     plan_azimut = models.CharField("Плановая траектория азимут", max_length=10, null=True)
     plan_list_name = models.CharField("Плановая траектория лист эксель", max_length=10, null=True)
+
     nnb_dynamic_read = models.IntegerField("Считываем динамические данные  от ННБ с этой строки", null=True)
     nnb_static_read = models.IntegerField("Считываем статические данные от ННБ с этой строки", null=True)
     plan_str = models.IntegerField("Считываем данные плана с этой строки", null=True)

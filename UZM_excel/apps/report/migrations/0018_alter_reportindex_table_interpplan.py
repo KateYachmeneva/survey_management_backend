@@ -16,20 +16,4 @@ class Migration(migrations.Migration):
             name='reportindex',
             table='report_trajectory_index',
         ),
-        migrations.CreateModel(
-            name='InterpPlan',
-            fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('depth', models.FloatField(verbose_name='глубина')),
-                ('corner', models.FloatField(null=True, verbose_name='угол')),
-                ('azimut', models.FloatField(null=True, verbose_name='азимут')),
-                ('run', models.ForeignKey(null=True, on_delete=django.db.models.deletion.CASCADE, to='Field.run')),
-            ],
-            options={
-                'verbose_name': 'Замер интерполированной плановой траектории',
-                'verbose_name_plural': 'Замеры интерполированной плановой траектории',
-                'db_table': 'meas_intr_plan',
-                'ordering': ['depth'],
-            },
-        ),
     ]
