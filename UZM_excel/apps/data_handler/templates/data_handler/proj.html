@@ -16,7 +16,7 @@
   <center>
   <div class = "container-projections" >
    <div class = "container-square" style="margin-left: 0;">
-     <canvas id="grafica1" width="1000px" height="1000px" ></canvas>
+     <canvas id="grafica1" width="100" height="100" ></canvas>
      <form id ="formH" name="form-parameter">
       <label class="mb-3">Запад/Восток</label>
       <div class="mb-3">
@@ -37,7 +37,7 @@
     </form>
    </div>
      <div class = "container-square" style="margin-left: 0;">
-     <canvas id="grafica2" width="1000px" height="1000px" ></canvas>
+     <canvas id="grafica2" width="100" height="100" ></canvas>
      <form id ="formV" name="form-parameter">
       <label class="mb-3">Вертикальная секция </label>
       <div class="mb-3 ">
@@ -125,8 +125,8 @@ formH.addEventListener('submit',(e) => {
   // заменяем график
   c = document.createElement('canvas');
   c.setAttribute("id", "grafica3");
-  c.setAttribute("width", "1000px");
-  c.setAttribute("height", "1000px");
+  c.setAttribute("width", "100");
+  c.setAttribute("height", "100");
   grafica1.replaceWith(c);
   grafica3 = document.querySelector('#grafica3');
 
@@ -231,8 +231,8 @@ formV.addEventListener('submit',(e) => {
   // заменяем график
   c = document.createElement('canvas');
   c.setAttribute("id", "grafica4");
-  c.setAttribute("width", "1000px");
-  c.setAttribute("height", "1000px");
+  c.setAttribute("width", "100");
+  c.setAttribute("height", "100");
   grafica2.replaceWith(c);
   grafica4 = document.querySelector('#grafica4');
 
@@ -459,6 +459,12 @@ new Chart(grafica1,
 
 <!-- Загрузка страницы -->
 window.addEventListener('load', () => {
+
+<!--console.log(document.cookie);-->
+
+<!--Обновляем куки-->
+document.cookie="csrftoken={{ csrf_token }}"
+<!--console.log(document.cookie);-->
 {% if context.graph_param.hor_x_min is not None %}
 document.getElementById('sbtnHor').click();
 {% endif %}

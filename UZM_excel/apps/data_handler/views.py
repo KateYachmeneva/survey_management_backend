@@ -87,7 +87,8 @@ def traj(request):
                     if data in context['igirgi_data'] and ind < len(StaticNNBData.objects.filter(
                             run__section__wellbore=run.section.wellbore).order_by('depth')):
                         context["waste_index"].append(ind)
-            context["waste_index_0"] = context["waste_index"][0]-1 if (context["waste_index"][0]-1) > 0 else 0
+            if len(context["waste_index"]) > 0:
+                context["waste_index_0"] = context["waste_index"][0]-1 if (context["waste_index"][0]-1) > 0 else 0
     if request.method == 'POST':
         run = Run.objects.get(id=request.GET.get('run_id'))
         context['title'] = run.section.wellbore.well_name.get_title()

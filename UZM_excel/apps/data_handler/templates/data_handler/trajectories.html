@@ -162,10 +162,12 @@
                         <td id="delta_depth" scope="col" style="width: 10em; text-align: center; vertical-align: middle; font-weight: normal;">X</td>
                         <td id="delta_corner" scope="col" style="width: 10em; text-align: center; vertical-align: middle; font-weight: normal;">X</td>
                         <td id="delta_azimut" scope="col" style="width: 10em; text-align: center; vertical-align: middle; font-weight: normal;">X</td>
+                        {% if 'waste_index_0' in context %}
                         <th scope="col" style="width: 10em; text-align: center; vertical-align: middle; font-weight: normal;">{{ context.waste_hor|index:context.waste_index_0|formatted_float }}</td></th>
                         <th scope="col" style="width: 10em; text-align: center; vertical-align: middle; font-weight: normal;">{{ context.waste_vert|index:context.waste_index_0|formatted_float }}</td></th>
                         <th scope="col" style="width: 10em; text-align: center; vertical-align: middle; font-weight: normal;">{{ context.waste_common|index:context.waste_index_0|formatted_float }}</td></th>
                         <th scope="col" style="width: 10em; text-align: center; vertical-align: middle; font-weight: normal;">Ближайший замер</th>
+                        {% endif %}
                     </tr>
                     </tbody>
                 </table>
@@ -316,7 +318,8 @@
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
-            <form action=""  method="post" name="data_form" enctype="multipart/form-data">
+            <form action=""  method="post" name="data_form" enctype="multipart/form-data"
+                  onsubmit="return validate_plan_form(this);">
             <div class="modal-body">
                     <div class="form-group">
                         <label for="run-name" class="col-form-label">Рейс:</label>
@@ -519,6 +522,7 @@ $('#data_Modal1').on('show.bs.modal', function (event) {
 
 })
 
+<!-- Отправка данных через POST метод по view! -->
 <!--Функция для модального окна под загрузку плана-->
 $('#data_Modal2').on('show.bs.modal', function (event) {
   var button = $(event.relatedTarget)
@@ -543,7 +547,33 @@ $('#data_Modal2').on('show.bs.modal', function (event) {
   document.getElementById('run_name').value = run_name;
 })
 
-<!--Функция для модального окна под настройку импорта траектории ННБ-->
+<!-- Валидация формы под загрузку плана-->
+function validate_plan_form(form){
+    valid = true;
+    if (form.plan_file.value == "" ){
+    alert ("Пожалуйста загрузите файл с плановой  траекторией в поле 'Файл'." );
+    valid = false;}
+    if (form.plan_depth.value == "" ){
+    alert ( "Пожалуйста заполните поле 'Глубина'." );
+    valid = false;}
+    if (form.plan_corner.value == "" ){
+    alert ( "Пожалуйста заполните поле 'Угол'." );
+    valid = false;}
+    if (form.plan_azimut.value == "" ){
+    alert ( "Пожалуйста заполните поле 'Азимут'." );
+    valid = false;}
+    if (form.plan_list_name.value == "" ){
+    alert ( "Пожалуйста заполните поле 'Лист'." );
+    valid = false;}
+    if (form.plan_str.value == "" ){
+    alert ( "Пожалуйста заполните поле 'Строка'." );
+    valid = false;}
+
+    return valid;
+}
+
+
+<!--Функция для загрузки модального окна под настройку импорта траектории ННБ-->
 $('#data_Modal3').on('show.bs.modal', function (event) {
   var button = $(event.relatedTarget)
 
@@ -573,6 +603,23 @@ $('#data_Modal3').on('show.bs.modal', function (event) {
 
 <!--Функция на отправку формы с индексами под чтения файла с траекторией ННБ-->
 function send_nnb_index(){
+    <!--  проверка на заполнение полей  -->
+    if ( document.getElementById('nnb_index').nnb_depth.value == "" ){
+    alert ( "Пожалуйста заполните поле 'Глубина'." );
+    return;}
+    if ( document.getElementById('nnb_index').nnb_corner.value == "" ){
+    alert ( "Пожалуйста заполните поле 'Угол'." );
+    return;}
+    if ( document.getElementById('nnb_index').nnb_azimut.value == "" ){
+    alert ( "Пожалуйста заполните поле 'Азимут'." );
+    return;}
+    if ( document.getElementById('nnb_index').nnb_list_name.value == "" ){
+    alert ( "Пожалуйста заполните поле 'Лист'." );
+    return;}
+    if ( document.getElementById('nnb_index').nnb_str.value == "" ){
+    alert ( "Пожалуйста заполните поле 'Строка'." );
+    return;}
+
     var params = new FormData(document.getElementById('nnb_index'));
     fetch('http://'+window.location.hostname+':'+window.location.port+'/report/api/update_index', { method: 'POST', body: params })
          .then(response=>response.json()).

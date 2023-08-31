@@ -115,12 +115,12 @@ def traj_del(request):
     for key, value in request.POST.dict().items():
         if 'igirgi' in key:
             igirgi_meas = IgirgiStatic.objects.get(id=value)
-            try:
+            igirgi_meas.delete()
+            try:  # удалить план вместе с игирги
                 interp_plan = InterpPlan.objects.get(run=igirgi_meas.run, depth=igirgi_meas.depth)
                 interp_plan.delete()
             except InterpPlan.DoesNotExist:
                 pass
-            igirgi_meas.delete()
         elif 'nnb' in key:
             if request.POST.get('type') == 'plan':
                 InterpPlan.objects.get(id=value).delete()
