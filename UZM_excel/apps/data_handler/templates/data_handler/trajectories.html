@@ -271,7 +271,7 @@
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
-            <form action=""  method="post" name="data_form" >
+            <form action=""  method="post" name="data_form" onsubmit="return validate_form1(this)">
             <div class="modal-body">
                     <div class="form-group">
                         <label for="data-name" class="col-form-label">Данные для:</label>
@@ -460,7 +460,11 @@ function uploadFile(input_obj){
      {method: 'POST', body: data})
     .then(response=>response.json())
     .then(data=>{console.log(data);
-                 location.reload();})
+                 if('error' in data){
+                 alert(data.error);
+                 }else{
+                 location.reload();}
+    })
     input_obj.value= "";
 }
 
@@ -523,6 +527,41 @@ $('#data_Modal1').on('show.bs.modal', function (event) {
 })
 
 <!-- Отправка данных через POST метод по view! -->
+<!-- Валидация при загрузке новых значений-->
+function validate_form1(form){
+    let valid = true;
+    let warning = [];
+    <!--  Глубина  -->
+<!--    let depth_array = form[2].value.split('\n');-->
+
+    <!--  Угол  -->
+    let corrner_array = form[3].value.split('\n');
+    corrner_array.forEach(function(element){
+        if( Number(element) > 100 || Number(element) < 0 ){
+            warning.push('Значения угла выходят за интервал (0, 100)');
+            }
+    });
+
+    <!--  Азимут  -->
+    let azimut_array = form[4].value.split('\n');
+    azimut_array.forEach(function(element){
+        if( Number(element) > 360 || Number(element) < 0 ){
+            warning.push('Значения азимута выходят за интервал (0, 360)');
+            }
+    });
+
+    if( warning.length > 0 ){
+        let Text = "При вставке значений возникли следующие ошибки:"
+        warning.forEach(function(element){
+                        Text = Text +'\n- '+ element
+                        });
+        Text = Text + '\nХотите продолжить?'
+        valid = confirm(Text);
+    }
+    console.log(warning);
+    console.log(valid);
+    return valid;
+}
 <!--Функция для модального окна под загрузку плана-->
 $('#data_Modal2').on('show.bs.modal', function (event) {
   var button = $(event.relatedTarget)

@@ -155,6 +155,16 @@ def uploadFile(request):
     """ Сюда будут приходить файлы для считывания траектории с fetch запросов """
     f_type = request.POST.get('type')  # пытаемся найти тип файла (траектория ннб или плановая)
     r_id = request.POST.get('run_id')
+    try:
+        index = ReportIndex.objects.get(run=r_id)
+        NoneCorrectItems = {None, ''}
+        Items = {index.nnb_static_depth, index.nnb_static_corner, index.nnb_static_azimut, index.nnb_static_list_name, }
+        if len(NoneCorrectItems.intersection(Items)) != 0:
+            raise ReportIndex.DoesNotExist
+    except ReportIndex.DoesNotExist:
+        return JsonResponse({'error': 'Ошибка чтения! Пожалуйста, проверьте настройки импорта для '
+                                      'выбранного рейса!'})
+
     if f_type is None:
         return JsonResponse({'status': 'Файл передан без типа. Укажите в поле type один из параметров:',
                              'type': '(nnb, plan, igirgi)'})

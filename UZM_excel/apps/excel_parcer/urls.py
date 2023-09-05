@@ -11,6 +11,7 @@ urlpatterns = [
     path('api/meas/run/<int:run_id>/', DataByRunAPIView.as_view()),
     path('api/meas/<int:pk>/', DataViewSet.as_view({'get': 'retrieve', 'post': 'create', 'put': 'update',
                                                     'delete': 'destroy'})),
+    path('api/raw_meas/run/<int:run_id>/', RawDataByRunAPIView.as_view()),
     path('', views.index, name='axes'),
     path('graph', views.graph, name='graph_axes'),
     path('settings', views.settings, name="axes-settings"),

@@ -137,7 +137,6 @@ class RunSerializer(serializers.ModelSerializer):
             return 'None'
 
 
-
 class SectionSerializer(serializers.ModelSerializer):
     runs = RunSerializer(many=True, read_only=True)
 
@@ -152,7 +151,7 @@ class WellboreSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Wellbore
-        fields = ('wellbore_name', 'wellbore', 'well_name', 'sections')
+        fields = ('wellbore_name', 'wellbore', 'well_name', 'sections', 'igirgi_drilling', 'current_depth')
         read_only_fields = ('wellbore_name',)
         extra_kwargs = {
             'wellbore': {'write_only': True},

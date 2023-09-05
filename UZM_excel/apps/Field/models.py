@@ -397,7 +397,7 @@ class WellSummary(models.Model):
 def get_all_run() -> QuerySet:
     """Функция взаимдействующая с Field моделью"""
     runs = Run.objects.all()
-    itog = sorted(runs, key=lambda x: str(x))
+    itog = sorted(runs, key=lambda x: str(x), reverse=True)
     return itog
 
 

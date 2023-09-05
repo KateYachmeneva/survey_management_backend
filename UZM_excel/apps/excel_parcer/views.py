@@ -240,13 +240,24 @@ def graph(request):
 
 
 def uploadAxesFile(request):
+    """ Функция для чтения замеров с осями из переданного файла"""
     if request.method == 'POST':
         if 'file' in request.FILES:
             doc = request.FILES['file']
             fs = FileSystemStorage()
             file_name = fs.save(doc.name, doc)
             current_run = Run.objects.get(id=request.POST.get('run_id'))
-            telesystem = AxesFileIndex.objects.get(run=current_run)
+            try:
+                telesystem = AxesFileIndex.objects.get(run=current_run)
+                NoneCorrectItems = {None, ''}
+                Items = {telesystem.depth, telesystem.GX, telesystem.GY, telesystem.GZ, telesystem.BX,
+                         telesystem.BY, telesystem.BZ, telesystem.string_index, telesystem.device}
+                if len(NoneCorrectItems.intersection(Items)) != 0:
+                    raise AxesFileIndex.DoesNotExist
+            except AxesFileIndex.DoesNotExist:
+                return JsonResponse({'warning': 'Ошибка чтения! Пожалуйста, проверьте настройки импорта для '
+                                                'выбранного рейса!'})
+
             result = parcing_manually("./media/" + file_name,
                                       telesystem.depth,
                                       telesystem.GX,

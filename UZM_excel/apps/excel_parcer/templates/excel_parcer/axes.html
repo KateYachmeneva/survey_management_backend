@@ -281,8 +281,6 @@
              });
     }
 
-
-
     <!--  Функция для загрузки файла перетаскиванием  -->
     function uploadFile(input_obj){
     var data = new FormData()
@@ -291,8 +289,14 @@
 
     fetch('http://'+window.location.hostname+':'+window.location.port+'/axes/api/upload_file', {method: 'POST', body: data})
     .then(response=>response.json())
-    .then(data=>{location.reload();})
+    .then(data=>{
+    if('warning' in data){
+    alert(data.warning);
+    }else{
+    location.reload();}
+    })
     input_obj.value= "";
+
     }
 
     <!--Функция для модального окна 1 (Добавление осей)-->

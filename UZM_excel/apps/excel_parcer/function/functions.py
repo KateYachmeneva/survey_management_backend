@@ -65,7 +65,7 @@ def parcing_manually(path, manually_depth, manually_gx, manually_gy, manually_gz
             for i in range(int(start_index)-1):
                 f.readline()  # считываем ненужные строки
             for raw in f.readlines():
-                raw_list = raw.replace('\n', '').replace('\t', ',').split(sep=',')
+                raw_list = raw.replace('\n', '').replace('\r', '').replace('\t\t', '\t').replace('\t', ',').split(sep=',')
                 if len(raw_list) < 7:  # в строке отсутствует разделитель
                     continue
                 for d_index, n_index in enumerate(index_List):
@@ -306,3 +306,15 @@ def write_to_bd(data: list[list], run: object) -> NoReturn:
         bd_data[0].in_statistics = True
 
     Data.objects.bulk_update(update_obj, ["CX", "CY", "CZ", "BX", "BY", "BZ", "in_statistics"])
+
+
+def convert_sign(eval_str: str) -> str:
+    """ Меняет знаки в выражениях для пересчёта """
+    if eval_str.find('*') != -1:
+        return eval_str.replace('*', '/')
+    elif eval_str.find('/') != -1:
+        return eval_str.replace('/', '*')
+    elif eval_str.find('+') != -1:
+        return eval_str.replace('+', '-')
+    elif eval_str.find('-') != -1:
+        return eval_str.replace('-', '+')

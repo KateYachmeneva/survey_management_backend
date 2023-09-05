@@ -89,6 +89,7 @@ def traj(request):
                         context["waste_index"].append(ind)
             if len(context["waste_index"]) > 0:
                 context["waste_index_0"] = context["waste_index"][0]-1 if (context["waste_index"][0]-1) > 0 else 0
+
     if request.method == 'POST':
         run = Run.objects.get(id=request.GET.get('run_id'))
         context['title'] = run.section.wellbore.well_name.get_title()
@@ -96,7 +97,7 @@ def traj(request):
         if 'plan_depth' in request.POST:  # данные с модальной формы 2 (плановая траектория)
             work_with_plan(request, run)
 
-        if 'data-depth' in request.POST:  # данные с модальной формы 1 (добавление значенией)
+        if 'data-depth' in request.POST:  # данные с модальной формы 1 (добавление значений)
             depth_data = request.POST['data-depth'].replace(',', '.').replace(' ', '') \
                 .replace('\r', '').replace('\n', '\t').split('\t')
             corner_data = request.POST['data-corner'].replace(',', '.').replace(' ', '') \

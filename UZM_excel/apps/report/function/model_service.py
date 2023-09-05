@@ -98,10 +98,7 @@ def get_single_traj(dtype: str, wellbore: object) -> dict:
     if dtype == 'staticNNB':
         queryset = StaticNNBData.objects.filter(run__in=runs)
     if dtype == 'plan':
-        if wellbore.igirgi_drilling:
-            queryset = InterpPlan.objects.filter(run__in=runs)
-        else:
-            queryset = Plan.objects.filter(run__in=runs)
+        queryset = Plan.objects.filter(run__in=runs)
     if dtype == 'dynamicIgirgi':
         queryset = IgirgiDynamic.objects.filter(run__in=runs)
 

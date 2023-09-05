@@ -26,7 +26,7 @@ class List(models.Model):
 
 
 class Device(models.Model):
-    """Модель под телесистему"""
+    """Модель под телесистему [Коэффициенты пересчета]"""
     device_title = models.CharField('Название телесистемы', max_length=100, unique=True)
     CX = models.CharField('GX', max_length=50)
     CY = models.CharField('GY', max_length=50)
