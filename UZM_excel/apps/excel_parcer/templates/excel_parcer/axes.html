@@ -157,7 +157,7 @@
 
 
 
-<!-- модальное окно для доабвления осей-->
+<!-- модальное окно для добавления осей-->
 <div class="modal fade" id="data_Modal1" tabindex="-1" role="dialog">
     <div class="modal-dialog modal-lg" role="document">
         <div class="modal-content">
@@ -167,7 +167,7 @@
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
-            <form action=""  method="post" name="data_form" >
+            <form action=""  method="post" name="data_form" id="AddAxesForm">
             <div class="modal-body">
                 <div class="form-group">
                     <input type="text" class="form-control" id="modal-run1" name="run" hidden>
@@ -214,7 +214,7 @@
                 </div>
             </div>
             <div class="modal-footer">
-                <button type="submit" class="btn btn-primary">Добавить</button>
+                <button type="button" onclick="sendAxes();" class="btn btn-primary">Добавить</button>
                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Закрыть</button>
             </div>
             </form>
@@ -222,7 +222,7 @@
     </div>
 </div>
 
-<!-- модальное окно для доабвления скорректированных значений-->
+<!-- модальное окно для добавления скорректированных значений-->
 <div class="modal fade" id="data_Modal2" tabindex="-1" role="dialog">
     <div class="modal-dialog modal-lg" role="document">
         <div class="modal-content">
@@ -279,6 +279,46 @@
              then(data=>{
              console.log(data);
              });
+    }
+
+    <!--  Функция для загрузки осей с формы  -->
+    function sendAxes(){
+        var params = new FormData(document.getElementById("AddAxesForm"));
+        fetch('http://'+window.location.hostname+':'+window.location.port+'/axes/api/addAxes',
+         {method: 'POST', body: params})
+                .then(response=>response.json())
+                .then(data=>{
+                console.log('Data = ', data);
+                console.log('Conflict = ', data.conflict);
+                if('warning' in data){
+                    data.conflict.old.forEach(function(oldValue, index){
+                        let newValue = data.conflict.new[index]
+                        let Text = "На глубине " + oldValue.depth +" изменились значения.\nСтарые значения/Новые значения:"+
+                        "\nGX: "+oldValue.CX+ " / " + newValue.CX +
+                        "\nGY: "+oldValue.CY+ " / " + newValue.CY +
+                        "\nGZ: "+oldValue.CZ+ " / " + newValue.CZ +
+                        "\nBX: "+oldValue.BX+ " / " + newValue.BX +
+                        "\nBY: "+oldValue.BY+ " / " + newValue.BY +
+                        "\nBZ: "+oldValue.BZ+ " / " + newValue.BZ +
+                        "\nПодтвердить изменения?"
+                        valid = confirm(Text);
+                        if(valid==true){
+                            var params = new FormData();
+                            params.set('id', oldValue.id)
+                            params.set('CX', newValue.CX)
+                            params.set('CY', newValue.CY)
+                            params.set('CZ', newValue.CZ)
+                            params.set('BX', newValue.BX)
+                            params.set('BY', newValue.BY)
+                            params.set('BZ', newValue.BZ)
+                            fetch('http://'+window.location.hostname+':'+window.location.port+'/axes/api/updateAxes',
+                            {method: 'POST', body: params}) }
+                    });
+                    location.reload();
+                }else{
+                    location.reload();}
+                });
+
     }
 
     <!--  Функция для загрузки файла перетаскиванием  -->

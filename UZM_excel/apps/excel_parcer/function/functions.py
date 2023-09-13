@@ -13,6 +13,7 @@ from excel_parcer.models import *
 from openpyxl.utils import get_column_letter, column_index_from_string
 
 from ..models import List, Device, Data
+from ..serializer import DataSerializer
 
 
 def toFixed(numObj, digits=0):
@@ -65,15 +66,16 @@ def parcing_manually(path, manually_depth, manually_gx, manually_gy, manually_gz
             for i in range(int(start_index)-1):
                 f.readline()  # считываем ненужные строки
             for raw in f.readlines():
-                raw_list = raw.replace('\n', '').replace('\r', '').replace('\t\t', '\t').replace('\t', ',').split(sep=',')
-                if len(raw_list) < 7:  # в строке отсутствует разделитель
-                    continue
-                for d_index, n_index in enumerate(index_List):
-                    try:
+                try:
+                    raw_list = raw.replace('\n', '').replace('\r', '').replace('\t\t', '\t').replace('\t', ',').split(sep=',')
+                    # print(raw_list)
+                    for index in index_List:  # проверка считанного замера
+                        float(raw_list[int(index) - 1])
+                    for d_index, n_index in enumerate(index_List):
                         data[d_index].append(float(raw_list[int(n_index) - 1]))
-                    except Exception as e:
-                        print(f'Ошибка индексов при считывании, файл: {path}')
-                        print(e)
+                except Exception as e:
+                    print('Пропуск замера. Ошибка:\n', e)
+                    continue
     elif 'sur' in re.findall(r".(sur)", path):
         index_List = [manually_bz, manually_by, manually_bx, manually_gz, manually_gy, manually_gx, manually_depth]
         start_index = (manually_import if manually_import is not None else 2)
@@ -82,7 +84,6 @@ def parcing_manually(path, manually_depth, manually_gx, manually_gy, manually_gz
                 f.readline()
             for raw in f.readlines():
                 raw_list = raw.replace('\n', '').split()
-                # print(raw_list)
                 if len(raw_list) < 7:  # в строке отсутсвует разделитель
                     continue
                 for d_index, n_index in enumerate(index_List):
@@ -283,9 +284,11 @@ def new_measurements(data, name):
 
 def write_to_bd(data: list[list], run: object) -> NoReturn:
     """
-    Записываем преобразованные данные в БД
+    Записываем преобразованные данные в БД, возвращаем conflict словарь старых и новых значений
+    которые будут перезаписаны
     """
     update_obj = list()
+    conflict = {'old': list(), 'new': list()}
     for rows in data:
         try:
             if len(rows) < 7:  # проверка на наличие всех осей
@@ -296,16 +299,27 @@ def write_to_bd(data: list[list], run: object) -> NoReturn:
             print(e)
             continue
         bd_data = Data.objects.get_or_create(depth=rows[0], run=run)
-        update_obj.append(bd_data[0])
-        bd_data[0].CX = rows[1]
-        bd_data[0].CY = rows[2]
-        bd_data[0].CZ = rows[3]
-        bd_data[0].BX = rows[4]
-        bd_data[0].BY = rows[5]
-        bd_data[0].BZ = rows[6]
-        bd_data[0].in_statistics = True
+        if bd_data[1]:
+            update_obj.append(bd_data[0])
+            bd_data[0].CX = rows[1]
+            bd_data[0].CY = rows[2]
+            bd_data[0].CZ = rows[3]
+            bd_data[0].BX = rows[4]
+            bd_data[0].BY = rows[5]
+            bd_data[0].BZ = rows[6]
+            bd_data[0].in_statistics = True
+        else:
+            conflict['old'].append(DataSerializer(bd_data[0]).data)
+            conflict['new'].append(DataSerializer(Data(depth=rows[0],
+                                                        CX=rows[1],
+                                                        CY=rows[2],
+                                                        CZ=rows[3],
+                                                        BX=rows[4],
+                                                        BY=rows[5],
+                                                        BZ=rows[6])).data)
 
     Data.objects.bulk_update(update_obj, ["CX", "CY", "CZ", "BX", "BY", "BZ", "in_statistics"])
+    return conflict
 
 
 def convert_sign(eval_str: str) -> str:

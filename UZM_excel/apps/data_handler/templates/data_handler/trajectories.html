@@ -537,7 +537,7 @@ function validate_form1(form){
     <!--  Угол  -->
     let corrner_array = form[3].value.split('\n');
     corrner_array.forEach(function(element){
-        if( Number(element) > 100 || Number(element) < 0 ){
+        if( +element > 100 || +element < 0 ){
             warning.push('Значения угла выходят за интервал (0, 100)');
             }
     });

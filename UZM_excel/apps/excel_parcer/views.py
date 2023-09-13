@@ -33,49 +33,7 @@ def index(request):
         context['well'] = current_run.section.wellbore.well_name
         context['data'] = Data.objects.filter(run=request.POST['run'], in_statistics=1).order_by('depth')
         context['selected_run'] = current_run
-
-        if 'data-axes' in request.POST:  # Модальная форма с ОСЯМИ
-            axes_data = request.POST['data-axes'].replace(',', '.'). \
-                replace(' ', '').replace('\r', '').replace('\n', '\t').replace('\t\t', '\t').split('\t')
-            # print(axes_data)
-            counter = 0
-            manually_bz = list()
-            manually_by = list()
-            manually_bx = list()
-            manually_gz = list()
-            manually_gy = list()
-            manually_gx = list()
-            manually_depth = list()
-            for data in axes_data:
-                if data == '':
-                    continue
-                if counter == 0:
-                    manually_depth.append(data)
-                elif counter == 1:
-                    manually_gx.append(data)
-                elif counter == 2:
-                    manually_gy.append(data)
-                elif counter == 3:
-                    manually_gz.append(data)
-                elif counter == 4:
-                    manually_bx.append(data)
-                elif counter == 5:
-                    manually_by.append(data)
-                else:
-                    manually_bz.append(data)
-                counter = (0 if counter == 6 else counter + 1)
-            # result - считанные данные
-            result = zip(manually_depth, manually_gx, manually_gy, manually_gz, manually_bx, manually_by, manually_bz)
-            # print(list(result))
-            if request.POST.get('device') != '-----' and request.POST.get('device') != '':
-                telesystem_ind = AxesFileIndex.objects.get(run_id=current_run)
-                telesystem_ind.device = Device.objects.get(device_title=request.POST.get('device'))
-                telesystem_ind.save()
-                result2 = new_measurements(list(result), request.POST.get('device'))  # перобразованные данные
-                write_to_bd(result2, current_run)
-            else:
-                write_to_bd(result, current_run)
-        if 'depth' in request.POST:  # Модальная форма со Скорректированными значениями
+        if 'depth' in request.POST:  # Модальная форма с скорректированными значениями
             depth_data = request.POST['depth'].replace(',', '.').replace(' ', '').replace('\r', ''). \
                 replace('\n', '\t').split('\t')
             Btotal_data = request.POST['Btotal_corr'].replace(',', '.').replace(' ', '').replace('\r', ''). \

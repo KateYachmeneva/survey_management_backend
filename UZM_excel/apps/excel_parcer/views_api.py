@@ -181,3 +181,70 @@ def wellbore_copy(request):
     (в request должны лежать id нового и старого стволов, сама модель Wellbore создается в модуле Field заранее)"""
     clone_wellbore_axes(request)
     return JsonResponse({'status': 'ok'})
+
+
+# axes/api/addAxes
+def add_Axes(request):
+    """По fetch запросу добавляем новые оси"""
+    if request.method == 'POST':  # Модальная форма с ОСЯМИ
+        current_run = Run.objects.get(id=request.POST['run'])
+        axes_data = request.POST['data-axes'].replace(',', '.'). \
+            replace(' ', '').replace('\r', '').replace('\n', '\t').replace('\t\t', '\t').split('\t')
+        # print(axes_data)
+        counter = 0
+        manually_bz = list()
+        manually_by = list()
+        manually_bx = list()
+        manually_gz = list()
+        manually_gy = list()
+        manually_gx = list()
+        manually_depth = list()
+        for data in axes_data:
+            if data == '':
+                continue
+            if counter == 0:
+                manually_depth.append(data)
+            elif counter == 1:
+                manually_gx.append(data)
+            elif counter == 2:
+                manually_gy.append(data)
+            elif counter == 3:
+                manually_gz.append(data)
+            elif counter == 4:
+                manually_bx.append(data)
+            elif counter == 5:
+                manually_by.append(data)
+            else:
+                manually_bz.append(data)
+            counter = (0 if counter == 6 else counter + 1)
+        # result - считанные данные
+        result = zip(manually_depth, manually_gx, manually_gy, manually_gz, manually_bx, manually_by, manually_bz)
+        # print(list(result))
+        if request.POST.get('device') != '-----' and request.POST.get('device') != '':
+            telesystem_ind = AxesFileIndex.objects.get(run_id=current_run)
+            telesystem_ind.device = Device.objects.get(device_title=request.POST.get('device'))
+            telesystem_ind.save()
+            result2 = new_measurements(list(result), request.POST.get('device'))  # перобразованные данные
+            conflict = write_to_bd(result2, current_run)
+        else:
+            conflict = write_to_bd(result, current_run)
+
+        if len(conflict['old']) > 0:
+            return JsonResponse({'warning': 'Изменились значения осей!', 'conflict': conflict})
+        else:
+            return JsonResponse({'status': 'ok'})
+    return JsonResponse({'warning': 'Обратитесь к POST методу!'})
+
+
+def update_Axes(request):
+    """По fetch запросу обновляем оси"""
+    print(request.POST.dict())
+    obj = Data.objects.get(id=request.POST['id'])
+    obj.CX = request.POST['CX']
+    obj.CY = request.POST['CY']
+    obj.CZ = request.POST['CZ']
+    obj.BX = request.POST['BX']
+    obj.BY = request.POST['BY']
+    obj.BZ = request.POST['BZ']
+    obj.save()
+    return JsonResponse({"status": f"Замер с ID:{request.POST['id']} успешно перезаписан!"})
