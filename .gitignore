@@ -5,7 +5,8 @@
 env
 UZM_excel\conf.py
 media
-files
+Report_input
+Report_out
 
 ### OSX ###
 .DS_Store
