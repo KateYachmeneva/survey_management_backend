@@ -6,7 +6,7 @@ from .views_api import *
 # Точки для работы с моделями траектории [обращаемся с DjangoTemplate по fetch запросу]
 urlpatterns = [
     # path('', views.index, name='report'),
-    path('api/run_index', views.run_index, name='run_index'),
+    path('api/run_index', FileIndexView.as_view(), name='run_index'),
     path('api/update_index', views.update_index),
     path('api/file_name', views.report, name='get_file_name'),
     path('api/get_file', views.get_report_file, name='get_report_file'),

@@ -266,6 +266,75 @@
 </div>
 
 
+<!-- Модальное окно для замены замеров -->
+<button id="btn_meas_modal" data-toggle="modal" data-target="#meas_Modal" hidden>
+    Запустить замену замеров
+</button>
+<!-- Сама модалка-->
+<div class="modal fade" id="meas_Modal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-xl" style="max-width:1800px">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Перезапись данных | {{context.selected_run}}</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="changes_form" method="post">
+                    <div class="row">
+                        <div class="col-6">
+                            <center>
+                                <h4>Старые значения</h4>
+                            </center>
+                            <table class="table table-sm">
+                                <thead class="thead-light">
+                                <tr>
+                                    <th scope="col">Глубина</th>
+                                    <th scope="col">BX</th>
+                                    <th scope="col">BY</th>
+                                    <th scope="col">BZ</th>
+                                    <th scope="col">GX</th>
+                                    <th scope="col">GY</th>
+                                    <th scope="col">GZ</th>
+                                    <th scope="col">Принять</th>
+                                </tr>
+                                </thead>
+                                <tbody id="old_tbd">
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="col-6">
+                            <center>
+                            <h4>Новые значения</h4>
+                            </center>
+                            <table class="table table-sm">
+                                <thead class="thead-light">
+                                <tr>
+                                    <th scope="col">Принять</th>
+                                    <th scope="col">Глубина</th>
+                                    <th scope="col">BX</th>
+                                    <th scope="col">BY</th>
+                                    <th scope="col">BZ</th>
+                                    <th scope="col">GX</th>
+                                    <th scope="col">GY</th>
+                                    <th scope="col">GZ</th>
+                                </tr>
+                                </thead>
+                                <tbody id="new_tbd">
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal" onclick="location.reload();">Закрыть</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script>
     <!-- Функция для сохранения комментариев к замерам -->
     function put_comm(number, comment){
@@ -288,37 +357,112 @@
          {method: 'POST', body: params})
                 .then(response=>response.json())
                 .then(data=>{
-                console.log('Data = ', data);
                 console.log('Conflict = ', data.conflict);
                 if('warning' in data){
-                    data.conflict.old.forEach(function(oldValue, index){
-                        let newValue = data.conflict.new[index]
-                        let Text = "На глубине " + oldValue.depth +" изменились значения.\nСтарые значения/Новые значения:"+
-                        "\nGX: "+oldValue.CX+ " / " + newValue.CX +
-                        "\nGY: "+oldValue.CY+ " / " + newValue.CY +
-                        "\nGZ: "+oldValue.CZ+ " / " + newValue.CZ +
-                        "\nBX: "+oldValue.BX+ " / " + newValue.BX +
-                        "\nBY: "+oldValue.BY+ " / " + newValue.BY +
-                        "\nBZ: "+oldValue.BZ+ " / " + newValue.BZ +
-                        "\nПодтвердить изменения?"
-                        valid = confirm(Text);
-                        if(valid==true){
-                            var params = new FormData();
-                            params.set('id', oldValue.id)
-                            params.set('CX', newValue.CX)
-                            params.set('CY', newValue.CY)
-                            params.set('CZ', newValue.CZ)
-                            params.set('BX', newValue.BX)
-                            params.set('BY', newValue.BY)
-                            params.set('BZ', newValue.BZ)
-                            fetch('http://'+window.location.hostname+':'+window.location.port+'/axes/api/updateAxes',
-                            {method: 'POST', body: params}) }
-                    });
-                    location.reload();
+                    Meas_array = new Array();
+                    <!--    Удаляем старые значения из формы         -->
+                    while (document.getElementById("old_tbd").firstChild) {
+                         document.getElementById("old_tbd").removeChild(document.getElementById("old_tbd").firstChild);
+                         document.getElementById("new_tbd").removeChild(document.getElementById("new_tbd").firstChild);
+                    }
+                    <!--           Заполняем старые значения         -->
+                    data.conflict.old.forEach(function(Value, index){
+                        var new_tr = document.createElement("tr");
+                        var tdDepth = document.createElement("td");
+                        tdDepth.innerHTML = Value.depth
+                        var tdBX = document.createElement("td");
+                        tdBX.innerHTML = Value.CX
+                        var tdBY = document.createElement("td");
+                        tdBY.innerHTML = Value.CY
+                        var tdBZ = document.createElement("td");
+                        tdBZ.innerHTML = Value.CZ
+                        var tdGX = document.createElement("td");
+                        tdGX.innerHTML = Value.BX
+                        var tdGY = document.createElement("td");
+                        tdGY.innerHTML = Value.BY
+                        var tdGZ = document.createElement("td");
+                        tdGZ.innerHTML = Value.BZ
+                        var tdBtn = document.createElement("td");
+                        html_btn = '<input type="radio" class="btn-check" name="options'+ index +'" id="first_opt'+ index +'" autocomplete="off" onclick="addMeas(this);"><label class="btn btn-outline-success" for="first_opt'+ index +'" style="height:25px; width:60px; display: flex; align-items: center; justify-content: center;">    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-check-lg" viewBox="0 0 16 16"><path d="M12.736 3.97a.733.733 0 0 1 1.047 0c.286.289.29.756.01 1.05L7.88 12.01a.733.733 0 0 1-1.065.02L3.217 8.384a.757.757 0 0 1 0-1.06.733.733 0 0 1 1.047 0l3.052 3.093 5.4-6.425a.247.247 0 0 1 .02-.022Z"/></svg></label>'
+                        tdBtn.innerHTML = html_btn
+
+                        new_tr.appendChild(tdDepth)
+                        new_tr.appendChild(tdBX)
+                        new_tr.appendChild(tdBY)
+                        new_tr.appendChild(tdBZ)
+                        new_tr.appendChild(tdGX)
+                        new_tr.appendChild(tdGY)
+                        new_tr.appendChild(tdGZ)
+                        new_tr.appendChild(tdBtn)
+
+
+                        var old_body = document.getElementById("old_tbd");
+                        old_body.appendChild(new_tr);
+                         })
+                    <!--           Заполняем новые значения         -->
+                    data.conflict.new.forEach(function(Value, index){
+                        var new_tr = document.createElement("tr");
+
+                        var tdDepth = document.createElement("td");
+                        tdDepth.innerHTML = Value.depth
+                        var tdBX = document.createElement("td");
+                        tdBX.innerHTML = Value.CX
+                        var tdBY = document.createElement("td");
+                        tdBY.innerHTML = Value.CY
+                        var tdBZ = document.createElement("td");
+                        tdBZ.innerHTML = Value.CZ
+                        var tdGX = document.createElement("td");
+                        tdGX.innerHTML = Value.BX
+                        var tdGY = document.createElement("td");
+                        tdGY.innerHTML = Value.BY
+                        var tdGZ = document.createElement("td");
+                        tdGZ.innerHTML = Value.BZ
+                        var tdBtn = document.createElement("td");
+                        html_btn = '<input type="radio" class="btn-check" name="options'+ index +'" id="second_opt'+ index +'" autocomplete="off" onclick="addMeas(this);"><label class="btn btn-outline-success" for="second_opt'+ index +'" style="height:25px; width:60px; display: flex; align-items: center; justify-content: center;">    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-check-lg" viewBox="0 0 16 16"><path d="M12.736 3.97a.733.733 0 0 1 1.047 0c.286.289.29.756.01 1.05L7.88 12.01a.733.733 0 0 1-1.065.02L3.217 8.384a.757.757 0 0 1 0-1.06.733.733 0 0 1 1.047 0l3.052 3.093 5.4-6.425a.247.247 0 0 1 .02-.022Z"/></svg></label>'
+                        tdBtn.innerHTML = html_btn
+
+                        new_tr.appendChild(tdBtn)
+                        new_tr.appendChild(tdDepth)
+                        new_tr.appendChild(tdBX)
+                        new_tr.appendChild(tdBY)
+                        new_tr.appendChild(tdBZ)
+                        new_tr.appendChild(tdGX)
+                        new_tr.appendChild(tdGY)
+                        new_tr.appendChild(tdGZ)
+
+                        var new_body = document.getElementById("new_tbd");
+                        new_body.appendChild(new_tr);
+                         })
+                    document.getElementById('btn_meas_modal').click();
                 }else{
                     location.reload();}
                 });
+    }
 
+    <!--  Отправка замеров на перезапись  -->
+    function addMeas(obj){
+        let mList = new Array();
+        for (var i = 0; i < obj.parentNode.parentNode.childNodes.length; i++) {
+            let element = obj.parentNode.parentNode.childNodes[i].firstChild.textContent;
+            if(element != ''){
+                mList.push(element);}
+
+        }
+        console.log('mList=', mList)
+        var params = new FormData();
+        params.set('run_id', sessionStorage.getItem("run_id"))
+        params.set('depth', mList[0])
+        params.set('CX', mList[1])
+        params.set('CY', mList[2])
+        params.set('CZ', mList[3])
+        params.set('BX', mList[4])
+        params.set('BY', mList[5])
+        params.set('BZ', mList[6])
+        fetch('http://'+window.location.hostname+':'+window.location.port+'/axes/api/updateAxes',
+        {method: 'POST', body: params})
+        .then(response=>response.json())
+        .then(data=>{
+        console.log('Response = ', data);})
     }
 
     <!--  Функция для загрузки файла перетаскиванием  -->
@@ -330,13 +474,89 @@
     fetch('http://'+window.location.hostname+':'+window.location.port+'/axes/api/upload_file', {method: 'POST', body: data})
     .then(response=>response.json())
     .then(data=>{
+    console.log('Data = ', data)
     if('warning' in data){
-    alert(data.warning);
-    }else{
-    location.reload();}
-    })
-    input_obj.value= "";
+        alert(data.warning);
+    }else if('conflict_warning' in data){
+        <!--    Разрешение конфликта перезаписи замеров    -->
+        Meas_array = new Array();
+        <!--    Удаляем старые значения из формы         -->
+        while (document.getElementById("old_tbd").firstChild) {
+             document.getElementById("old_tbd").removeChild(document.getElementById("old_tbd").firstChild);
+             document.getElementById("new_tbd").removeChild(document.getElementById("new_tbd").firstChild);
+        }
+        <!--           Заполняем старые значения         -->
+        data.conflict.old.forEach(function(Value, index){
+            var new_tr = document.createElement("tr");
+            var tdDepth = document.createElement("td");
+            tdDepth.innerHTML = Value.depth
+            var tdBX = document.createElement("td");
+            tdBX.innerHTML = Value.CX
+            var tdBY = document.createElement("td");
+            tdBY.innerHTML = Value.CY
+            var tdBZ = document.createElement("td");
+            tdBZ.innerHTML = Value.CZ
+            var tdGX = document.createElement("td");
+            tdGX.innerHTML = Value.BX
+            var tdGY = document.createElement("td");
+            tdGY.innerHTML = Value.BY
+            var tdGZ = document.createElement("td");
+            tdGZ.innerHTML = Value.BZ
+            var tdBtn = document.createElement("td");
+            html_btn = '<input type="radio" class="btn-check" name="options'+ index +'" id="first_opt'+ index +'" autocomplete="off" onclick="addMeas(this);"><label class="btn btn-outline-success" for="first_opt'+ index +'" style="height:25px; width:60px; display: flex; align-items: center; justify-content: center;">    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-check-lg" viewBox="0 0 16 16"><path d="M12.736 3.97a.733.733 0 0 1 1.047 0c.286.289.29.756.01 1.05L7.88 12.01a.733.733 0 0 1-1.065.02L3.217 8.384a.757.757 0 0 1 0-1.06.733.733 0 0 1 1.047 0l3.052 3.093 5.4-6.425a.247.247 0 0 1 .02-.022Z"/></svg></label>'
+            tdBtn.innerHTML = html_btn
 
+            new_tr.appendChild(tdDepth)
+            new_tr.appendChild(tdBX)
+            new_tr.appendChild(tdBY)
+            new_tr.appendChild(tdBZ)
+            new_tr.appendChild(tdGX)
+            new_tr.appendChild(tdGY)
+            new_tr.appendChild(tdGZ)
+            new_tr.appendChild(tdBtn)
+
+
+            var old_body = document.getElementById("old_tbd");
+            old_body.appendChild(new_tr);
+             })
+        <!--           Заполняем новые значения         -->
+        data.conflict.new.forEach(function(Value, index){
+            var new_tr = document.createElement("tr");
+
+            var tdDepth = document.createElement("td");
+            tdDepth.innerHTML = Value.depth
+            var tdBX = document.createElement("td");
+            tdBX.innerHTML = Value.CX
+            var tdBY = document.createElement("td");
+            tdBY.innerHTML = Value.CY
+            var tdBZ = document.createElement("td");
+            tdBZ.innerHTML = Value.CZ
+            var tdGX = document.createElement("td");
+            tdGX.innerHTML = Value.BX
+            var tdGY = document.createElement("td");
+            tdGY.innerHTML = Value.BY
+            var tdGZ = document.createElement("td");
+            tdGZ.innerHTML = Value.BZ
+            var tdBtn = document.createElement("td");
+            html_btn = '<input type="radio" class="btn-check" name="options'+ index +'" id="second_opt'+ index +'" autocomplete="off" onclick="addMeas(this);"><label class="btn btn-outline-success" for="second_opt'+ index +'" style="height:25px; width:60px; display: flex; align-items: center; justify-content: center;">    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-check-lg" viewBox="0 0 16 16"><path d="M12.736 3.97a.733.733 0 0 1 1.047 0c.286.289.29.756.01 1.05L7.88 12.01a.733.733 0 0 1-1.065.02L3.217 8.384a.757.757 0 0 1 0-1.06.733.733 0 0 1 1.047 0l3.052 3.093 5.4-6.425a.247.247 0 0 1 .02-.022Z"/></svg></label>'
+            tdBtn.innerHTML = html_btn
+
+            new_tr.appendChild(tdBtn)
+            new_tr.appendChild(tdDepth)
+            new_tr.appendChild(tdBX)
+            new_tr.appendChild(tdBY)
+            new_tr.appendChild(tdBZ)
+            new_tr.appendChild(tdGX)
+            new_tr.appendChild(tdGY)
+            new_tr.appendChild(tdGZ)
+
+            var new_body = document.getElementById("new_tbd");
+            new_body.appendChild(new_tr);
+             })
+        document.getElementById('btn_meas_modal').click();
+    }else{
+        location.reload();}  })
+    input_obj.value= "";
     }
 
     <!--Функция для модального окна 1 (Добавление осей)-->
