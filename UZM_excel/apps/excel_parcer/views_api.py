@@ -230,6 +230,7 @@ def add_Axes(request):
             conflict = write_to_bd(result, current_run)
 
         if len(conflict['old']) > 0:
+            print('Открыть модальное окно!')
             return JsonResponse({'warning': 'Изменились значения осей!', 'conflict': conflict})
         else:
             return JsonResponse({'status': 'ok'})
@@ -239,12 +240,16 @@ def add_Axes(request):
 def update_Axes(request):
     """По fetch запросу обновляем оси"""
     print(request.POST.dict())
-    obj = Data.objects.get(id=request.POST['id'])
-    obj.CX = request.POST['CX']
-    obj.CY = request.POST['CY']
-    obj.CZ = request.POST['CZ']
-    obj.BX = request.POST['BX']
-    obj.BY = request.POST['BY']
-    obj.BZ = request.POST['BZ']
-    obj.save()
-    return JsonResponse({"status": f"Замер с ID:{request.POST['id']} успешно перезаписан!"})
+    try:
+        obj = Data.objects.get(run=request.POST['run_id'], depth=request.POST['depth'])
+        obj.CX = request.POST['CX']
+        obj.CY = request.POST['CY']
+        obj.CZ = request.POST['CZ']
+        obj.BX = request.POST['BX']
+        obj.BY = request.POST['BY']
+        obj.BZ = request.POST['BZ']
+        obj.save()
+    except Data.DoesNotExist:
+        return JsonResponse({"warning": "Ошибка перезаписи."})
+
+    return JsonResponse({"status": f"Замер с ID:{obj.id} успешно перезаписан!"})

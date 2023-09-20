@@ -227,7 +227,11 @@ def uploadAxesFile(request):
                                       telesystem.string_index, )
             print(result)
             result2 = new_measurements(result, telesystem.device.device_title)
-            write_to_bd(result2, current_run)
+            conflict = write_to_bd(result2, current_run)
+
+            if len(conflict['old']) > 0:
+                print('Открыть модальное окно!')
+                return JsonResponse({'conflict_warning': 'Изменились значения осей!', 'conflict': conflict})
 
     return JsonResponse({'status': 'ok'})
 

@@ -88,3 +88,9 @@ target/
 
 ### Django ###
 
+UZM_excel/apps/report/migrations/__pycache__/__init__.cpython-310.pyc
+*.pyc
+UZM_excel/apps/report/migrations/__pycache__/0014_alter_reportindex_run.cpython-310.pyc
+UZM_excel/apps/report/migrations/__pycache__/0013_alter_dynamicnnbdata_run_alter_igirgidynamic_run_and_more.cpython-310.pyc
+UZM_excel/apps/report/migrations/__pycache__/0012_alter_dynamicnnbdata_table_alter_igirgidynamic_table_and_more.cpython-310.pyc
+UZM_excel/apps/report/function/__pycache__/work_with_data.cpython-310.pyc
