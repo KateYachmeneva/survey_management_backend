@@ -93,14 +93,14 @@ def get_single_traj(dtype: str, wellbore: object) -> dict:
 
     if dtype == 'staticIgirgi':
         queryset = IgirgiStatic.objects.filter(run__in=runs)
-    if dtype == 'dynamicNNB':
-        queryset = DynamicNNBData.objects.filter(run__in=runs)
     if dtype == 'staticNNB':
         queryset = StaticNNBData.objects.filter(run__in=runs)
     if dtype == 'plan':
         queryset = Plan.objects.filter(run__in=runs)
     if dtype == 'dynamicIgirgi':
         queryset = IgirgiDynamic.objects.filter(run__in=runs)
+    if dtype == 'dynamicNNB':
+        queryset = DynamicNNBData.objects.filter(run__in=runs)
 
     data = {'Глубина': list(),
             'Угол': list(),
@@ -110,6 +110,12 @@ def get_single_traj(dtype: str, wellbore: object) -> dict:
         data['Угол'].append(meas.corner)
         data['Азимут'].append(meas.azimut)
 
+    # добавим точку привязки, начальный 0
+    if len(data['Глубина']) > 0:
+        if data['Глубина'][0] != 0:
+            data['Глубина'] = [0, *data['Глубина']]
+            data['Угол'] = [0, *data['Угол']]
+            data['Азимут'] = [0, *data['Азимут']]
     return data
 
 

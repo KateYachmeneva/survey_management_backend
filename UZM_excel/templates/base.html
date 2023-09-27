@@ -150,7 +150,14 @@
 <!--    </div>-->
 {%  block content %}
 {% endblock %}
+
 </div>
+
+<script>
+window.addEventListener('load', () => {
+    <!--Обновляем куки-->
+    document.cookie="csrftoken={{ csrf_token }}"})
+</script>
 </body>
 
 </html>
