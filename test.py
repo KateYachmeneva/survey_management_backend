@@ -8,9 +8,23 @@
 #
 # print(''.join(str(s)+"; " for s in re.findall('<(\S*)>', text2)))
 
-with open("C:\\Users\\a_dovidenkov\\Downloads\\Данные для тестов\\TMN_1_277-2_BS_INCL_RT_MD_2770.txt") as my_file:
-    line = my_file.readline()
-    while line:
-        print(repr())
-        line = my_file.readline()
+import sqlite3
+
+
+def progress(status, remaining, total):
+    print(f'Копирование {total-remaining} из {total} страниц...')
+
+
+try:
+    sqlite_con = sqlite3.connect('F:\\Рабочий стол\\GIT\\UZM_excel\\db.sqlite3')
+    backup_con = sqlite3.connect('F:\\Рабочий стол\\GIT\\UZM_excel\\Бэкап\\backup.db')
+    with backup_con:
+        sqlite_con.backup(backup_con, pages=1, progress=progress)
+    print("Резервное копирование выполнено успешно")
+except sqlite3.Error as error:
+    print("Ошибка при резервном копировании: ", error)
+finally:
+    if (backup_con):
+        backup_con.close()
+        sqlite_con.close()
 

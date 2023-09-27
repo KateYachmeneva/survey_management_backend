@@ -65,7 +65,7 @@ class DeviceCoefApiView(APIView):
                          Response={200: 'Коэффициенты записаны'}
                          )
     def post(self, request, run_id):
-        print(request.POST.dict())
+        # print(request.POST.dict())
         try:
             run = Run.objects.get(id=run_id)
         except:
@@ -239,7 +239,7 @@ def add_Axes(request):
 
 def update_Axes(request):
     """По fetch запросу обновляем оси"""
-    print(request.POST.dict())
+    # print(request.POST.dict())
     try:
         obj = Data.objects.get(run=request.POST['run_id'], depth=request.POST['depth'])
         obj.CX = request.POST['CX']

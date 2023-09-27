@@ -1,5 +1,5 @@
 from math import sqrt
-from typing import Union, Iterable, NoReturn
+from typing import Union, Iterable, NoReturn, Dict, List, Any
 
 from ..models import *
 from django.db.models import Max, QuerySet
@@ -87,20 +87,20 @@ def get_data(runs: Union[object, Iterable[object]]) -> dict:
     return data
 
 
-def get_single_traj(dtype: str, wellbore: object) -> dict:
+def get_single_traj(dtype: str, wellbore: object) -> dict[list[int], list[int], list[int]] | None:
     """Делает то же самое что функция выше, но для одного типа замеров"""
     runs = Run.objects.filter(section__wellbore=wellbore)
 
     if dtype == 'staticIgirgi':
         queryset = IgirgiStatic.objects.filter(run__in=runs)
-    if dtype == 'dynamicNNB':
-        queryset = DynamicNNBData.objects.filter(run__in=runs)
     if dtype == 'staticNNB':
         queryset = StaticNNBData.objects.filter(run__in=runs)
     if dtype == 'plan':
         queryset = Plan.objects.filter(run__in=runs)
     if dtype == 'dynamicIgirgi':
         queryset = IgirgiDynamic.objects.filter(run__in=runs)
+    if dtype == 'dynamicNNB':
+        queryset = DynamicNNBData.objects.filter(run__in=runs)
 
     data = {'Глубина': list(),
             'Угол': list(),
@@ -110,6 +110,13 @@ def get_single_traj(dtype: str, wellbore: object) -> dict:
         data['Угол'].append(meas.corner)
         data['Азимут'].append(meas.azimut)
 
+    if len(data['Глубина']) == 0:
+        return None
+    # добавим точку привязки, начальный 0
+    if data['Глубина'][0] != 0:
+        data['Глубина'] = [0, *data['Глубина']]
+        data['Угол'] = [0, *data['Угол']]
+        data['Азимут'] = [0, *data['Азимут']]
     return data
 
 
@@ -118,15 +125,23 @@ def last_depth(Wellbore: object):
     return IgirgiStatic.objects.filter(run__section__wellbore=Wellbore).aggregate(Max('depth'))['depth__max']
 
 
-def waste(wellbore: object, full: int = 0):
+def waste(wellbore: object, full: bool = False, dynamic: bool = False):
+    if dynamic:
+        nnb = DynamicNNBData.objects.filter(run__section__wellbore=wellbore).order_by('depth')
+        igirgi = IgirgiDynamic.objects.filter(run__section__wellbore=wellbore).order_by('depth')
+    else:
+        if wellbore.igirgi_drilling:  # если бурим по траектории ИГиРГИ то используем план вместо траектории ннб
+            nnb = InterpPlan.objects.filter(run__section__wellbore=wellbore).order_by('depth')
+        else:
+            nnb = StaticNNBData.objects.filter(run__section__wellbore=wellbore).order_by('depth')
+        igirgi = IgirgiStatic.objects.filter(run__section__wellbore=wellbore).order_by('depth')
+
+    return calculation_waste(wellbore, igirgi, nnb, full)
+
+
+def calculation_waste(wellbore: object, igirgi: object, nnb: object, full: bool= False):
     """ Формируем отходы по последней точке
     Если full то выдает весь массив отходов"""
-    if wellbore.igirgi_drilling:  # если бурим по траектории ИГиРГИ то используем план вместо траектории ннб
-        nnb = InterpPlan.objects.filter(run__section__wellbore=wellbore).order_by('depth')
-    else:
-        nnb = StaticNNBData.objects.filter(run__section__wellbore=wellbore).order_by('depth')
-
-    igirgi = IgirgiStatic.objects.filter(run__section__wellbore=wellbore).order_by('depth')
 
     RKB = (84 if wellbore.well_name.RKB is None else wellbore.well_name.RKB)
     VSaz = (1 if wellbore.well_name.VSaz is None else wellbore.well_name.VSaz)
@@ -158,7 +173,7 @@ def waste(wellbore: object, full: int = 0):
     Ex = (wellbore.well_name.EX if wellbore.well_name.EX is not None else 0)
     Ny = (wellbore.well_name.NY if wellbore.well_name.NY is not None else 0)
 
-    if full == 1:
+    if full:
         horiz = list()
         vert = list()
         departure = list()
@@ -170,17 +185,17 @@ def waste(wellbore: object, full: int = 0):
         X_igirgi = Ex + meas[1]
         Y_igigri = Ny + meas[0]
 
-        if full == 1:
+        if full:
             horiz.append(round(sqrt((X_nnb - X_igirgi) ** 2 + (Y_nnb - Y_igigri) ** 2), 2))
             vert.append(round(meas[5] - meas[2], 2))
             departure.append(
                 round(sqrt((X_nnb - X_igirgi) ** 2 + (Y_nnb - Y_igigri) ** 2 + (meas[2] - meas[5]) ** 2), 2))
-            continue
-        horiz = round(sqrt((X_nnb - X_igirgi) ** 2 + (Y_nnb - Y_igigri) ** 2), 2)  # отход по горизонтали
-        vert = round(meas[5] - meas[2], 2)  # отход по вертикали
-        departure = round(
-            sqrt((X_nnb - X_igirgi) ** 2 + (Y_nnb - Y_igigri) ** 2 + (meas[2] - meas[5]) ** 2),
-            2)  # отход общий
+        else:
+            horiz = round(sqrt((X_nnb - X_igirgi) ** 2 + (Y_nnb - Y_igigri) ** 2), 2)  # отход по горизонтали
+            vert = round(meas[5] - meas[2], 2)  # отход по вертикали
+            departure = round(
+                sqrt((X_nnb - X_igirgi) ** 2 + (Y_nnb - Y_igigri) ** 2 + (meas[2] - meas[5]) ** 2),
+                2)  # отход общий
     return horiz, vert, departure
 
 

@@ -169,14 +169,13 @@ def processing_data(start_data: dict, run_id: int, index_id: int) -> FileRespons
 
     # запись в бд
     bd_Write_data(all_data, run_id)
-
-    Run = get_run_by_id(run_id)
+    run_obj = Run.objects.get(id=run_id)
 
     # перезапись данных (расширение подаваемых значений, данными БД)
-    all_data = get_data(Run)
+    all_data = get_data(run_obj)
     # выдача файлов на скачивание
     file_type = 0 if start_data["response_type"] == "cut_version" else 1
-    file_name, waste = write_data_in_Excel(all_data, f'Единая_форма_отчета{file_type}.xlsx', file_type, Run)
+    file_name, waste = write_data_in_Excel(all_data, f'Единая_форма_отчета.xlsx', run_obj)
     return FileResponse(open(file_dir + "\\Report_out\\" + file_name, 'rb'))
 
 
@@ -446,13 +445,13 @@ def work_with_plan(request: dict, run: object) -> bool:
     plan_file = request.FILES['plan_file']  # сохранение файла плана
     path = fs.save('plan_' + plan_file.name, plan_file)
     plan_index(run, request.POST)  # перезапись индексов
-    print('Начали читать план')
+    # print('Начали читать план')
     data = reader('plan_file', path, ReportIndex.objects.get(run=run).id)  # берём данные с плана
     # удаляем старый план
     # print(data)
     plan_delete(run)
     bd_Write_plan(data, run.id, request.POST['plan_version'])  # сохраняем в бд
-    print('сохранили в бд')
+    # print('сохранили в бд')
     return True
 
 

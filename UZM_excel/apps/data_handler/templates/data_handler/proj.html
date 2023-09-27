@@ -74,18 +74,24 @@
 // plannedTraj, igirgiTraj, nnbTraj -плановая траетория, траектория ИгиРГИ , траектория ННБ соответственно
 
 //x -  запад/восток , y - север/юг
-
-
 const plannedTraj = {{ context.data.plan.hor | safe }};
 const igirgiTraj = {{ context.data.staticIgirgi.hor | safe }};
 const nnbTraj = {{ context.data.staticNNB.hor | safe }};
 
 // Получаем массивы для отрисовки вертикальной проекции
 // x-TVD(вертикальная секция)  y -TVDSS (абсолютная отметка)
-
 const plannedTrajV = {{ context.data.plan.ver | safe }};
 const igirgiTrajV = {{ context.data.staticIgirgi.ver | safe }};
 const nnbTrajV = {{ context.data.staticNNB.ver | safe }};
+
+{% if 'dynamicIgirgi' in context.data %}
+const igirgiDTrajV = {{ context.data.dynamicIgirgi.ver | safe }};
+{% endif %}
+
+{% if 'dynamicNNB' in context.data %}
+const nnbDTrajV = {{ context.data.dynamicNNB.ver | safe }};
+{% endif %}
+
 
 // Получение ссылки на элемент canvas в DOM
 const grafica1 = document.querySelector('#grafica1');
@@ -270,6 +276,26 @@ formV.addEventListener('submit',(e) => {
           fill: false,
           borderColor: 'rgba(0,71,171)',
         },
+        {% if 'dynamicIgirgi' in context.data %}
+        {
+          label: 'Динамика ИГиРГИ',
+          yAxesID: 'B',
+          data: igirgiDTrajV,
+          showLine: true,
+          fill: false,
+          borderColor: 'rgba(255,168,18)',
+        },
+        {% endif %}
+        {% if 'dynamicNNB' in context.data %}
+        {
+          label: 'Динамика ННБ',
+          yAxesID: 'B',
+          data: nnbDTrajV,
+          showLine: true,
+          fill: false,
+          borderColor: 'rgba(0,71,171)',
+        },
+        {% endif %}
       ],
     },
     options: {
@@ -424,6 +450,26 @@ new Chart(grafica1,
           fill: false,
           borderColor: 'rgba(0,71,171)',
         },
+        {% if 'dynamicIgirgi' in context.data %}
+        {
+          label: 'Динамика ИГиРГИ',
+          yAxesID: 'B',
+          data: igirgiDTrajV,
+          showLine: true,
+          fill: false,
+          borderColor: 'rgba(255,168,18)',
+        },
+        {% endif %}
+        {% if 'dynamicNNB' in context.data %}
+        {
+          label: 'Динамика ННБ',
+          yAxesID: 'B',
+          data: nnbDTrajV,
+          showLine: true,
+          fill: false,
+          borderColor: 'rgba(0,71,171)',
+        },
+        {% endif %}
       ],
     },
     options: {

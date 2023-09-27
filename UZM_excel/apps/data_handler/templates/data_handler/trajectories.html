@@ -159,10 +159,10 @@
 
                     <tbody>
                     <tr>
+                        {% if context.previous_igirgi_meas.depth is not None %}
                         <td id="delta_depth" scope="col" style="width: 10em; text-align: center; vertical-align: middle; font-weight: normal;">X</td>
                         <td id="delta_corner" scope="col" style="width: 10em; text-align: center; vertical-align: middle; font-weight: normal;">X</td>
                         <td id="delta_azimut" scope="col" style="width: 10em; text-align: center; vertical-align: middle; font-weight: normal;">X</td>
-                        {% if 'waste_index_0' in context %}
                         <th scope="col" style="width: 10em; text-align: center; vertical-align: middle; font-weight: normal;">{{ context.waste_hor|index:context.waste_index_0|formatted_float }}</td></th>
                         <th scope="col" style="width: 10em; text-align: center; vertical-align: middle; font-weight: normal;">{{ context.waste_vert|index:context.waste_index_0|formatted_float }}</td></th>
                         <th scope="col" style="width: 10em; text-align: center; vertical-align: middle; font-weight: normal;">{{ context.waste_common|index:context.waste_index_0|formatted_float }}</td></th>
@@ -668,9 +668,10 @@ function send_nnb_index(){
          });
 }
 
-<!-- Загрзка страницы / Расчет разницы гулбина/углов/азимутов-->
+<!-- Загрзка страницы / Расчет разницы глубина/углов/азимутов-->
 window.addEventListener('load', () => {
 
+    {% if context.previous_igirgi_meas.depth is not None %}
     <!--  Разность для нулевых  -->
     let dif = document.getElementById('igirgi_depth').innerHTML - document.getElementById('nnb_depth').innerHTML;
     if(Math.abs(dif) > 0){document.getElementById('delta_depth').style.backgroundColor = '#facfcf';}
@@ -685,6 +686,7 @@ window.addEventListener('load', () => {
     if(dif > 300){ dif = dif -  360;};
     if(dif < -300){ dif = dif + 360;};
     document.getElementById('delta_azimut').innerHTML = dif.toFixed(2);
+    {% endif %}
 
     <!--  Разность глубин  -->
     document.getElementsByName('delta0').forEach(function(element, ind){

@@ -98,7 +98,7 @@ class ProjectionParamView(APIView):
                 return Response({'warning': 'Ствол с указанным id не существует!'})
 
         obj = ProjectionParam.objects.get_or_create(wellbore=w)
-        print(request.POST.dict())
+        # print(request.POST.dict())
         # проверка на наличие коэффициентов
         hor = True
         ver = True
@@ -139,7 +139,7 @@ class ProjectionParamView(APIView):
         if not ver and not hor:
             return Response({'warning': 'Не заполнены обязательные параметры!'})
 
-        print(obj)
+        # print(obj)
         obj[0].save()
         return Response({'status': 'ок'})
 

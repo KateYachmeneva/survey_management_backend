@@ -69,13 +69,13 @@ def report(request):
     run = Run.objects.get(id=request.POST['run_id'])
     runs = Run.objects.filter(section__wellbore=run.section.wellbore)
     all_data = get_data(runs)
-    file_name, waste = write_data_in_Excel(all_data, f'Единая_форма_отчета0.xlsx', 0, run)  # имя файла и отходы
+    file_name, waste = write_data_in_Excel(all_data, f'Единая_форма_отчета.xlsx', run)  # имя файла и отходы
     return JsonResponse({'file_name': file_name, 'waste': waste})
 
 
 # report/api/get_file
 def get_report_file(request):
-    """Пролучаем файл по имени """
+    """Получаем файл по имени """
     # print('Беру отчёт с сервера!')
     file_name = request.POST['name']
     file_dir = os.getcwd() + "\\files"
