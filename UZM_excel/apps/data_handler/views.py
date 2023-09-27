@@ -74,7 +74,7 @@ def traj(request):
                     context["previous_nnb_meas"] = objs.objects.filter(run=runs[i - 1]).latest('depth')
 
             # Отходы
-            context["waste_hor"], context["waste_vert"], context["waste_common"] = waste(run.section.wellbore, 1)
+            context["waste_hor"], context["waste_vert"], context["waste_common"] = waste(run.section.wellbore, True)
             # Индексы отходов (Какие отходы выводить)
             context["waste_index"] = list()
             for ind, data in enumerate(IgirgiStatic.objects.filter(
@@ -148,7 +148,7 @@ def edit_traj(request):
                     obj = StaticNNBData.objects.get(id=key[0])
             else:
                 obj = IgirgiStatic.objects.get(id=key[0])
-            print(items[1])  # - все 3 числа замеров
+            # print(items[1])  # - все 3 числа замеров
             if items[1][0] == '' or items[1][1] == '' or items[1][2] == '':
                 obj.delete()
             else:
@@ -239,7 +239,9 @@ def proj(request):
                "active": 'proj',
                "data": {'staticIgirgi': {'hor': list(), 'ver': list()},
                         'staticNNB': {'hor': list(), 'ver': list()},
-                        'plan': {'hor': list(), 'ver': list()}}
+                        'plan': {'hor': list(), 'ver': list()},
+                        'dynamicIgirgi': {'hor': list(), 'ver': list()},
+                        'dynamicNNB': {'hor': list(), 'ver': list()},}
                }
 
     if request.GET.get('run_id') is not None:
@@ -247,10 +249,13 @@ def proj(request):
         context['selected_obj'] = run.section.wellbore
         context['graph_param'] = ProjectionParam.objects.get_or_create(wellbore=context['selected_obj'])[0]
         # данные для проекции
-        for key, vdict in context["data"].items():
+        for key, vdict in list(context["data"].items()):
             dtraj = get_single_traj(key, context['selected_obj'])  # получаем траекторию в словаре
+            if dtraj is None:
+                context["data"].pop(key)
+                continue
             # получаем проекцию
-            x1, y1, x2, y2 = single_data_graph(dtraj, context['selected_obj'])
+            x1, y1, x2, y2, z = single_data_graph(dtraj, context['selected_obj'])
             for meas in zip(x1, y1):
                 vdict['hor'].append({'x': meas[0], 'y': meas[1]})
 

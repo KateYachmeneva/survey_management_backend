@@ -72,8 +72,8 @@ def edit_index(request):
             try:
                 obj = Data.objects.get(id=key[0])
             except:
-                continue
                 print('Замер уже удалён')
+                continue
 
             if items[1][0] == '':
                 if key[1] == 'btotal':

@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'corsheaders',
     'rest_framework',
     'data_handler',
+    'dynamics',
     'excel_parcer.apps.ExcelParcerConfig',
     'report.apps.ReportConfig',
     'Field.apps.FieldConfig',
