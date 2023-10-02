@@ -37,24 +37,33 @@ def dynamics_traj(request):
 
     if request.method == 'POST':
         update_obj = list()
+        create_obj = list()
         meas_str = request.POST['data'].replace(',', '.').replace('\r', '').split('\n')
         if request.POST.get("data-type") == 'Динамики ННБ':
-            obj = DynamicNNBData.objects
+            obj = DynamicNNBData
         else:
-            obj = IgirgiDynamic.objects
+            obj = IgirgiDynamic
         for item in map(lambda x: x.split('\t'), meas_str):
             try:
                 if item[0] != '' and item[1] != '' and item[2] != '':  # Если значения не нулевые
-                    new_obj = obj.get_or_create(run=run, depth=float(item[0]))
-                    new_obj[0].corner = float(item[1])
-                    new_obj[0].azimut = float(item[2])
-                    update_obj.append(new_obj[0])
+                    try:
+                        new_obj = obj.objects.get(run=run, depth=float(item[0]))
+                        new_obj.corner = float(item[1])
+                        new_obj.azimut = float(item[2])
+                        update_obj.append(new_obj[0])
+                    except obj.DoesNotExist:
+                        create_obj.append(
+                            obj(run=run,
+                                depth=float(item[0]),
+                                corner=float(item[1]),
+                                azimut=float(item[2]))
+                        )
             except IndexError as e:
                 print('Пропуск при вставке динамики', e)
             except ValueError as e:
                 print('Пропуск при вставке динамики', e)
-
-        obj.bulk_update(update_obj, ["corner", "azimut", ])
+        obj.objects.bulk_create(create_obj)
+        obj.objects.bulk_update(update_obj, ["corner", "azimut", ])
 
     return render(request, 'dynamics/dynamic_trajectories.html', {'context': context, })
 

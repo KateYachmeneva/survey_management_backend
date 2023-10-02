@@ -48,7 +48,7 @@ th  {
         <br>
         <button type="button" onclick="delete_meas()" class="btn btn-danger"> Удалить
         </button><span class="position-related translate-middle badge rounded-pill bg-primary" id="delete_count"></span>
-        <a href="{% url 'traj'%}?run_id={{context.selected_obj.id}}" style="text-decoration: none;color: #000;">
+        <a href="{% url 'dynamics'%}?run_id={{context.selected_obj.id}}" style="text-decoration: none;color: #000;">
         <button type="button" class="btn btn-secondary">Назад </button></a>
     </div>
     {% endblock %}
