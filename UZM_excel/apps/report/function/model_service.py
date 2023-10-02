@@ -71,6 +71,9 @@ def get_data(runs: Union[object, Iterable[object]]) -> dict:
         data.pop(key)
 
     # добавим точку привязки, начальный 0
+    if data['Статические замеры ННБ']['Глубина'][0] != 0:
+        add_anchor_point(data['Статические замеры ННБ'])
+
     if data['Статические замеры ИГИРГИ']['Глубина'][0] != 0:
         add_anchor_point(data['Статические замеры ИГИРГИ'])
 
@@ -81,9 +84,13 @@ def get_data(runs: Union[object, Iterable[object]]) -> dict:
         if data['Плановая траектория интерп']['Глубина'][0] != 0:
             add_anchor_point(data['Плановая траектория интерп'])
 
-    if data['Статические замеры ННБ']['Глубина'][0] != 0:
-        add_anchor_point(data['Статические замеры ННБ'])
+    if data.get('Динамические замеры ННБ') is not None:
+        if data['Динамические замеры ННБ']['Глубина'][0] != 0:
+            add_anchor_point(data['Динамические замеры ННБ'])
 
+    if data.get('Динамические замеры ИГИРГИ') is not None:
+        if data['Динамические замеры ИГИРГИ']['Глубина'][0] != 0:
+            add_anchor_point(data['Динамические замеры ИГИРГИ'])
     return data
 
 

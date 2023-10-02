@@ -261,7 +261,7 @@ def sevcom_data(excel_sheet: openpyxl.workbook.workbook.Workbook,
         dif_Az = meas[2] - meas[4]  # разница азимут
         dif_Az = dif_Az if dif_Az <= 300 else dif_Az - 360
         dif_Az = dif_Az if dif_Az >= -300 else dif_Az + 360
-        excel_sheet.cell(row=row, column=9).value = round(dif_Az, 2)
+        excel_sheet.cell(row=row, column=10).value = round(dif_Az, 2)
         # пошли отходы
         Ex = (well_obj.EX if well_obj.EX is not None else 0)
         Ny = (well_obj.NY if well_obj.NY is not None else 0)

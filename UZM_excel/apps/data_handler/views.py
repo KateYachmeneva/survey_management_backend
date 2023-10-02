@@ -35,7 +35,7 @@ def traj(request):
                "active": 'traj',
                "tree": get_tree(),
                }
-
+    print('Запрос на траекторию')
     if request.method == "GET":
         if request.GET.get('run_id') is not None:  # если в get запросе не run_id выводим пустую страницу
             run_id = request.GET.get('run_id')
@@ -87,8 +87,10 @@ def traj(request):
                     if data in context['igirgi_data'] and ind < len(StaticNNBData.objects.filter(
                             run__section__wellbore=run.section.wellbore).order_by('depth')):
                         context["waste_index"].append(ind)
-            if len(context["waste_index"]) > 0:
-                context["waste_index_0"] = context["waste_index"][0]-1 if (context["waste_index"][0]-1) > 0 else 0
+            try:
+                context["waste_index_0"] = context["waste_index"][0]-1
+            except IndexError:
+                context["waste_index_0"] = 0
 
     if request.method == 'POST':
         run = Run.objects.get(id=request.GET.get('run_id'))

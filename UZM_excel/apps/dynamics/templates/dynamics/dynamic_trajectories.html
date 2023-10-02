@@ -10,8 +10,10 @@
 {%  block header %}
 <!--для скрола таблицы-->
 <link type="text/css" href="{% static 'css/data_handler/scroll.css' %}" rel="stylesheet" />
+<link type="text/css" href="{% static 'css/DragAndDropFile.css' %}" rel="stylesheet" />
 <!--для анимации кнопки загрузки-->
-
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <style>
 .fa {
   margin-right: 0.15em;
@@ -31,6 +33,10 @@
         </div>
         <div style="margin-top:5px;text-align: right;">
             {% if context.selected_obj.id is not None %}
+            <!--    Кнопка отвечает за отправку отчёта    -->
+            <button id='btn_send' type="button" class="btn btn-primary" onclick="Send_mail()">
+                <i id='fa_send' class="fa fa-spinner fa-spin" hidden></i>Отправить отчет
+            </button>
             <!--    Кнопка отвечает за редактирование значений траектории    -->
             <a href="{% url 'edit_dynamics' %}?run_id={{context.selected_obj.id}} " style="text-decoration: none;color: #000;">
                 <button type="button" class="btn btn-secondary" aria-controls="dtDynamicVerticalScrollExample">
@@ -230,6 +236,54 @@
 {% endblock%}
 
 <script>
+
+<!-- Отправка отчёта -->
+function Send_mail() {
+    console.log('Отправляем сообщение');
+    document.getElementById("fa_send").hidden = false;
+    <!--  Задаём в пост запрос номер рейса  -->
+    var params = new FormData();
+    params.set('run_id', {{context.selected_obj.id}});
+
+
+    fetch('http://'+window.location.hostname+':'+window.location.port+'/report/api/file_name',
+    { method: 'POST', body: params })
+    .then(response=>response.json()).
+    then(data=>{
+        var FileName = data['file_name'];
+        var Waste = data['waste'];
+        console.log(FileName);
+            <!--  Задаём в пост запрос имя файла на скачивании  -->
+            params = new FormData();
+            params.set('name', FileName);
+            <!--  Скачиваем файл  -->
+            fetch('http://'+window.location.hostname+':'+window.location.port+'/report/api/get_file',
+            { method: 'POST', body: params })
+            .then(response=>response.blob()).
+            then(data=>{
+                const anchorElement = document.createElement('a');
+                const url = window.URL.createObjectURL(data);
+                anchorElement.href = url;
+                anchorElement.download = String(FileName);
+                anchorElement.click();
+             })
+    <!-- Генерация письма в Outlook -->
+    const a_mail = document.createElement('a');
+    const url = 'mailto:{{context.letter.mailto}}&cc={{context.letter.cc}}&body={{context.letter.body}}'+
+    Math.abs(Waste['common'].toFixed(2))+'{{context.letter.comm_waste}}{{context.letter.hor_waste}}' +
+    Math.abs(Waste['hor'].toFixed(2))+' м '+ Waste['word']['hor'] +'{{context.letter.ver_waste}}'+
+    Math.abs(Waste['ver'].toFixed(2))+' м '+Waste['word']['ver']+
+    '{{context.letter.endbody}}&subject='+String(FileName).slice(0, -5);
+    a_mail.href = url;
+    a_mail.click();
+
+    document.getElementById("fa_send").hidden = true;
+    })
+}
+
+
+
+
 
 <!--Функция для модального окна под добавление замеров-->
 $('#data_Modal1').on('show.bs.modal', function (event) {
