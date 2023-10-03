@@ -6,7 +6,7 @@ from .views_api import *
 # Точки для работы с моделями траектории [обращаемся с DjangoTemplate по fetch запросу]
 urlpatterns = [
     # path('', views.index, name='report'),
-    path('api/run_index', FileIndexView.as_view(), name='run_index'),
+    path('api/run_index', views.run_index, name='run_index'),
     path('api/update_index', views.update_index),
     path('api/file_name', views.report, name='get_file_name'),
     path('api/get_file', views.get_report_file, name='get_report_file'),
@@ -18,6 +18,5 @@ urlpatterns = [
     path('api/upload_file', views.uploadFile),  # внутри смотрим на то какой файл нам пришел
     # path('api/delete_igirgi_data', views.delete_igirgi_data, name='delete_igirgi_data'),
     # path('data_input/', views.manual_input, name='manual_input'),
-    path('api/comment_copy', views.comment_copy),
-    path('api/projection_param/<int:wellbore_id>', ProjectionParamView.as_view()),
+    path('api/projection_param/<int:wellbore_id>', views.proj_param),
 ]

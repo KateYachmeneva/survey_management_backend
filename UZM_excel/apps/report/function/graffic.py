@@ -344,9 +344,7 @@ def get_graphics(all_data: dict, wellbore: object) -> dict:
         drawer.text((880, 850),
                     f'Динамические замеры\n\n'
                     f'Точка замера: {format(number_data2["Точка замера"], ".2f")} м\n'
-                    f'Отход по горизонтали: {format(number_data2["Отход по горизонтали"], ".2f")} м {waste_word2["hor"]}\n'
                     f'Отход по вертикали: {format(number_data2["Отход по вертикали"], ".2f")} м {waste_word2["ver"]}\n'
-                    f'Общий отход: {format(number_data2["Общий отход"], ".2f")} м\n'
                     f'Абсолютная отметка: {format(number_data2["Абсолютная отметка"], ".2f")} м\n',
                     font=font, fill='black')
     else:
@@ -375,6 +373,7 @@ def get_number_data(data_dict: dict, all_data: dict, dynamic: bool = False) -> t
         X_igirgi = data_dict['dynamic_igirgi_delta_x'][-1]  # EW для отходов
         Y_igigri = data_dict['dynamic_igirgi_delta_y'][-1]  # NS для отходов
         number_data['Абсолютная отметка'] = round(data_dict['dynamic_igirgi_TVDSS'][-1], 2)
+        number_data['Отход по вертикали'] = round(data_dict['dynamic_nnb_TVD'][-1] - data_dict['dynamic_igirgi_TVD'][-1], 2)
     else:
         number_data['Точка замера'] = all_data['Статические замеры ИГИРГИ']['Глубина'][-1]
         X_nnb = data_dict['nnb_delta_x'][-1]  # EW для отходов
@@ -382,9 +381,10 @@ def get_number_data(data_dict: dict, all_data: dict, dynamic: bool = False) -> t
         X_igirgi = data_dict['igirgi_delta_x'][-1]  # EW для отходов
         Y_igigri = data_dict['igirgi_delta_y'][-1]  # NS для отходов
         number_data['Абсолютная отметка'] = round(data_dict['igirgi_TVDSS'][-1], 2)
+        number_data['Отход по вертикали'] = round(data_dict['nnb_TVD'][-1] - data_dict['igirgi_TVD'][-1], 2)
 
     number_data['Отход по горизонтали'] = round(math.sqrt((X_nnb - X_igirgi) ** 2 + (Y_nnb - Y_igigri) ** 2), 2)
-    number_data['Отход по вертикали'] = round(data_dict['nnb_TVD'][-1] - data_dict['igirgi_TVD'][-1], 2)
+
     # при 0 убираем знак в названии
     number_data['Отход по горизонтали'] = (
         number_data['Отход по горизонтали'] if number_data['Отход по горизонтали'] != 0.0

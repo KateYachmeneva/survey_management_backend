@@ -63,11 +63,12 @@ def parcing_manually(path, manually_depth, manually_gx, manually_gy, manually_gz
         index_List = [manually_bz, manually_by, manually_bx, manually_gz, manually_gy, manually_gx, manually_depth]
         start_index = (manually_import if manually_import is not None else 31)
         with open(path, encoding="utf-8") as f:
-            for i in range(int(start_index)-1):
+            for i in range(int(start_index) - 1):
                 f.readline()  # считываем ненужные строки
             for raw in f.readlines():
                 try:
-                    raw_list = raw.replace('\n', '').replace('\r', '').replace('\t\t', '\t').replace('\t', ',').split(sep=',')
+                    raw_list = raw.replace('\n', '').replace('\r', '').replace('\t\t', '\t').replace('\t', ',').split(
+                        sep=',')
                     # print(raw_list)
                     for index in index_List:  # проверка считанного замера
                         float(raw_list[int(index) - 1])
@@ -287,7 +288,7 @@ def write_to_bd(data: list[list], run: object) -> NoReturn:
     Записываем преобразованные данные в БД, возвращаем conflict словарь старых и новых значений
     которые будут перезаписаны
     """
-    update_obj = list()
+    create_obj = list()
     conflict = {'old': list(), 'new': list()}
     for rows in data:
         try:
@@ -298,27 +299,34 @@ def write_to_bd(data: list[list], run: object) -> NoReturn:
         except Exception as e:
             print(e)
             continue
-        bd_data = Data.objects.get_or_create(depth=rows[0], run=run)
-        if bd_data[1]:
-            update_obj.append(bd_data[0])
-            bd_data[0].CX = rows[1]
-            bd_data[0].CY = rows[2]
-            bd_data[0].CZ = rows[3]
-            bd_data[0].BX = rows[4]
-            bd_data[0].BY = rows[5]
-            bd_data[0].BZ = rows[6]
-            bd_data[0].in_statistics = True
-        else:
-            conflict['old'].append(DataSerializer(bd_data[0]).data)
-            conflict['new'].append(DataSerializer(Data(depth=rows[0],
-                                                        CX=rows[1],
-                                                        CY=rows[2],
-                                                        CZ=rows[3],
-                                                        BX=rows[4],
-                                                        BY=rows[5],
-                                                        BZ=rows[6])).data)
 
-    Data.objects.bulk_update(update_obj, ["CX", "CY", "CZ", "BX", "BY", "BZ", "in_statistics"])
+        try:
+            bd_data = Data.objects.get(depth=rows[0], run=run)
+            # Если замер не изменился не записываем его
+            if bd_data.CX == float(rows[1]) and bd_data.CY == float(rows[2]) and bd_data.CZ == float(rows[3]) and \
+                    bd_data.BX == float(rows[4]) and bd_data.BY == float(rows[5]) and bd_data.BZ == float(rows[6]):
+                continue
+            else:
+                conflict['old'].append(DataSerializer(bd_data).data)
+                conflict['new'].append(DataSerializer(Data(depth=rows[0],
+                                                           CX=rows[1],
+                                                           CY=rows[2],
+                                                           CZ=rows[3],
+                                                           BX=rows[4],
+                                                           BY=rows[5],
+                                                           BZ=rows[6])).data)
+        except Data.DoesNotExist:
+            create_obj.append(Data(
+                depth=rows[0],
+                run=run,
+                CX=rows[1],
+                CY=rows[2],
+                CZ=rows[3],
+                BX=rows[4],
+                BY=rows[5],
+                BZ=rows[6],
+                in_statistics=True, ))
+    Data.objects.bulk_create(create_obj)
     return conflict
 
 

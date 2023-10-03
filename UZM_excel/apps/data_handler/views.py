@@ -35,7 +35,7 @@ def traj(request):
                "active": 'traj',
                "tree": get_tree(),
                }
-    print('Запрос на траекторию')
+
     if request.method == "GET":
         if request.GET.get('run_id') is not None:  # если в get запросе не run_id выводим пустую страницу
             run_id = request.GET.get('run_id')
@@ -65,32 +65,36 @@ def traj(request):
                     return render(request, 'data_handler/trajectories.html', {'context': context, })
             else:
                 context["nnb_data"] = StaticNNBData.objects.filter(run=run_id)
-
-            # Последний замер прошлого рейса (Ближайший замер)
-            for i, r in enumerate(runs):
-                if run == r and run != runs[0]:
-                    context["previous_igirgi_meas"] = IgirgiStatic.objects.filter(run=runs[i-1]).latest('depth')
-                    objs = InterpPlan if run.section.wellbore.igirgi_drilling else StaticNNBData
-                    context["previous_nnb_meas"] = objs.objects.filter(run=runs[i - 1]).latest('depth')
-
-            # Отходы
-            context["waste_hor"], context["waste_vert"], context["waste_common"] = waste(run.section.wellbore, True)
-            # Индексы отходов (Какие отходы выводить)
-            context["waste_index"] = list()
-            for ind, data in enumerate(IgirgiStatic.objects.filter(
-                    run__section__wellbore=run.section.wellbore).order_by('depth')):
-                if run.section.wellbore.igirgi_drilling:
-                    if data in context['igirgi_data'] and ind < len(InterpPlan.objects.filter(
-                            run__section__wellbore=run.section.wellbore).order_by('depth')):
-                        context["waste_index"].append(ind)
-                else:
-                    if data in context['igirgi_data'] and ind < len(StaticNNBData.objects.filter(
-                            run__section__wellbore=run.section.wellbore).order_by('depth')):
-                        context["waste_index"].append(ind)
             try:
-                context["waste_index_0"] = context["waste_index"][0]-1
-            except IndexError:
-                context["waste_index_0"] = 0
+                # Последний замер прошлого рейса (Ближайший замер)
+                for i, r in enumerate(runs):
+                    if run == r and run != runs[0]:
+                        context["previous_igirgi_meas"] = IgirgiStatic.objects.filter(run=runs[i-1]).latest('depth')
+                        objs = InterpPlan if run.section.wellbore.igirgi_drilling else StaticNNBData
+                        context["previous_nnb_meas"] = objs.objects.filter(run=runs[i - 1]).latest('depth')
+
+                # Отходы
+                context["waste_hor"], context["waste_vert"], context["waste_common"] = waste(run.section.wellbore, True)
+                # Индексы отходов (Какие отходы выводить)
+                context["waste_index"] = list()
+                for ind, data in enumerate(IgirgiStatic.objects.filter(
+                        run__section__wellbore=run.section.wellbore).order_by('depth')):
+                    if run.section.wellbore.igirgi_drilling:
+                        if data in context['igirgi_data'] and ind < len(InterpPlan.objects.filter(
+                                run__section__wellbore=run.section.wellbore).order_by('depth')):
+                            context["waste_index"].append(ind)
+                    else:
+                        if data in context['igirgi_data'] and ind < len(StaticNNBData.objects.filter(
+                                run__section__wellbore=run.section.wellbore).order_by('depth')):
+                            context["waste_index"].append(ind)
+                try:
+                    context["waste_index_0"] = context["waste_index"][0]-1
+                except IndexError:
+                    context["waste_index_0"] = 0
+            except IgirgiStatic.DoesNotExist:
+                pass
+            except StaticNNBData.DoesNotExist:
+                pass
 
     if request.method == 'POST':
         run = Run.objects.get(id=request.GET.get('run_id'))
