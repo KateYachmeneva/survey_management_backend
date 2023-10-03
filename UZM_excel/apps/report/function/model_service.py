@@ -146,7 +146,9 @@ def waste(wellbore: object, full: bool = False, dynamic: bool = False):
     return calculation_waste(wellbore, igirgi, nnb, full)
 
 
-def calculation_waste(wellbore: object, igirgi: object, nnb: object, full: bool= False):
+def calculation_waste(wellbore: object, igirgi: object, nnb: object, full: bool = False) -> tuple[list | float,
+                                                                                                  list | float,
+                                                                                                  list | float]:
     """ Формируем отходы по последней точке
     Если full то выдает весь массив отходов"""
 
@@ -185,24 +187,28 @@ def calculation_waste(wellbore: object, igirgi: object, nnb: object, full: bool=
         vert = list()
         departure = list()
 
-    for meas in zip(igirgi_delta_x, igirgi_delta_y, igirgi_delta_TVD, nnb_delta_x, nnb_delta_y, nnb_delta_TVD):
-        X_nnb = Ex + meas[4]
-        Y_nnb = Ny + meas[3]
+        for meas in zip(igirgi_delta_x, igirgi_delta_y, igirgi_delta_TVD, nnb_delta_x, nnb_delta_y, nnb_delta_TVD):
+            X_nnb = Ex + meas[4]
+            Y_nnb = Ny + meas[3]
 
-        X_igirgi = Ex + meas[1]
-        Y_igigri = Ny + meas[0]
+            X_igirgi = Ex + meas[1]
+            Y_igigri = Ny + meas[0]
 
-        if full:
             horiz.append(round(sqrt((X_nnb - X_igirgi) ** 2 + (Y_nnb - Y_igigri) ** 2), 2))
             vert.append(round(meas[5] - meas[2], 2))
             departure.append(
                 round(sqrt((X_nnb - X_igirgi) ** 2 + (Y_nnb - Y_igigri) ** 2 + (meas[2] - meas[5]) ** 2), 2))
-        else:
-            horiz = round(sqrt((X_nnb - X_igirgi) ** 2 + (Y_nnb - Y_igigri) ** 2), 2)  # отход по горизонтали
-            vert = round(meas[5] - meas[2], 2)  # отход по вертикали
-            departure = round(
-                sqrt((X_nnb - X_igirgi) ** 2 + (Y_nnb - Y_igigri) ** 2 + (meas[2] - meas[5]) ** 2),
-                2)  # отход общий
+    else:
+        X_nnb = nnb_delta_x[-1]
+        X_igirgi = igirgi_delta_x[-1]
+        Y_nnb = nnb_delta_y[-1]
+        Y_igigri = igirgi_delta_y[-1]
+
+        horiz = round(sqrt((X_nnb - X_igirgi) ** 2 + (Y_nnb - Y_igigri) ** 2), 2)  # отход по горизонтали
+        vert = round(nnb_delta_TVD[-1] - igirgi_delta_TVD[-1], 2)  # отход по вертикали
+        departure = round(
+            sqrt((X_nnb - X_igirgi) ** 2 + (Y_nnb - Y_igigri) ** 2 + (nnb_delta_TVD[-1] - igirgi_delta_TVD[-1]) ** 2),
+            2)  # отход общий
     return horiz, vert, departure
 
 

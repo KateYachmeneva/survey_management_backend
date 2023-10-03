@@ -290,18 +290,22 @@ def get_graphics(all_data: dict, wellbore: object) -> dict:
     if graph_param is not None:
         if None not in (graph_param.hor_x_min, graph_param.hor_x_max):
             ax1.set_xlim(graph_param.hor_x_min, graph_param.hor_x_max)
+            ax1.set_xticks(np.arange(graph_param.hor_x_min, graph_param.hor_x_max, graph_param.hor_x_del))
         else:
             ax1.set_xlim(ext_dict['min_x'] - additional_delta, ext_dict['max_x'] + additional_delta)
         if None not in (graph_param.hor_y_min, graph_param.hor_y_max):
             ax1.set_ylim(graph_param.hor_y_min, graph_param.hor_y_max)
+            ax1.set_yticks(np.arange(graph_param.hor_y_min, graph_param.hor_y_max, graph_param.hor_y_del))
         else:
             ax1.set_ylim(ext_dict['min_y'] - additional_delta, ext_dict['max_y'] + additional_delta)
 
         if None not in (graph_param.ver_x_min, graph_param.ver_x_max):
             ax2.set_xlim(graph_param.ver_x_min, graph_param.ver_x_max)
+            ax2.set_xticks(np.arange(graph_param.ver_x_min, graph_param.ver_x_max, graph_param.ver_x_del))
 
         if None not in (graph_param.ver_y_min, graph_param.ver_y_max):
             ax2.set_ylim(graph_param.ver_y_min, graph_param.ver_y_max)
+            ax2.set_yticks(np.arange(graph_param.ver_y_min, graph_param.ver_y_max, graph_param.ver_y_del))
     else:
         # создаем квадратную сетку
         ax1.set_xlim(ext_dict['min_x'] - additional_delta, ext_dict['max_x'] + additional_delta)
@@ -393,7 +397,7 @@ def get_number_data(data_dict: dict, all_data: dict, dynamic: bool = False) -> t
         number_data['Отход по вертикали'] if number_data['Отход по вертикали'] != 0.0
         else abs(number_data['Отход по вертикали']))
     number_data['Общий отход'] = round(
-        math.sqrt((X_nnb - X_igirgi) ** 2 + (Y_nnb - Y_igigri) ** 2 + (
+        math.sqrt((X_nnb  - X_igirgi) ** 2 + (Y_nnb - Y_igigri) ** 2 + (
                 data_dict['nnb_TVD'][-1] - data_dict['igirgi_TVD'][-1]) ** 2), 2)
 
     # Ключевые слова отходов для письма и для отчёта

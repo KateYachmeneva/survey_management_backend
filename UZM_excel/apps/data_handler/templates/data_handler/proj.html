@@ -545,6 +545,7 @@ function save_params(){
          { method: 'POST', body: params })
          .then(response=>response.json()).
           then(data=>{
+          show_alert_success('Данные сохранены!');
           console.log(data);
           });
 

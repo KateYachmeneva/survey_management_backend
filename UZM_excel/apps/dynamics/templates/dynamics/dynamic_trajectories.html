@@ -146,24 +146,22 @@
             </div>
             {% endblock %}
             <!--       Таблица с отходами и комментариями     -->
-            {% block WasteTableBody %}
             <div class="col-6">
                 <table name="table-data" class="table table-light table-sm table-bordered table-hover">
                     <tbody>
-                    {% for ind in context.waste_hor %}
+                    {% if 'delta_depth' in context %}
                     <tr>
-                        <td id="delta_depth{{ forloop.counter0 }}" name="delta0"></td>
-                        <td id="delta_cor{{ forloop.counter0 }}" name="delta1"></td>
-                        <td id="delta_azimut{{ forloop.counter0 }}" name="delta2"></td>
-                        <td name="waste1">{{ context.waste_hor|index:forloop.counter0|formatted_float }}</td>
-                        <td name="waste2">{{ context.waste_vert|index:forloop.counter0|formatted_float }}</td>
-                        <td name="waste3">{{ context.waste_common|index:forloop.counter0|formatted_float }}</td>
+                        <td>{{context.delta_depth}}</td>
+                        <td>{{context.delta_corner}}</td>
+                        <td>{{context.delta_azimut}}</td>
+                        <td>{{context.waste_hor}}</td>
+                        <td>{{context.waste_ver}}</td>
+                        <td>{{context.waste_common}}</td>
                     </tr>
-                    {% endfor %}
+                    {% endif %}
                     </tbody>
                 </table>
             </div>
-            {% endblock %}
         </div>
     </div>
 </div>

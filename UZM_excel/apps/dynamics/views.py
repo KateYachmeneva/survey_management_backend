@@ -33,7 +33,18 @@ def dynamics_traj(request):
         context["nnb_data"] = DynamicNNBData.objects.filter(run=run_id)
 
         # Отходы
-        context["waste_hor"], context["waste_vert"], context["waste_common"] = waste(run.section.wellbore, True, True)
+        context["waste_hor"], context["waste_ver"], context["waste_common"] = waste(run.section.wellbore, full=False,
+                                                                                    dynamic=True)
+        try:
+            last_igirgi = IgirgiDynamic.objects.filter(run=run_id).latest('depth')
+            last_nnb = DynamicNNBData.objects.filter(run=run_id).latest('depth')
+            context['delta_depth'] = round(last_nnb.depth - last_igirgi.depth, 2)
+            context['delta_corner'] = round(last_nnb.corner - last_igirgi.corner, 2)
+            context['delta_azimut'] = round(last_nnb.azimut - last_igirgi.azimut, 2)
+        except IgirgiDynamic.DoesNotExist:
+            pass
+        except DynamicNNBData.DoesNotExist:
+            pass
 
     if request.method == 'POST':
         update_obj = list()
@@ -47,10 +58,10 @@ def dynamics_traj(request):
             try:
                 if item[0] != '' and item[1] != '' and item[2] != '':  # Если значения не нулевые
                     try:
-                        new_obj = obj.objects.get(run=run, depth=float(item[0]))
-                        new_obj.corner = float(item[1])
-                        new_obj.azimut = float(item[2])
-                        update_obj.append(new_obj[0])
+                        new_meas = obj.objects.get(run=run, depth=float(item[0]))
+                        new_meas.corner = float(item[1])
+                        new_meas.azimut = float(item[2])
+                        update_obj.append(new_meas)
                     except obj.DoesNotExist:
                         create_obj.append(
                             obj(run=run,
