@@ -547,17 +547,16 @@ formB.addEventListener('submit',(e) => {
   arr = getXmaxValue(depthBoxy);
   arr1 = getYmaxValue(depthBoxy);
   arr2 = getYmaxValue(depthBz);
-
   if (depthMax == 0 )
    depthMax = Math.max(...arr);
   if (minBoxy == 0)
-  minBoxy = Math.min(...arr1) ;
+  minBoxy = 0 ;
   if (maxBz == 0)
      maxBz = Math.max(...arr2) ;
   if (maxBoxy == 0)
   maxBoxy = Math.max(...arr1) + maxBz/2 ;
   if (minBz == 0)
-     minBz = Math.min(...arr2) ;
+     minBz = 0 ;
 
   new Chart(grafica9,
   {
@@ -665,6 +664,7 @@ formBt.addEventListener('submit',(e) => {
   grafica10 = document.querySelector('#grafica10');
   arr = getXmaxValue(depthBraw);
   arr1 = getYmaxValue(depthBraw);
+
   if (depthMax == 0 )
     depthMax = Math.max(...arr);
   if (maxBtotal == 0)
