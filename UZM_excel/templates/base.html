@@ -14,6 +14,9 @@
     </script>
     <link rel="stylesheet" href="https://cdn.datatables.net/1.10.22/css/dataTables.bootstrap4.min.css">
     <meta charset="UTF-8">
+    <<!--  Для оповещений|Лежит в data_handler-->
+    <link type="text/css" href="{% static 'css/alert/alert.css' %}" rel="stylesheet"
+          xmlns="http://www.w3.org/1999/html"/>>
     <title>{{context.title}}</title>
     {%  block header %}
     {% endblock %}
@@ -78,7 +81,7 @@
                 </li>
 
                 <li class="nav-item">
-                    <a href="{% url 'data_info' %}" class="nav-link active" style="font-weight: 600;">
+                    <a href="{% url 'traj' %}" class="nav-link active" style="font-weight: 600;">
                         Формирование оперативного отчета
                     </a>
                 </li>
@@ -103,12 +106,24 @@
         </span>
     </div>
 </nav>
+    <div style="padding-top: 5.5em;">
+        {%  block content %}
+        {% endblock %}
+    </div>
 
-<div style="padding-top: 5.5em;">
-{%  block content %}
-{% endblock %}
+<!--alert!-->
+<div id="alert_success" class="alert alert-success alert-dismissible" role="alert">
+    <div id="alert_text"> <strong>Данные записаны!</strong> <br> Текст </div>
+    <button type="button" class="btn-close" onclick="alert_success.classList.remove('active');" aria-label="Close"></button>
 </div>
+<script>
+    function show_alert_success(text){
+        alert_success.classList.add('active');
+        alert_text.innerHTML = text;
+        setTimeout(() => alert_success.classList.remove('active'), 2000)
+    }
 
+</script>
 </body>
 
 </html>

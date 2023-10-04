@@ -396,9 +396,8 @@ class WellSummary(models.Model):
 
 def get_all_run() -> QuerySet:
     """Функция взаимдействующая с Field моделью"""
-    runs = Run.objects.all()
-    itog = sorted(runs, key=lambda x: str(x))
-    return itog
+    runs = Run.objects.all().order_by('-id')
+    return runs
 
 
 def get_all_well() -> QuerySet:

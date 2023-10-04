@@ -159,10 +159,10 @@
 
                     <tbody>
                     <tr>
+                        {% if context.previous_igirgi_meas.depth is not None %}
                         <td id="delta_depth" scope="col" style="width: 10em; text-align: center; vertical-align: middle; font-weight: normal;">X</td>
                         <td id="delta_corner" scope="col" style="width: 10em; text-align: center; vertical-align: middle; font-weight: normal;">X</td>
                         <td id="delta_azimut" scope="col" style="width: 10em; text-align: center; vertical-align: middle; font-weight: normal;">X</td>
-                        {% if 'waste_index_0' in context %}
                         <th scope="col" style="width: 10em; text-align: center; vertical-align: middle; font-weight: normal;">{{ context.waste_hor|index:context.waste_index_0|formatted_float }}</td></th>
                         <th scope="col" style="width: 10em; text-align: center; vertical-align: middle; font-weight: normal;">{{ context.waste_vert|index:context.waste_index_0|formatted_float }}</td></th>
                         <th scope="col" style="width: 10em; text-align: center; vertical-align: middle; font-weight: normal;">{{ context.waste_common|index:context.waste_index_0|formatted_float }}</td></th>
@@ -271,7 +271,7 @@
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
-            <form action=""  method="post" name="data_form" >
+            <form action=""  method="post" name="data_form" onsubmit="return validate_form1(this)">
             <div class="modal-body">
                     <div class="form-group">
                         <label for="data-name" class="col-form-label">Данные для:</label>
@@ -460,7 +460,11 @@ function uploadFile(input_obj){
      {method: 'POST', body: data})
     .then(response=>response.json())
     .then(data=>{console.log(data);
-                 location.reload();})
+                 if('error' in data){
+                 alert(data.error);
+                 }else{
+                 location.reload();}
+    })
     input_obj.value= "";
 }
 
@@ -523,6 +527,41 @@ $('#data_Modal1').on('show.bs.modal', function (event) {
 })
 
 <!-- Отправка данных через POST метод по view! -->
+<!-- Валидация при загрузке новых значений-->
+function validate_form1(form){
+    let valid = true;
+    let warning = [];
+    <!--  Глубина  -->
+<!--    let depth_array = form[2].value.split('\n');-->
+
+    <!--  Угол  -->
+    let corrner_array = form[3].value.split('\n');
+    corrner_array.forEach(function(element){
+        if( +element > 100 || +element < 0 ){
+            warning.push('Значения угла выходят за интервал (0, 100)');
+            }
+    });
+
+    <!--  Азимут  -->
+    let azimut_array = form[4].value.split('\n');
+    azimut_array.forEach(function(element){
+        if( Number(element) > 360 || Number(element) < 0 ){
+            warning.push('Значения азимута выходят за интервал (0, 360)');
+            }
+    });
+
+    if( warning.length > 0 ){
+        let Text = "При вставке значений возникли следующие ошибки:"
+        warning.forEach(function(element){
+                        Text = Text +'\n- '+ element
+                        });
+        Text = Text + '\nХотите продолжить?'
+        valid = confirm(Text);
+    }
+    console.log(warning);
+    console.log(valid);
+    return valid;
+}
 <!--Функция для модального окна под загрузку плана-->
 $('#data_Modal2').on('show.bs.modal', function (event) {
   var button = $(event.relatedTarget)
@@ -629,9 +668,10 @@ function send_nnb_index(){
          });
 }
 
-<!-- Загрзка страницы / Расчет разницы гулбина/углов/азимутов-->
+<!-- Загрзка страницы / Расчет разницы глубина/углов/азимутов-->
 window.addEventListener('load', () => {
 
+    {% if context.previous_igirgi_meas.depth is not None %}
     <!--  Разность для нулевых  -->
     let dif = document.getElementById('igirgi_depth').innerHTML - document.getElementById('nnb_depth').innerHTML;
     if(Math.abs(dif) > 0){document.getElementById('delta_depth').style.backgroundColor = '#facfcf';}
@@ -646,6 +686,7 @@ window.addEventListener('load', () => {
     if(dif > 300){ dif = dif -  360;};
     if(dif < -300){ dif = dif + 360;};
     document.getElementById('delta_azimut').innerHTML = dif.toFixed(2);
+    {% endif %}
 
     <!--  Разность глубин  -->
     document.getElementsByName('delta0').forEach(function(element, ind){

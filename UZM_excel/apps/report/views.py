@@ -4,6 +4,7 @@ import time
 from PIL import Image
 from django.http import JsonResponse, FileResponse, HttpResponse
 from django.shortcuts import render, redirect
+from drf_yasg.openapi import Response
 
 # Create your views here.
 from .function.api_func import get_index
@@ -13,6 +14,7 @@ from .function.work_with_Excel import write_data_in_Excel
 from .function.work_with_data import rewrite_ReportIndex, work_with_file, plan_delete, work_with_nnb
 from Field.models import get_all_run, Run, Wellbore
 from .models import *
+from .serializer import ProjectionParamSerializer
 
 
 # def index(request):
@@ -69,13 +71,13 @@ def report(request):
     run = Run.objects.get(id=request.POST['run_id'])
     runs = Run.objects.filter(section__wellbore=run.section.wellbore)
     all_data = get_data(runs)
-    file_name, waste = write_data_in_Excel(all_data, f'Единая_форма_отчета0.xlsx', 0, run)  # имя файла и отходы
+    file_name, waste = write_data_in_Excel(all_data, f'Единая_форма_отчета.xlsx', run)  # имя файла и отходы
     return JsonResponse({'file_name': file_name, 'waste': waste})
 
 
 # report/api/get_file
 def get_report_file(request):
-    """Пролучаем файл по имени """
+    """Получаем файл по имени """
     # print('Беру отчёт с сервера!')
     file_name = request.POST['name']
     file_dir = os.getcwd() + "\\files"
@@ -155,6 +157,16 @@ def uploadFile(request):
     """ Сюда будут приходить файлы для считывания траектории с fetch запросов """
     f_type = request.POST.get('type')  # пытаемся найти тип файла (траектория ннб или плановая)
     r_id = request.POST.get('run_id')
+    try:
+        index = ReportIndex.objects.get(run=r_id)
+        NoneCorrectItems = {None, ''}
+        Items = {index.nnb_static_depth, index.nnb_static_corner, index.nnb_static_azimut, index.nnb_static_list_name, }
+        if len(NoneCorrectItems.intersection(Items)) != 0:
+            raise ReportIndex.DoesNotExist
+    except ReportIndex.DoesNotExist:
+        return JsonResponse({'error': 'Ошибка чтения! Пожалуйста, проверьте настройки импорта для '
+                                      'выбранного рейса!'})
+
     if f_type is None:
         return JsonResponse({'status': 'Файл передан без типа. Укажите в поле type один из параметров:',
                              'type': '(nnb, plan, igirgi)'})
@@ -168,6 +180,72 @@ def uploadFile(request):
     return JsonResponse({'status': 'ok'})
 
 
-def comment_copy(request):
-    num = NNBToIgirgi()
-    return JsonResponse({"Не было найдено комментариев:": f"{num}"})
+def proj_param(request, wellbore_id):
+    """ Параметры для графика проекций горизонтальной/вертикальной"""
+
+    if request.method == 'GET':
+        try:
+            params = ProjectionParam.objects.get(wellbore=wellbore_id)
+            return JsonResponse(ProjectionParamSerializer(params).data)
+        except ProjectionParam.DoesNotExist:
+            return JsonResponse({'warning': 'Не удалось найти параметры по данному id ствола.'})
+
+    if request.method == 'POST':
+        if wellbore_id is None:
+            return JsonResponse({'warning': 'Не указан id ствола! Укажите id в параметре wellbore_id.'})
+        else:
+            try:
+                w = Wellbore.objects.get(id=wellbore_id)
+            except Exception as e:
+                return JsonResponse({'warning': 'Ствол с указанным id не существует!'})
+
+        obj = ProjectionParam.objects.get_or_create(wellbore=w)
+        # print(request.POST.dict())
+        # проверка на наличие коэффициентов
+        hor = True
+        ver = True
+        hor_x_min = request.POST.get('hor_x_min')
+        hor_x_max = request.POST.get('hor_x_max')
+        hor_x_del = request.POST.get('hor_x_del')
+        hor_y_min = request.POST.get('hor_y_min')
+        hor_y_max = request.POST.get('hor_y_max')
+        hor_y_del = request.POST.get('hor_y_del')
+
+        if None or '' in (hor_x_min, hor_x_max, hor_x_del, hor_y_min, hor_y_max, hor_y_del):
+            hor = False
+        else:
+            obj[0].hor_x_min = hor_x_min
+            obj[0].hor_x_max = hor_x_max
+            obj[0].hor_x_del = hor_x_del
+            obj[0].hor_y_min = hor_y_min
+            obj[0].hor_y_max = hor_y_max
+            obj[0].hor_y_del = hor_y_del
+
+        ver_x_min = request.POST.get('ver_x_min')
+        ver_x_max = request.POST.get('ver_x_max')
+        ver_x_del = request.POST.get('ver_x_del')
+        ver_y_min = request.POST.get('ver_y_min')
+        ver_y_max = request.POST.get('ver_y_max')
+        ver_y_del = request.POST.get('ver_y_del')
+
+        if None or '' in (ver_x_min, ver_x_max, ver_x_del, ver_y_min, ver_y_max, ver_y_del):
+            ver = False
+        else:
+            obj[0].ver_x_min = ver_x_min
+            obj[0].ver_x_max = ver_x_max
+            obj[0].ver_x_del = ver_x_del
+            obj[0].ver_y_min = ver_y_min
+            obj[0].ver_y_max = ver_y_max
+            obj[0].ver_y_del = ver_y_del
+
+        if not ver and not hor:
+            return JsonResponse({'warning': 'Не заполнены обязательные параметры!'})
+
+        # print(obj)
+        obj[0].save()
+        return JsonResponse({'status': 'ок'})
+
+#
+# def comment_copy(request):
+#     num = NNBToIgirgi()
+#     return JsonResponse({"Не было найдено комментариев:": f"{num}"})

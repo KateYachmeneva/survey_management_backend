@@ -2,10 +2,13 @@
 .env.example
 .env.local
 .env.staging
+.idea
+.pytest_cache
 env
 UZM_excel\conf.py
 media
-files
+Report_input
+Report_out
 
 ### OSX ###
 .DS_Store
@@ -86,4 +89,5 @@ target/
 
 
 ### Django ###
+*.pyc
 

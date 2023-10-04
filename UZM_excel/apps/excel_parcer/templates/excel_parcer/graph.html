@@ -35,26 +35,26 @@
           <input class="col-sm-4 col-form-control" value="{{context.selected.well_name.get_status}}" disabled>
         </div>
       </div>
+<!--   Для подгона размера графиков под ОТЧЁТ   -->
 <!--      <div class="col-6">-->
-<!--        <div class="accordion">-->
-<!--          <div class="accordion-item">-->
-<!--            <h2 class="accordion-header">-->
-<!--              <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">-->
-<!--                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrows-angle-expand" viewBox="0 0 16 16">-->
-<!--                  <path fill-rule="evenodd" d="M5.828 10.172a.5.5 0 0 0-.707 0l-4.096 4.096V11.5a.5.5 0 0 0-1 0v3.975a.5.5 0 0 0 .5.5H4.5a.5.5 0 0 0 0-1H1.732l4.096-4.096a.5.5 0 0 0 0-.707zm4.344-4.344a.5.5 0 0 0 .707 0l4.096-4.096V4.5a.5.5 0 1 0 1 0V.525a.5.5 0 0 0-.5-.5H11.5a.5.5 0 0 0 0 1h2.768l-4.096 4.096a.5.5 0 0 0 0 .707z"></path>-->
-<!--                </svg>-->
-<!--                 Изменить размер графиков-->
-<!--              </button>-->
-<!--            </h2>-->
-<!--            <div id="collapseOne" class="accordion-collapse collapse" data-bs-parent="#accordionExample">-->
-<!--              <div class="accordion-body">-->
-<!--                <strong>This is the first item's accordion body.</strong> It is shown by default, until the collapse plugin adds the appropriate classes that we use to style each element. These classes control the overall appearance, as well as the showing and hiding via CSS transitions. You can modify any of this with custom CSS or overriding our default variables. It's also worth noting that just about any HTML can go within the <code>.accordion-body</code>, though the transition does limit overflow.-->
-<!--              </div>-->
-<!--            </div>-->
+<!--        <div class="row">-->
+<!--          <label class="col-sm col-form-label">Формат отображения: </label>-->
+<!--          <div class="col-sm-6 btn-group" role="group">-->
+<!--            <button type="button" class="btn btn-outline-secondary">-->
+<!--              <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="currentColor" class="bi bi-arrows-angle-expand" viewBox="0 0 16 16">-->
+<!--  <path fill-rule="evenodd" d="M5.828 10.172a.5.5 0 0 0-.707 0l-4.096 4.096V11.5a.5.5 0 0 0-1 0v3.975a.5.5 0 0 0 .5.5H4.5a.5.5 0 0 0 0-1H1.732l4.096-4.096a.5.5 0 0 0 0-.707zm4.344-4.344a.5.5 0 0 0 .707 0l4.096-4.096V4.5a.5.5 0 1 0 1 0V.525a.5.5 0 0 0-.5-.5H11.5a.5.5 0 0 0 0 1h2.768l-4.096 4.096a.5.5 0 0 0 0 .707z"></path>-->
+<!--</svg>-->
+<!--            </button>-->
+<!--            <button class="btn btn-outline-secondary">-->
+<!--              <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="currentColor" class="bi bi-arrows-angle-contract" viewBox="0 0 16 16">-->
+<!--  <path fill-rule="evenodd" d="M.172 15.828a.5.5 0 0 0 .707 0l4.096-4.096V14.5a.5.5 0 1 0 1 0v-3.975a.5.5 0 0 0-.5-.5H1.5a.5.5 0 0 0 0 1h2.768L.172 15.121a.5.5 0 0 0 0 .707zM15.828.172a.5.5 0 0 0-.707 0l-4.096 4.096V1.5a.5.5 0 1 0-1 0v3.975a.5.5 0 0 0 .5.5H14.5a.5.5 0 0 0 0-1h-2.768L15.828.879a.5.5 0 0 0 0-.707z"/>-->
+<!--</svg>-->
+<!--            </button>-->
+<!--            <button class="btn btn-secondary" disabled>Свой размер</button>-->
 <!--          </div>-->
 <!--        </div>-->
 
-<!--      </div>-->
+      </div>
     </div>
   </div>
   <br>
@@ -64,21 +64,21 @@
   <form id ="form">
   <label>Глубина, м </label>
   <div class="mb-3">
-<label>Минимальное значение: <input id="depthMin" type="number" step="10"></label>
-<label>Максимальное значение: <input id="depthMax" type="number" step="10"></label>
+<label>Минимальное значение: <input id="depthMin" type="number" step="0.0000001"></label>
+<label>Максимальное значение: <input id="depthMax" type="number" step="0.0000001"></label>
 <label>Шаг: <input id="depthStep" type="number" step="10"></label>
 </div>
 <label>Goxy,G</label>
 <div class="mb-3">
-<label>Минимальное значение: <input id="minGoxy" type="number" step="0.1"></label>
-<label>Максимальное значение: <input id="maxGoxy" type="number" step="0.1"></label>
-<label>Шаг: <input id="stepGoxy" type="number" step="0.1"></label>
+<label>Минимальное значение: <input id="minGoxy" type="number" step="0.0000001"></label>
+<label>Максимальное значение: <input id="maxGoxy" type="number" step="0.0000001"></label>
+<label>Шаг: <input id="stepGoxy" type="number" step="0.0000001"></label>
 </div>   
 <label>Gz,G </label>
 <div class="mb-3">
-<label>Минимальное значение: <input id="minGz" type="number" step="0.1"></label>
-<label>Максимальное значение: <input id="maxGz" type="number" step="0.1"></label>
-<label>Шаг: <input id="stepGz" type="number" step="0.1"></label>
+<label>Минимальное значение: <input id="minGz" type="number" step="0.0000001"></label>
+<label>Максимальное значение: <input id="maxGz" type="number" step="0.0000001"></label>
+<label>Шаг: <input id="stepGz" type="number" step="0.0000001"></label>
 </div>    
 <div class="container-btn" >   
 <button type="submit" id="sbtn">Submit</button>
@@ -90,15 +90,15 @@
 <form id ="formGtotal">
   <label>Глубина, м </label>
   <div class="mb-3">
-<label>Минимальное  значение: <input id="depthMin" type="number" step="10"></label>
-<label>Максимальное значение: <input id="depthMax" type="number" step="10"></label>
-<label>Шаг: <input id="depthStep" type="number" step="10"></label>
+<label>Минимальное  значение: <input id="depthMin" type="number" step="0.0000001"></label>
+<label>Максимальное значение: <input id="depthMax" type="number" step="0.0000001"></label>
+<label>Шаг: <input id="depthStep" type="number" step="0.0000001"></label>
 </div>
 <label>Gtotal,G</label>
 <div class="mb-3">
-<label>Минимальное значение: <input id="minGtotal" type="number" step="0.001"></label>
-<label>Максимальное значение: <input id="maxGtotal" type="number" step="0.001"></label>
-<label>Шаг: <input id="stepGtotal" type="number" step="0.001"></label>
+<label>Минимальное значение: <input id="minGtotal" type="number" step="0.0000001"></label>
+<label>Максимальное значение: <input id="maxGtotal" type="number" step="0.0000001"></label>
+<label>Шаг: <input id="stepGtotal" type="number" step="0.0000001"></label>
 </div>   
 <div class="container-btn" >   
 <button type="submit" id="sbtnGtotal">Submit</button>
@@ -111,21 +111,21 @@
   <form id ="formB">
     <label>Глубина, м </label>
     <div class="mb-3">
-  <label>Минимальное  значение: <input id="depthMin" type="number" step="10"></label>
-  <label>Максимальное значение: <input id="depthMax" type="number" step="10"></label>
-  <label>Шаг: <input id="depthStep" type="number" step="10"></label>
+  <label>Минимальное  значение: <input id="depthMin" type="number" step="0.0000001"></label>
+  <label>Максимальное значение: <input id="depthMax" type="number" step="0.0000001"></label>
+  <label>Шаг: <input id="depthStep" type="number" step="0.0000001"></label>
   </div>
   <label>Boxy,нТл</label>
   <div class="mb-3">
-  <label>Минимальное значение: <input id="minBoxy" type="number" step="10"></label>
-  <label>Максимальное значение: <input id="maxBoxy" type="number" step="10"></label>
-  <label>Шаг: <input id="stepBoxy" type="number" step="50"></label>
+  <label>Минимальное значение: <input id="minBoxy" type="number" step="0.0000001"></label>
+  <label>Максимальное значение: <input id="maxBoxy" type="number" step="0.0000001"></label>
+  <label>Шаг: <input id="stepBoxy" type="number" step="0.0000001"></label>
   </div>   
   <label>Bz,нТл </label>
   <div class="mb-3">
-  <label>Минимальное значение: <input id="minBz" type="number" step="50"></label>
-  <label>Максимальное значение: <input id="maxBz" type="number" step="50"></label>
-  <label>Шаг: <input id="stepBz" type="number" step="50"></label>
+  <label>Минимальное значение: <input id="minBz" type="number" step="0.0000001"></label>
+  <label>Максимальное значение: <input id="maxBz" type="number" step="0.0000001"></label>
+  <label>Шаг: <input id="stepBz" type="number" step="0.0000001"></label>
   </div>    
   <div class="container-btn" >   
   <button type="submit" id="sbtn">Submit</button>
@@ -138,15 +138,15 @@
   <form id ="formBt">
     <label>Глубина, м </label>
     <div class="mb-3">
-  <label>Минимальное  значение: <input id="depthMin" type="number" step="10"></label>
-  <label>Максимальное значение: <input id="depthMax" type="number" step="10"></label>
-  <label>Шаг: <input id="depthStep" type="number" step="10"></label>
+  <label>Минимальное  значение: <input id="depthMin" type="number" step="0.0000001"></label>
+  <label>Максимальное значение: <input id="depthMax" type="number" step="0.0000001"></label>
+  <label>Шаг: <input id="depthStep" type="number" step="0.0000001"></label>
   </div>
   <label>Btotal,нТл</label>
   <div class="mb-3">
-  <label>Минимальное значение: <input id="minBtot" type="number" step="10"></label>
-  <label>Максимальное значение: <input id="maxBtot" type="number" step="10"></label>
-  <label>Шаг: <input id="stepBtot" type="number" step="50"></label>
+  <label>Минимальное значение: <input id="minBtot" type="number" step="0.0000001"></label>
+  <label>Максимальное значение: <input id="maxBtot" type="number" step="0.0000001"></label>
+  <label>Шаг: <input id="stepBtot" type="number" step="0.0000001"></label>
   </div>   
   <div class="container-btn" >   
   <button type="submit" id="sbtn">Submit</button>
@@ -159,9 +159,9 @@
 <form id ="formHSTF">
   <label>Глубина, м </label>
   <div class="mb-3">
-<label>Минимальное  значение: <input id="depthMin" type="number" step="10"></label>
-<label>Максимальное значение: <input id="depthMax" type="number" step="10"></label>
-<label>Шаг: <input id="depthStep" type="number" step="10"></label>
+<label>Минимальное  значение: <input id="depthMin" type="number" step="0.0000001"></label>
+<label>Максимальное значение: <input id="depthMax" type="number" step="0.0000001"></label>
+<label>Шаг: <input id="depthStep" type="number" step="0.0000001"></label>
 </div> 
 <div class="container-btn" >   
 <button type="submit" id="sbtn">Submit</button>
@@ -174,15 +174,15 @@
   <form id ="formDip">
     <label>Глубина, м </label>
     <div class="mb-3">
-  <label>Минимальное  значение: <input id="depthMin" type="number" step="10"></label>
-  <label>Максимальное значение: <input id="depthMax" type="number" step="10"></label>
-  <label>Шаг: <input id="depthStep" type="number" step="10"></label>
+  <label>Минимальное  значение: <input id="depthMin" type="number" step="0.0000001"></label>
+  <label>Максимальное значение: <input id="depthMax" type="number" step="0.0000001"></label>
+  <label>Шаг: <input id="depthStep" type="number" step="0.0000001"></label>
   </div>
   <label>Dip,гр</label>
   <div class="mb-3">
-  <label>Минимальное значение: <input id="minDip" type="number" step="0.1"></label>
-  <label>Максимальное значение: <input id="maxDip" type="number" step="0.1"></label>
-  <label>Шаг: <input id="stepDip" type="number" step="0.1"></label>
+  <label>Минимальное значение: <input id="minDip" type="number" step="0.0000001"></label>
+  <label>Максимальное значение: <input id="maxDip" type="number" step="0.0000001"></label>
+  <label>Шаг: <input id="stepDip" type="number" step="0.0000001"></label>
   </div>           
   <div class="container-btn" >   
   <button type="submit" id="sbtn">Submit</button>
@@ -547,17 +547,16 @@ formB.addEventListener('submit',(e) => {
   arr = getXmaxValue(depthBoxy);
   arr1 = getYmaxValue(depthBoxy);
   arr2 = getYmaxValue(depthBz);
-
   if (depthMax == 0 )
    depthMax = Math.max(...arr);
   if (minBoxy == 0)
-  minBoxy = Math.min(...arr1) ;
+  minBoxy = 0 ;
   if (maxBz == 0)
      maxBz = Math.max(...arr2) ;
   if (maxBoxy == 0)
   maxBoxy = Math.max(...arr1) + maxBz/2 ;
   if (minBz == 0)
-     minBz = Math.min(...arr2) ;
+     minBz = 0 ;
 
   new Chart(grafica9,
   {
@@ -665,6 +664,7 @@ formBt.addEventListener('submit',(e) => {
   grafica10 = document.querySelector('#grafica10');
   arr = getXmaxValue(depthBraw);
   arr1 = getYmaxValue(depthBraw);
+
   if (depthMax == 0 )
     depthMax = Math.max(...arr);
   if (maxBtotal == 0)

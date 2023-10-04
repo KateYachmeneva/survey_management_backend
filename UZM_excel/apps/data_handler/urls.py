@@ -1,4 +1,4 @@
-from django.urls import path
+from django.urls import path, include
 
 from . import views
 
@@ -8,5 +8,6 @@ urlpatterns = [
     path('parametrs', views.param, name='param'),
     path('trajectories', views.traj, name='traj'),
     path('edit_trajectories', views.edit_traj, name='edit_traj'),
-    path('projection', views.proj, name='proj')
+    path('projection', views.proj, name='proj'),
+    path('dynamics/', include('dynamics.urls')),
 ]

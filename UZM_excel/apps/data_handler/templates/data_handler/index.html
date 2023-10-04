@@ -18,33 +18,24 @@ body{ overflow: hidden; }
 <nav class="navbar navbar-expand-lg navbar-light bg-light">
   <div class="container-fluid">
       <ul class="nav nav-pills m-auto">
-        <li class="nav-item">
-          {% if context.active == 'param' %}
-          <a href="{% url 'param' %}" class="nav-link active" style="font-size:large">Общие параметры</a>
-          {% else %}
-          <a href="{% url 'param' %}" class="nav-link" style="font-size:large">Общие параметры</a>
-          {% endif %}
-        </li>
-        <li class="nav-item active">
-          {% if context.active == 'plan' %}
-          <a href="{% url 'plan' %}" class="nav-link active" style="font-size:large">Плановая траектория</a>
-          {% else %}
-          <a href="{% url 'plan' %}" class="nav-link" style="font-size:large">Плановая траектория</a>
-          {% endif %}
-        </li>
-        <li class="nav-item">
-          {% if context.active == 'traj'%}
-          <a href="{% url 'traj' %}" class="nav-link active" style="font-size:large">Траектории</a>
-          {% else %}
-          <a href="{% url 'traj' %}" class="nav-link" style="font-size:large">Траектории</a>
-          {% endif %}
-        </li>
           <li class="nav-item">
-              {% if context.active == 'proj'%}
-              <a href="{% url 'proj' %}" class="nav-link active" style="font-size:large">Проекции</a>
-              {% else %}
-              <a href="{% url 'proj' %}" class="nav-link" style="font-size:large">Проекции</a>
-              {% endif %}
+              <a href="{% url 'param' %}" class="nav-link {% if context.active == 'param' %}active{% endif %}" style="font-size:large">Общие параметры</a>
+          </li>
+
+          <li class="nav-item active">
+              <a href="{% url 'plan' %}" class="nav-link {% if context.active == 'plan' %}active{% endif %}" style="font-size:large">Плановая траектория</a>
+          </li>
+
+          <li class="nav-item">
+              <a href="{% url 'traj' %}" class="nav-link {% if context.active == 'traj'%}active{% endif %}" style="font-size:large">Траектории</a>
+          </li>
+
+          <li class="nav-item">
+              <a href="{% url 'dynamics' %}" class="nav-link {% if context.active == 'dynamics'%}active{% endif %}" style="font-size:large">Динамика</a>
+          </li>
+
+          <li class="nav-item">
+              <a href="{% url 'proj' %}" class="nav-link {% if context.active == 'proj'%}active{% endif %}" style="font-size:large">Проекции</a>
           </li>
       </ul>
   </div>

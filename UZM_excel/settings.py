@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'corsheaders',
     'rest_framework',
     'data_handler',
+    'dynamics',
     'excel_parcer.apps.ExcelParcerConfig',
     'report.apps.ReportConfig',
     'Field.apps.FieldConfig',
@@ -146,6 +147,9 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 #  'http://10.23.125.230:9613',
 # ]
 
+# Для DRF
+CORS_ORIGIN_ALLOW_ALL = True
+# Для Django
 CORS_ALLOW_ALL_ORIGINS = True
 CORS_ALLOW_CREDENTIALS = True
 

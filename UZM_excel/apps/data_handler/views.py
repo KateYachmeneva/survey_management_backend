@@ -65,30 +65,37 @@ def traj(request):
                     return render(request, 'data_handler/trajectories.html', {'context': context, })
             else:
                 context["nnb_data"] = StaticNNBData.objects.filter(run=run_id)
+            try:
+                # Последний замер прошлого рейса (Ближайший замер)
+                for i, r in enumerate(runs):
+                    if run == r and run != runs[0]:
+                        context["previous_igirgi_meas"] = IgirgiStatic.objects.filter(run=runs[i-1]).latest('depth')
+                        objs = InterpPlan if run.section.wellbore.igirgi_drilling else StaticNNBData
+                        context["previous_nnb_meas"] = objs.objects.filter(run=runs[i - 1]).latest('depth')
 
-            # Последний замер прошлого рейса (Ближайший замер)
-            for i, r in enumerate(runs):
-                if run == r and run != runs[0]:
-                    context["previous_igirgi_meas"] = IgirgiStatic.objects.filter(run=runs[i-1]).latest('depth')
-                    objs = InterpPlan if run.section.wellbore.igirgi_drilling else StaticNNBData
-                    context["previous_nnb_meas"] = objs.objects.filter(run=runs[i - 1]).latest('depth')
+                # Отходы
+                context["waste_hor"], context["waste_vert"], context["waste_common"] = waste(run.section.wellbore, True)
+                # Индексы отходов (Какие отходы выводить)
+                context["waste_index"] = list()
+                for ind, data in enumerate(IgirgiStatic.objects.filter(
+                        run__section__wellbore=run.section.wellbore).order_by('depth')):
+                    if run.section.wellbore.igirgi_drilling:
+                        if data in context['igirgi_data'] and ind < len(InterpPlan.objects.filter(
+                                run__section__wellbore=run.section.wellbore).order_by('depth')):
+                            context["waste_index"].append(ind)
+                    else:
+                        if data in context['igirgi_data'] and ind < len(StaticNNBData.objects.filter(
+                                run__section__wellbore=run.section.wellbore).order_by('depth')):
+                            context["waste_index"].append(ind)
+                try:
+                    context["waste_index_0"] = context["waste_index"][0]-1
+                except IndexError:
+                    context["waste_index_0"] = 0
+            except IgirgiStatic.DoesNotExist:
+                pass
+            except StaticNNBData.DoesNotExist:
+                pass
 
-            # Отходы
-            context["waste_hor"], context["waste_vert"], context["waste_common"] = waste(run.section.wellbore, 1)
-            # Индексы отходов (Какие отходы выводить)
-            context["waste_index"] = list()
-            for ind, data in enumerate(IgirgiStatic.objects.filter(
-                    run__section__wellbore=run.section.wellbore).order_by('depth')):
-                if run.section.wellbore.igirgi_drilling:
-                    if data in context['igirgi_data'] and ind < len(InterpPlan.objects.filter(
-                            run__section__wellbore=run.section.wellbore).order_by('depth')):
-                        context["waste_index"].append(ind)
-                else:
-                    if data in context['igirgi_data'] and ind < len(StaticNNBData.objects.filter(
-                            run__section__wellbore=run.section.wellbore).order_by('depth')):
-                        context["waste_index"].append(ind)
-            if len(context["waste_index"]) > 0:
-                context["waste_index_0"] = context["waste_index"][0]-1 if (context["waste_index"][0]-1) > 0 else 0
     if request.method == 'POST':
         run = Run.objects.get(id=request.GET.get('run_id'))
         context['title'] = run.section.wellbore.well_name.get_title()
@@ -96,7 +103,7 @@ def traj(request):
         if 'plan_depth' in request.POST:  # данные с модальной формы 2 (плановая траектория)
             work_with_plan(request, run)
 
-        if 'data-depth' in request.POST:  # данные с модальной формы 1 (добавление значенией)
+        if 'data-depth' in request.POST:  # данные с модальной формы 1 (добавление значений)
             depth_data = request.POST['data-depth'].replace(',', '.').replace(' ', '') \
                 .replace('\r', '').replace('\n', '\t').split('\t')
             corner_data = request.POST['data-corner'].replace(',', '.').replace(' ', '') \
@@ -147,7 +154,7 @@ def edit_traj(request):
                     obj = StaticNNBData.objects.get(id=key[0])
             else:
                 obj = IgirgiStatic.objects.get(id=key[0])
-            print(items[1])  # - все 3 числа замеров
+            # print(items[1])  # - все 3 числа замеров
             if items[1][0] == '' or items[1][1] == '' or items[1][2] == '':
                 obj.delete()
             else:
@@ -238,7 +245,9 @@ def proj(request):
                "active": 'proj',
                "data": {'staticIgirgi': {'hor': list(), 'ver': list()},
                         'staticNNB': {'hor': list(), 'ver': list()},
-                        'plan': {'hor': list(), 'ver': list()}}
+                        'plan': {'hor': list(), 'ver': list()},
+                        'dynamicIgirgi': {'hor': list(), 'ver': list()},
+                        'dynamicNNB': {'hor': list(), 'ver': list()},}
                }
 
     if request.GET.get('run_id') is not None:
@@ -246,10 +255,13 @@ def proj(request):
         context['selected_obj'] = run.section.wellbore
         context['graph_param'] = ProjectionParam.objects.get_or_create(wellbore=context['selected_obj'])[0]
         # данные для проекции
-        for key, vdict in context["data"].items():
+        for key, vdict in list(context["data"].items()):
             dtraj = get_single_traj(key, context['selected_obj'])  # получаем траекторию в словаре
+            if dtraj is None:
+                context["data"].pop(key)
+                continue
             # получаем проекцию
-            x1, y1, x2, y2 = single_data_graph(dtraj, context['selected_obj'])
+            x1, y1, x2, y2, z = single_data_graph(dtraj, context['selected_obj'])
             for meas in zip(x1, y1):
                 vdict['hor'].append({'x': meas[0], 'y': meas[1]})
 

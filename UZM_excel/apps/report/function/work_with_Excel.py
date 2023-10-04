@@ -1,6 +1,6 @@
 import os
 from math import sqrt
-from typing import NoReturn
+from typing import NoReturn, Tuple, Any, Dict
 
 import openpyxl
 from openpyxl.drawing.image import Image
@@ -70,38 +70,35 @@ def excel_open(column: dict) -> dict:
 """
 
 
-def write_data_in_Excel(all_data: dict, filename: str, short_type: int, Run: object) -> str:
+def write_data_in_Excel(all_data: dict, filename: str, Run: object) -> tuple[
+    str, dict[str, float | Any]]:
     """
-    Записываем замеры из all_data в шаблон
-    filename - имя шаблона в папке Шаблон
-    short_type - сокращенный файл (0) или полный (1)
-    Well- скважина
-
-    На выходе получаем имя файла, которое отдаем на выдачу и параметры отходов
+    Записываем замеры из all_data в шаблон, filename - имя шаблона в папке Шаблон
+    На выходе получаем имя файла и параметры отходов
     """
     well = Run.section.wellbore.well_name
     wellbore = Run.section.wellbore
-    # построение графика
-    other_data, waste_word = get_graphics(all_data, wellbore)  # other_data - тут лежат TVD, угол, азимут
+    # построение графика,  other_data - тут лежат TVD, угол, азимут
+    other_data, waste_word = get_graphics(all_data, wellbore)
 
-    Field = well.pad_name.field
     report_type = {'шаблон': 'единый'}
-    if Field.field_name == 'Северо-Комсомольское':  # используем шаблон с картографическим азимутом
+    # используем шаблон с картографическим азимутом
+    if well.pad_name.field.field_name == 'Северо-Комсомольское':
         filename = 'Северо-Комсомольское_отчёт.xlsx'
         report_type['шаблон'] = 'северокомсомольский'
-    elif Field.field_name == 'Самотлорское':  # шаблон с номером рейса, без абсолютной отметки
+    # шаблон с номером рейса, без абсолютной отметки
+    elif well.pad_name.field.field_name == 'Самотлорское':
         filename = 'Самотлорское_отчёт.xlsx'
         report_type['шаблон'] = 'самотлорское'
 
     file_folder = file_dir + '\\Шаблон\\' + filename
     excel_file = openpyxl.load_workbook(file_folder)
-    # print(all_data['Статические замеры ННБ'])  для отладки
-    # print(all_data['Статические замеры ИГИРГИ'])
-    second_data = all_data['Статические замеры ННБ'] if not wellbore.igirgi_drilling else\
-        all_data['Плановая траектория интерп']
+
     # если бурим по траектории ИГиРГИ заменяем замеры ннб на план
+    nnb_data = all_data['Статические замеры ННБ'] if not wellbore.igirgi_drilling else \
+        all_data['Плановая траектория интерп']
     hor, ver, common = write_data(excel_file,  # горизонтальные, вертикальные, общие отходы
-                                  second_data,
+                                  nnb_data,
                                   all_data['Статические замеры ИГИРГИ'],
                                   other_data,
                                   Run,
@@ -112,27 +109,15 @@ def write_data_in_Excel(all_data: dict, filename: str, short_type: int, Run: obj
              'common': common,
              'word': waste_word,
              }
-    if short_type == 1:  # полный формат с доп данными
-        nnb_dynamic(excel_file, all_data['Динамические замеры ННБ'])
-        write_dynamic_igirgi(excel_file,
-                             all_data['Динамические замеры ИГИРГИ'],
-                             all_data['Статические замеры ИГИРГИ'])
 
-    # # # Отладочная информация в отчёте
-    # excel_file.create_sheet('Отладка', 3)
-    # excel_sheet = excel_file['Отладка']
-    # j = 1
-    # for key, column_dict in all_data.items():
-    #     excel_sheet.cell(row=1, column=j).value = key
-    #     for column_name, data_list in column_dict.items():
-    #         excel_sheet.cell(row=2, column=j).value = column_name
-    #         i = 3
-    #         for value in data_list:
-    #             excel_sheet.cell(row=i, column=j).value = value
-    #             i += 1
-    #         j += 1
+    if 'Динамические замеры ИГИРГИ' in all_data:  # полный формат с доп данными
+        dynamic_nnb(excel_file, all_data['Динамические замеры ННБ'])
+        dynamic_igirgi(excel_file, all_data['Динамические замеры ИГИРГИ'])
+    else:
+        excel_file.remove(excel_file['Динамика ННБ'])
+        excel_file.remove(excel_file['Динамика ИГиРГИ'])
 
-    # добавляем график
+        # добавляем график проекции
     grafic = Image(file_dir + f'\\Report_out\\{wellbore}.png')
     excel_file['Проекции'].add_image(grafic, 'A1')
 
@@ -144,69 +129,54 @@ def write_data_in_Excel(all_data: dict, filename: str, short_type: int, Run: obj
     return report_name, waste
 
 
-def write_dynamic_igirgi(excel_file: openpyxl.workbook.workbook.Workbook,
-                         dynamic_data: dict,
-                         static_data: dict):
-    """
-    Записывает динамические замеры в эксель, помечаем желтым статические данные
-    """
-    # excel_file.create_sheet('Динамика ИГиРГИ', 2)
+def dynamic_igirgi(excel_file: openpyxl.workbook.workbook.Workbook, dynamic_data: dict):
+    """ Записывает динамические замеры в эксель """
     copy_hat(excel_file, 'Динамика ИГиРГИ')
-
     excel_sheet = excel_file['Динамика ИГиРГИ']
-    row = 17
+    row = 18
     for meas in zip(dynamic_data['Глубина'], dynamic_data['Угол'], dynamic_data['Азимут']):
         excel_sheet.cell(row=row, column=1).value = meas[0]
         excel_sheet.cell(row=row, column=2).value = meas[1]
         excel_sheet.cell(row=row, column=3).value = meas[2]
-        if meas[0] in static_data['Глубина']:
-            excel_sheet.cell(row=row, column=1).fill = PatternFill('solid', fgColor='EDFF21')
-            excel_sheet.cell(row=row, column=2).fill = PatternFill('solid', fgColor='EDFF21')
-            excel_sheet.cell(row=row, column=3).fill = PatternFill('solid', fgColor='EDFF21')
         row += 1
 
 
-def nnb_dynamic(excel: openpyxl.workbook.workbook.Workbook, data: dict) -> NoReturn:
+def dynamic_nnb(excel: openpyxl.workbook.workbook.Workbook, dynamic_data: dict) -> NoReturn:
     """Записывает в отчет динамику ННБ"""
-    # print(excel)
-    # excel.create_sheet('Динамика ННБ', 2)
     copy_hat(excel, 'Динамика ННБ')
     excel_sheet = excel['Динамика ННБ']
-    for key, array in data.items():
-        row = 17
-        if key == 'Глубина':
-            col = 1
-        if key == 'Угол':
-            col = 2
-        if key == 'Азимут':
-            col = 3
-        for element in array:
-            excel_sheet.cell(row=row, column=col).value = element
-            row += 1
+    row = 18
+    for meas in zip(dynamic_data['Глубина'], dynamic_data['Угол'], dynamic_data['Азимут']):
+        excel_sheet.cell(row=row, column=1).value = meas[0]
+        excel_sheet.cell(row=row, column=2).value = meas[1]
+        excel_sheet.cell(row=row, column=3).value = meas[2]
+        row += 1
 
 
 def write_data(excel: openpyxl.workbook.workbook.Workbook,
                nnb: dict, igirgi: dict, other: dict,
-               Run: object, report_type: dict) -> float:
-    """ Первая страница запись (Данные)
-        Возвращаем последние посчитанные отходы на для названия файла
+               Run: object, report_type: dict) -> tuple[float, float, float]:
     """
-    Well = Run.section.wellbore.well_name
-    excel_sheet = excel['Данные']
+    Первая страница запись (Данные)
+    Возвращаем последние посчитанные отходы для наименования файла
+    """
+    well_obj = Run.section.wellbore.well_name
+    write_hat(excel['Данные'], well_obj)  # шапка для страницы
 
-    write_hat(excel['Данные'], Well)  # шапка для страницы
-    if report_type['шаблон'] != 'единый':  # обработчик нестандартных шаблонов
-        if report_type['шаблон'] == 'северокомсомольский':
-            sevcom_hat(excel['Данные'], Well)
-            return sevcom_data(excel_sheet, nnb, igirgi, other, Well)
-        elif report_type['шаблон'] == 'самотлорское':
-            samotlor_hat(excel['Данные'], Well)
-            return samotlor_data(excel_sheet, nnb, igirgi, other, Well)
+    # обработчик нестандартных шаблонов
+    if report_type['шаблон'] == 'северокомсомольский':
+        sevcom_hat(excel['Данные'], well_obj)
+        return sevcom_data(excel['Данные'], nnb, igirgi, other, well_obj)
+
+    if report_type['шаблон'] == 'самотлорское':
+        samotlor_hat(excel['Данные'], well_obj)
+        return samotlor_data(excel['Данные'], nnb, igirgi, other, well_obj)
 
     # стандартное заполнение отчёта (можно вынести в отдельную функцию)
-    table_hat(excel['Данные'], Well)  # шапка для таблицы
+    table_hat(excel['Данные'], well_obj)  # шапка для таблицы
     row = 18
-    count = 0  # первую стрчоку не выводим
+    count = 0  # первую строку не выводим
+    excel_sheet = excel['Данные']
     # запись в ячейки
     for meas in zip(igirgi['Глубина'], igirgi['Угол'], igirgi['Азимут'], nnb['Угол'], nnb['Азимут'],
                     other['igirgi_TVDSS'], other['igirgi_delta_x'], other['igirgi_delta_y'], other['igirgi_TVD'],
@@ -218,10 +188,10 @@ def write_data(excel: openpyxl.workbook.workbook.Workbook,
         excel_sheet.cell(row=row, column=1).value = round(meas[0], 2)  # Глубина
         excel_sheet.cell(row=row, column=2).value = round(meas[1], 2)  # Зенитный угол
         excel_sheet.cell(row=row, column=3).value = round(meas[2], 2)  # Азимут картографический
-        if Well.dec is None:
+        if well_obj.dec is None:
             excel_sheet.cell(row=row, column=4).value = '-'  # Азимут магнитный
         else:
-            azimut = round(meas[2] - Well.total_correction, 2)
+            azimut = round(meas[2] - well_obj.total_correction, 2)
             excel_sheet.cell(row=row, column=4).value = azimut if azimut > 0 else azimut + 360  # Азимут магнитный
 
         excel_sheet.cell(row=row, column=5).value = round(meas[5], 2)  # Абсолютная отметка TVDSS
@@ -233,8 +203,8 @@ def write_data(excel: openpyxl.workbook.workbook.Workbook,
         dif_Az = dif_Az if dif_Az >= -300 else dif_Az + 360
         excel_sheet.cell(row=row, column=9).value = round(dif_Az, 2)
         # пошли отходы
-        Ex = (Well.EX if Well.EX is not None else 0)
-        Ny = (Well.NY if Well.NY is not None else 0)
+        Ex = (well_obj.EX if well_obj.EX is not None else 0)
+        Ny = (well_obj.NY if well_obj.NY is not None else 0)
         X_nnb = Ex + meas[10]
         Y_nnb = Ny + meas[9]
 
@@ -257,7 +227,7 @@ def write_data(excel: openpyxl.workbook.workbook.Workbook,
 
 def sevcom_data(excel_sheet: openpyxl.workbook.workbook.Workbook,
                 nnb: dict, igirgi: dict, other: dict,
-                Well: object) -> float:
+                well_obj: object) -> tuple[float, float, float]:
     """Нестандартный формат отчёта с доп колонкой на картографический азимут"""
     row = 18
     count = 0  # первую строку не выводим
@@ -272,16 +242,16 @@ def sevcom_data(excel_sheet: openpyxl.workbook.workbook.Workbook,
         excel_sheet.cell(row=row, column=1).value = round(meas[0], 2)  # Глубина
         excel_sheet.cell(row=row, column=2).value = round(meas[1], 2)  # Зенитный угол
         excel_sheet.cell(row=row, column=3).value = round(meas[2], 2)  # Азимут географический
-        if Well.grid_convergence is None:  # Азимут картографический NEW
+        if well_obj.grid_convergence is None:  # Азимут картографический NEW
             excel_sheet.cell(row=row, column=4).value = '-'
         else:
-            azimut = round(meas[2] - Well.grid_convergence, 2)
+            azimut = round(meas[2] - well_obj.grid_convergence, 2)
             excel_sheet.cell(row=row, column=4).value = azimut if azimut > 0 else azimut + 360
 
-        if Well.dec is None:  # Азимут магнитный
+        if well_obj.dec is None:  # Азимут магнитный
             excel_sheet.cell(row=row, column=5).value = '-'
         else:
-            azimut = round(meas[2] - Well.total_correction, 2)
+            azimut = round(meas[2] - well_obj.total_correction, 2)
             excel_sheet.cell(row=row, column=5).value = azimut if azimut > 0 else azimut + 360
 
         excel_sheet.cell(row=row, column=6).value = round(meas[5], 2)  # Абсолютная отметка TVDSS
@@ -291,10 +261,10 @@ def sevcom_data(excel_sheet: openpyxl.workbook.workbook.Workbook,
         dif_Az = meas[2] - meas[4]  # разница азимут
         dif_Az = dif_Az if dif_Az <= 300 else dif_Az - 360
         dif_Az = dif_Az if dif_Az >= -300 else dif_Az + 360
-        excel_sheet.cell(row=row, column=9).value = round(dif_Az, 2)
+        excel_sheet.cell(row=row, column=10).value = round(dif_Az, 2)
         # пошли отходы
-        Ex = (Well.EX if Well.EX is not None else 0)
-        Ny = (Well.NY if Well.NY is not None else 0)
+        Ex = (well_obj.EX if well_obj.EX is not None else 0)
+        Ny = (well_obj.NY if well_obj.NY is not None else 0)
         X_nnb = Ex + meas[10]
         Y_nnb = Ny + meas[9]
 
@@ -318,14 +288,15 @@ def sevcom_data(excel_sheet: openpyxl.workbook.workbook.Workbook,
 
 def samotlor_data(excel_sheet: openpyxl.workbook.workbook.Workbook,
                   nnb: dict, igirgi: dict, other: dict,
-                  Well: object) -> float:
+                  Well: object) -> tuple[float, float, float]:
     """Нестандартный формат отчёта с номером рейса и без абсолютной отметки"""
     row = 18
     count = 0  # первую строку не выводим
     # запись в ячейки
     for meas in zip(igirgi['Глубина'], igirgi['Угол'], igirgi['Азимут'], nnb['Угол'], nnb['Азимут'],
                     other['igirgi_TVDSS'], other['igirgi_delta_x'], other['igirgi_delta_y'], other['igirgi_TVD'],
-                    other['nnb_delta_x'], other['nnb_delta_y'], other['nnb_TVD'], igirgi['Комментарий'], igirgi['Рейс']):
+                    other['nnb_delta_x'], other['nnb_delta_y'], other['nnb_TVD'], igirgi['Комментарий'],
+                    igirgi['Рейс']):
         if count == 0:
             count += 1
             continue

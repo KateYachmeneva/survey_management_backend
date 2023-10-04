@@ -18,6 +18,5 @@ urlpatterns = [
     path('api/upload_file', views.uploadFile),  # внутри смотрим на то какой файл нам пришел
     # path('api/delete_igirgi_data', views.delete_igirgi_data, name='delete_igirgi_data'),
     # path('data_input/', views.manual_input, name='manual_input'),
-    path('api/comment_copy', views.comment_copy),
-    path('api/projection_param/<int:wellbore_id>', ProjectionParamView.as_view()),
+    path('api/projection_param/<int:wellbore_id>', views.proj_param),
 ]

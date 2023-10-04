@@ -2,6 +2,8 @@ import copy
 import math
 import os
 from math import sin, cos
+from typing import Tuple, Any
+
 from PIL import Image, ImageDraw, ImageFont
 from random import random, randint
 
@@ -18,6 +20,7 @@ def getGorizontalAxes(Inc1, Inc2, Az1, Az2, deltaMD):
     """
     Получаем шаг по X, Y, Z для горизонтальной проекции
     """
+    # print(f'DeltaMd = {deltaMD}, deltaInc = {Inc1}-{Inc2}')
     dInc = math.radians(Inc2 - Inc1)
     dAzim = math.radians(Az2 - Az1)
     I1 = math.radians(Inc1)
@@ -128,7 +131,7 @@ data_name = {'igirgi_file': 'Статические замеры ИГИРГИ',
 
 
 # TODO получаем QueryDict и преобразовываем в словарь листов
-def single_data_graph(data, wellbore: object) -> dict:
+def single_data_graph(data, wellbore: object) -> tuple[Any, Any, Any, Any, Any]:
     """ Значения для графиков проекции одиночные (берём индивидуально под тип траектории)"""
     well = wellbore.well_name
     # для траектории
@@ -139,7 +142,7 @@ def single_data_graph(data, wellbore: object) -> dict:
                                        Depth=data['Глубина'],
                                        RKB=RKB,
                                        VSaz=VSaz)
-    return x1, y1, x2, y2
+    return x1, y1, x2, y2, z
 
 
 def get_graphics(all_data: dict, wellbore: object) -> dict:
@@ -156,7 +159,9 @@ def get_graphics(all_data: dict, wellbore: object) -> dict:
             -igirgi_TVD
     """
     well = wellbore.well_name
+    data_dict = dict()  # словарь с данными, которые необходимо записать в эксель
 
+    # Константы
     # для траектории
     RKB = (84 if well.RKB is None else well.RKB)
     VSaz = (1 if well.VSaz is None else well.VSaz)
@@ -165,13 +170,9 @@ def get_graphics(all_data: dict, wellbore: object) -> dict:
     Ex = (well.EX if well.EX is not None else 0)
     Ny = (well.NY if well.NY is not None else 0)
 
-    data_dict = dict()  # словарь с данными, которые необходимо записать в эксель
-
     fig = plt.figure(figsize=(15, 15))
-
     ax1 = fig.add_subplot(2, 2, 1)
     ax2 = fig.add_subplot(2, 2, 2)
-
     fig.subplots_adjust(wspace=0.5, hspace=0.5)
 
     data = all_data['Плановая траектория']
@@ -196,8 +197,7 @@ def get_graphics(all_data: dict, wellbore: object) -> dict:
                                            Depth=data['Глубина'],
                                            RKB=RKB,
                                            VSaz=VSaz)
-        EW_nnb = x1[-1]  # EW для отходов
-        NS_nnb = y1[-1]  # NS для отходов
+
         data_dict['nnb_TVD'] = copy.deepcopy(z)
         data_dict['nnb_TVDSS'] = copy.deepcopy(y2)
         data_dict['nnb_delta_y'] = copy.deepcopy(y1)
@@ -214,8 +214,8 @@ def get_graphics(all_data: dict, wellbore: object) -> dict:
     ax2.plot(x2, y2, 'b', label='Подрядчик по ННБ')
 
     if not wellbore.igirgi_drilling:
-        EW_nnb = x1[-1]  # EW для отходов
-        NS_nnb = y1[-1]  # NS для отходов
+        X_nnb = x1[-1]  # EW для отходов
+        Y_nnb = y1[-1]  # NS для отходов
         data_dict['nnb_TVD'] = copy.deepcopy(z)
         data_dict['nnb_TVDSS'] = copy.deepcopy(y2)
         data_dict['nnb_delta_y'] = copy.deepcopy(y1)
@@ -230,10 +230,6 @@ def get_graphics(all_data: dict, wellbore: object) -> dict:
 
     ax1.plot(x1, y1, color='orange', label='IGIRGI')
     ax2.plot(x2, y2, color='orange', label='IGIRGI')
-
-    EW_igirgi = x1[-1]  # EW для отходов
-    NS_igirgi = y1[-1]  # NS для отходов
-
     # for item in zip(x1, y1, x2, y2, z, data['Глубина']): print(f"NS: {item[0]} | EW: {item[1]} | Vsect: {item[2]} |
     # TVDSS: {item[3]} | TVD: {item[4]} | DEPTH: {item[5]}")
 
@@ -251,14 +247,25 @@ def get_graphics(all_data: dict, wellbore: object) -> dict:
                                            VSaz=VSaz)
         ax2.plot(x2, y2, 'b--', label='ННБ_Din')
 
+        data_dict['dynamic_nnb_TVD'] = copy.deepcopy(z)
+        data_dict['dynamic_nnb_TVDSS'] = copy.deepcopy(y2)
+        data_dict['dynamic_nnb_delta_y'] = copy.deepcopy(y1)
+        data_dict['dynamic_nnb_delta_x'] = copy.deepcopy(x1)
+
     if 'Динамические замеры ИГИРГИ' in all_data.keys():
         data = all_data['Динамические замеры ИГИРГИ']
+        # print(all_data['Динамические замеры ИГИРГИ'])
         x1, y1, x2, y2, z = get_graph_data(I=data['Угол'],
                                            A=data['Азимут'],
                                            Depth=data['Глубина'],
                                            RKB=RKB,
                                            VSaz=VSaz)
         ax2.plot(x2, y2, '--', color='orange', label='IGIRGI_Din')
+
+        data_dict['dynamic_igirgi_TVD'] = copy.deepcopy(z)
+        data_dict['dynamic_igirgi_TVDSS'] = copy.deepcopy(y2)
+        data_dict['dynamic_igirgi_delta_y'] = copy.deepcopy(y1)
+        data_dict['dynamic_igirgi_delta_x'] = copy.deepcopy(x1)
 
     # собственные границы графиков
     step = 6  # на графике 6 шагов
@@ -283,18 +290,22 @@ def get_graphics(all_data: dict, wellbore: object) -> dict:
     if graph_param is not None:
         if None not in (graph_param.hor_x_min, graph_param.hor_x_max):
             ax1.set_xlim(graph_param.hor_x_min, graph_param.hor_x_max)
+            ax1.set_xticks(np.arange(graph_param.hor_x_min, graph_param.hor_x_max, graph_param.hor_x_del))
         else:
             ax1.set_xlim(ext_dict['min_x'] - additional_delta, ext_dict['max_x'] + additional_delta)
         if None not in (graph_param.hor_y_min, graph_param.hor_y_max):
             ax1.set_ylim(graph_param.hor_y_min, graph_param.hor_y_max)
+            ax1.set_yticks(np.arange(graph_param.hor_y_min, graph_param.hor_y_max, graph_param.hor_y_del))
         else:
             ax1.set_ylim(ext_dict['min_y'] - additional_delta, ext_dict['max_y'] + additional_delta)
 
         if None not in (graph_param.ver_x_min, graph_param.ver_x_max):
             ax2.set_xlim(graph_param.ver_x_min, graph_param.ver_x_max)
+            ax2.set_xticks(np.arange(graph_param.ver_x_min, graph_param.ver_x_max, graph_param.ver_x_del))
 
         if None not in (graph_param.ver_y_min, graph_param.ver_y_max):
             ax2.set_ylim(graph_param.ver_y_min, graph_param.ver_y_max)
+            ax2.set_yticks(np.arange(graph_param.ver_y_min, graph_param.ver_y_max, graph_param.ver_y_del))
     else:
         # создаем квадратную сетку
         ax1.set_xlim(ext_dict['min_x'] - additional_delta, ext_dict['max_x'] + additional_delta)
@@ -313,48 +324,41 @@ def get_graphics(all_data: dict, wellbore: object) -> dict:
 
     ax2.legend(bbox_to_anchor=(-0.015, -0.15), fontsize=10)  # общая подпись
 
-    waste_word = dict()
-    AZ = all_data['Статические замеры ННБ']['Азимут'][-1]  # по горизонтали
-    if 45 <= AZ <= 135:
-        if NS_igirgi == NS_nnb:
-            waste_word['hor'] = ''
-        else:
-            waste_word['hor'] = ('правее' if NS_igirgi < NS_nnb else 'левее')
-    elif 225 <= AZ <= 315:
-        if NS_igirgi == NS_nnb:
-            waste_word['hor'] = ''
-        else:
-            waste_word['hor'] = ('правее' if NS_igirgi > NS_nnb else 'левее')
-    elif 135 <= AZ <= 225:
-        if EW_igirgi == EW_nnb:
-            waste_word['hor'] = ''
-        else:
-            waste_word['hor'] = ('правее' if EW_igirgi < EW_nnb else 'левее')
-    elif AZ >= 315 or AZ <= 45:
-        if EW_igirgi == EW_nnb:
-            waste_word['hor'] = ''
-        else:
-            waste_word['hor'] = ('правее' if EW_igirgi > EW_nnb else 'левее')
-    text_data = get_text_data(data_dict, all_data, Ex, Ny)  # числовые значения отходов
-    if text_data["Отход по вертикали"] == 0:  # по вертикали
-        waste_word['ver'] = ''
-    else:
-        waste_word['ver'] = ('выше' if text_data["Отход по вертикали"] > 0 else 'ниже')
-
     # сохраняем изображение
     plt.savefig(file_dir + f'/Report_out/{wellbore}.png')
+
+    # Числовые и словесные значения отходов последней точки
+    number_data, waste_word = get_number_data(data_dict, all_data)
+    if 'Динамические замеры ИГИРГИ' in all_data:
+        number_data2, waste_word2 = get_number_data(data_dict, all_data, dynamic=True)
 
     # вставка текста на изображение
     image = Image.open(file_dir + f'/Report_out/{wellbore}.png')
     font = ImageFont.truetype("arial.ttf", 25)
     drawer = ImageDraw.Draw(image)
-    drawer.text((180, 820),
-                f'Точка замера: {format(text_data["Точка замера"], ".2f")} м\n'
-                f'Отход по горизонтали: {format(text_data["Отход по горизонтали"], ".2f")} м {waste_word["hor"]}\n'
-                f'Отход по вертикали: {format(text_data["Отход по вертикали"], ".2f")} м {waste_word["ver"]}\n'
-                f'Общий отход: {format(text_data["Общий отход"], ".2f")} м\n'
-                f'Абсолютная отметка: {format(text_data["Абсолютная отметка"], ".2f")} м\n',
-                font=font, fill='black')
+    if 'Динамические замеры ИГИРГИ' in all_data:
+        drawer.text((180, 850),
+                    f'Статические замеры\n\n'
+                    f'Точка замера: {format(number_data["Точка замера"], ".2f")} м\n'
+                    f'Отход по горизонтали: {format(number_data["Отход по горизонтали"], ".2f")} м {waste_word["hor"]}\n'
+                    f'Отход по вертикали: {format(number_data["Отход по вертикали"], ".2f")} м {waste_word["ver"]}\n'
+                    f'Общий отход: {format(number_data["Общий отход"], ".2f")} м\n'
+                    f'Абсолютная отметка: {format(number_data["Абсолютная отметка"], ".2f")} м\n',
+                    font=font, fill='black')
+        drawer.text((880, 850),
+                    f'Динамические замеры\n\n'
+                    f'Точка замера: {format(number_data2["Точка замера"], ".2f")} м\n'
+                    f'Отход по вертикали: {format(number_data2["Отход по вертикали"], ".2f")} м {waste_word2["ver"]}\n'
+                    f'Абсолютная отметка: {format(number_data2["Абсолютная отметка"], ".2f")} м\n',
+                    font=font, fill='black')
+    else:
+        drawer.text((180, 850),
+                    f'Точка замера: {format(number_data["Точка замера"], ".2f")} м\n'
+                    f'Отход по горизонтали: {format(number_data["Отход по горизонтали"], ".2f")} м {waste_word["hor"]}\n'
+                    f'Отход по вертикали: {format(number_data["Отход по вертикали"], ".2f")} м {waste_word["ver"]}\n'
+                    f'Общий отход: {format(number_data["Общий отход"], ".2f")} м\n'
+                    f'Абсолютная отметка: {format(number_data["Абсолютная отметка"], ".2f")} м\n',
+                    font=font, fill='black')
     image.save(file_dir + f'/Report_out/{wellbore}.png')
 
     # для отображения в письме добавляем ()
@@ -363,25 +367,67 @@ def get_graphics(all_data: dict, wellbore: object) -> dict:
     return data_dict, waste_word
 
 
-def get_text_data(data_dict: dict, all_data: dict, Ex, Ny) -> dict():
+def get_number_data(data_dict: dict, all_data: dict, dynamic: bool = False) -> tuple[dict, dict]:
     """Формируем данные для текста на графике"""
-    text_data = dict()
-    text_data['Точка замера'] = all_data['Статические замеры ИГИРГИ']['Глубина'][-1]
-    X_nnb = Ex + data_dict['nnb_delta_x'][-1]
-    Y_nnb = Ny + data_dict['nnb_delta_y'][-1]
-    X_igirgi = Ex + data_dict['igirgi_delta_x'][-1]
-    Y_igigri = Ny + data_dict['igirgi_delta_y'][-1]
+    number_data = dict()
+    if dynamic:
+        number_data['Точка замера'] = all_data['Динамические замеры ИГИРГИ']['Глубина'][-1]
+        X_nnb = data_dict['dynamic_nnb_delta_x'][-1]  # EW для отходов
+        Y_nnb = data_dict['dynamic_nnb_delta_y'][-1]  # NS для отходов
+        X_igirgi = data_dict['dynamic_igirgi_delta_x'][-1]  # EW для отходов
+        Y_igigri = data_dict['dynamic_igirgi_delta_y'][-1]  # NS для отходов
+        number_data['Абсолютная отметка'] = round(data_dict['dynamic_igirgi_TVDSS'][-1], 2)
+        number_data['Отход по вертикали'] = round(data_dict['dynamic_nnb_TVD'][-1] - data_dict['dynamic_igirgi_TVD'][-1], 2)
+    else:
+        number_data['Точка замера'] = all_data['Статические замеры ИГИРГИ']['Глубина'][-1]
+        X_nnb = data_dict['nnb_delta_x'][-1]  # EW для отходов
+        Y_nnb = data_dict['nnb_delta_y'][-1]  # NS для отходов
+        X_igirgi = data_dict['igirgi_delta_x'][-1]  # EW для отходов
+        Y_igigri = data_dict['igirgi_delta_y'][-1]  # NS для отходов
+        number_data['Абсолютная отметка'] = round(data_dict['igirgi_TVDSS'][-1], 2)
+        number_data['Отход по вертикали'] = round(data_dict['nnb_TVD'][-1] - data_dict['igirgi_TVD'][-1], 2)
 
-    text_data['Отход по горизонтали'] = round(math.sqrt((X_nnb - X_igirgi) ** 2 + (Y_nnb - Y_igigri) ** 2), 2)
-    text_data['Отход по вертикали'] = round(data_dict['nnb_TVD'][-1] - data_dict['igirgi_TVD'][-1], 2)
+    number_data['Отход по горизонтали'] = round(math.sqrt((X_nnb - X_igirgi) ** 2 + (Y_nnb - Y_igigri) ** 2), 2)
+
     # при 0 убираем знак в названии
-    text_data['Отход по горизонтали'] = (text_data['Отход по горизонтали'] if text_data['Отход по горизонтали'] != 0.0
-                                         else abs(text_data['Отход по горизонтали']))
-    text_data['Отход по вертикали'] = (text_data['Отход по вертикали'] if text_data['Отход по вертикали'] != 0.0
-                                       else abs(text_data['Отход по вертикали']))
-    text_data['Общий отход'] = round(
-        math.sqrt((X_nnb - X_igirgi) ** 2 + (Y_nnb - Y_igigri) ** 2 + (
+    number_data['Отход по горизонтали'] = (
+        number_data['Отход по горизонтали'] if number_data['Отход по горизонтали'] != 0.0
+        else abs(number_data['Отход по горизонтали']))
+    number_data['Отход по вертикали'] = (
+        number_data['Отход по вертикали'] if number_data['Отход по вертикали'] != 0.0
+        else abs(number_data['Отход по вертикали']))
+    number_data['Общий отход'] = round(
+        math.sqrt((X_nnb  - X_igirgi) ** 2 + (Y_nnb - Y_igigri) ** 2 + (
                 data_dict['nnb_TVD'][-1] - data_dict['igirgi_TVD'][-1]) ** 2), 2)
 
-    text_data['Абсолютная отметка'] = round(data_dict['igirgi_TVDSS'][-1], 2)
-    return text_data
+    # Ключевые слова отходов для письма и для отчёта
+    waste_word = dict()
+    AZ = all_data['Статические замеры ННБ']['Азимут'][-1]  # по горизонтали
+
+    if 45 <= AZ <= 135:
+        if Y_igigri == Y_nnb:
+            waste_word['hor'] = ''
+        else:
+            waste_word['hor'] = ('правее' if Y_igigri < Y_nnb else 'левее')
+    elif 225 <= AZ <= 315:
+        if Y_igigri == Y_nnb:
+            waste_word['hor'] = ''
+        else:
+            waste_word['hor'] = ('правее' if Y_igigri > Y_nnb else 'левее')
+    elif 135 <= AZ <= 225:
+        if X_igirgi == X_nnb:
+            waste_word['hor'] = ''
+        else:
+            waste_word['hor'] = ('правее' if X_igirgi < X_nnb else 'левее')
+    elif AZ >= 315 or AZ <= 45:
+        if X_igirgi == X_nnb:
+            waste_word['hor'] = ''
+        else:
+            waste_word['hor'] = ('правее' if X_igirgi > X_nnb else 'левее')
+
+    if number_data["Отход по вертикали"] == 0:  # по вертикали
+        waste_word['ver'] = ''
+    else:
+        waste_word['ver'] = ('выше' if number_data["Отход по вертикали"] > 0 else 'ниже')
+
+    return number_data, waste_word

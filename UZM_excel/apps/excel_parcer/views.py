@@ -33,49 +33,7 @@ def index(request):
         context['well'] = current_run.section.wellbore.well_name
         context['data'] = Data.objects.filter(run=request.POST['run'], in_statistics=1).order_by('depth')
         context['selected_run'] = current_run
-
-        if 'data-axes' in request.POST:  # Модальная форма с ОСЯМИ
-            axes_data = request.POST['data-axes'].replace(',', '.'). \
-                replace(' ', '').replace('\r', '').replace('\n', '\t').replace('\t\t', '\t').split('\t')
-            # print(axes_data)
-            counter = 0
-            manually_bz = list()
-            manually_by = list()
-            manually_bx = list()
-            manually_gz = list()
-            manually_gy = list()
-            manually_gx = list()
-            manually_depth = list()
-            for data in axes_data:
-                if data == '':
-                    continue
-                if counter == 0:
-                    manually_depth.append(data)
-                elif counter == 1:
-                    manually_gx.append(data)
-                elif counter == 2:
-                    manually_gy.append(data)
-                elif counter == 3:
-                    manually_gz.append(data)
-                elif counter == 4:
-                    manually_bx.append(data)
-                elif counter == 5:
-                    manually_by.append(data)
-                else:
-                    manually_bz.append(data)
-                counter = (0 if counter == 6 else counter + 1)
-            # result - считанные данные
-            result = zip(manually_depth, manually_gx, manually_gy, manually_gz, manually_bx, manually_by, manually_bz)
-            # print(list(result))
-            if request.POST.get('device') != '-----' and request.POST.get('device') != '':
-                telesystem_ind = AxesFileIndex.objects.get(run_id=current_run)
-                telesystem_ind.device = Device.objects.get(device_title=request.POST.get('device'))
-                telesystem_ind.save()
-                result2 = new_measurements(list(result), request.POST.get('device'))  # перобразованные данные
-                write_to_bd(result2, current_run)
-            else:
-                write_to_bd(result, current_run)
-        if 'depth' in request.POST:  # Модальная форма со Скорректированными значениями
+        if 'depth' in request.POST:  # Модальная форма с скорректированными значениями
             depth_data = request.POST['depth'].replace(',', '.').replace(' ', '').replace('\r', ''). \
                 replace('\n', '\t').split('\t')
             Btotal_data = request.POST['Btotal_corr'].replace(',', '.').replace(' ', '').replace('\r', ''). \
@@ -114,8 +72,8 @@ def edit_index(request):
             try:
                 obj = Data.objects.get(id=key[0])
             except:
-                continue
                 print('Замер уже удалён')
+                continue
 
             if items[1][0] == '':
                 if key[1] == 'btotal':
@@ -240,13 +198,24 @@ def graph(request):
 
 
 def uploadAxesFile(request):
+    """ Функция для чтения замеров с осями из переданного файла"""
     if request.method == 'POST':
         if 'file' in request.FILES:
             doc = request.FILES['file']
             fs = FileSystemStorage()
             file_name = fs.save(doc.name, doc)
             current_run = Run.objects.get(id=request.POST.get('run_id'))
-            telesystem = AxesFileIndex.objects.get(run=current_run)
+            try:
+                telesystem = AxesFileIndex.objects.get(run=current_run)
+                NoneCorrectItems = {None, ''}
+                Items = {telesystem.depth, telesystem.GX, telesystem.GY, telesystem.GZ, telesystem.BX,
+                         telesystem.BY, telesystem.BZ, telesystem.string_index, telesystem.device}
+                if len(NoneCorrectItems.intersection(Items)) != 0:
+                    raise AxesFileIndex.DoesNotExist
+            except AxesFileIndex.DoesNotExist:
+                return JsonResponse({'warning': 'Ошибка чтения! Пожалуйста, проверьте настройки импорта для '
+                                                'выбранного рейса!'})
+
             result = parcing_manually("./media/" + file_name,
                                       telesystem.depth,
                                       telesystem.GX,
@@ -258,7 +227,11 @@ def uploadAxesFile(request):
                                       telesystem.string_index, )
             print(result)
             result2 = new_measurements(result, telesystem.device.device_title)
-            write_to_bd(result2, current_run)
+            conflict = write_to_bd(result2, current_run)
+
+            if len(conflict['old']) > 0:
+                print('Открыть модальное окно!')
+                return JsonResponse({'conflict_warning': 'Изменились значения осей!', 'conflict': conflict})
 
     return JsonResponse({'status': 'ok'})
 
